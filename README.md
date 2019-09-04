@@ -1,33 +1,16 @@
 Current Status
 ==============
 
-Server endpoint
----------------
+General
+-------
 
-| Endpoint                    | HEAD | GET | POST | PUT | DELETE |
-|-----------------------------|------|-----|------|-----|--------|
-| /                           | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_active_tasks              | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_all_dbs                   | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_dbs_info                  | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_cluster_setup             | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_db_updates                | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_membership                | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_replicate                 | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_scheduler/jobs            | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_scheduler/docs            | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_node/{node-name}/_stats   | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_node/{node-name}/_system  | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_node/{node-name}/_restart | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_utils                     | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_up                        | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /_uuids                     | ❌    | ❌   | ❌    | ❌   | ❌      |
-| /favicon.ico                | ❌    | ❌   | ❌    | ❌   | ❌      |
-|                             |      |     |      |     |        |
+| Feature        | Status |
+|----------------|--------|
+| Authentication | ✔️      |
+
 
 Databases endpoint
 ------------------
-
 | Endpoint                | HEAD | GET | POST | PUT | DELETE |
 |-------------------------|------|-----|------|-----|--------|
 | /db ✓                   | ✔️    | ✔️   | ❌    | ❌   | ❌      |
@@ -52,4 +35,30 @@ Databases endpoint
 | /db/_missing_revs       | ❌    | ❌   | ❌    | ❌   | ❌      |
 | /db/_revs_diff          | ❌    | ❌   | ❌    | ❌   | ❌      |
 | /db/_revs_limit         | ❌    | ❌   | ❌    | ❌   | ❌      |
+
+
+Server endpoint
+---------------
+| Endpoint                    | HEAD | GET | POST | PUT | DELETE |
+|-----------------------------|------|-----|------|-----|--------|
+| /                           | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_active_tasks              | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_all_dbs                   | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_dbs_info                  | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_cluster_setup             | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_db_updates                | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_membership                | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_replicate                 | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_scheduler/jobs            | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_scheduler/docs            | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_node/{node-name}/_stats   | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_node/{node-name}/_system  | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_node/{node-name}/_restart | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_utils                     | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_up                        | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /_uuids                     | ❌    | ❌   | ❌    | ❌   | ❌      |
+| /favicon.ico                | ❌    | ❌   | ❌    | ❌   | ❌      |
+|                             |      |     |      |     |        |
+
+
 
