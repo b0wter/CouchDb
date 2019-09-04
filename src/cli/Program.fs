@@ -25,7 +25,8 @@ let main argv =
                              | Database.Exists.Result.RequestError e -> "request error: " + e.reason
                 //let result = exists |> Result.mapBoth (fun b -> b |> string) (fun e -> e |> string) //|> (fun (r: Result<string, string>) -> match r with Ok a -> a | Error b -> b)
                 *)
-                let! result = Database.Details.queryMultiple p ["test-db"] //match! Database.Details.querySingle "test-db" with
+                //let! result = Database.Details.queryMultiple p ["test-db"] //match! Database.Details.querySingle "test-db" with
+                let! result = Server.Info.query p
                             //| Database.Details.SingleResult.Failure e ->
                 do printfn "%A" result
                 return 0
