@@ -111,6 +111,18 @@ module Core =
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer)
 
+    /// <summary>
+    /// Creates a post request containing a json serialized payload.
+    /// </summary>
+    let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) =
+        fun () ->
+            let url = combineUrls (p |> DbProperties.baseEndpoint) path
+            let json = content |> Newtonsoft.Json.JsonConvert.SerializeObject
+            Http.AsyncRequest(url, body = TextRequest json, cookieContainer = DefaultCookieContainer, headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ] )
+
+    /// <summary>
+    /// Creates a put request without a body.
+    /// </summary>
     let createPut (p: DbProperties.T) (path: HttpPath) =
         fun () ->
             let url = combineUrls (p |> DbProperties.baseEndpoint) path

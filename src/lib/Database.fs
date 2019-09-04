@@ -147,20 +147,50 @@ module Database =
             doc_count: int
             doc_del_count: int
             instance_start_time: string
-            purge_seq: int
+            purge_seq: string
             sizes: Sizes
             update_seq: string
         }
 
-        type Result
+        type MultipleNames = {
+            keys: string list
+        }
+
+        type MultipleResult
+            = Success of Response []
+            | UnknownDatabase
+            | Unknown of Core.SuccessRequestResult
+            | Failure of Core.ErrorRequestResult
+
+        type SingleResult
             = Success of Response
             | UnknownDatabase
             | Unknown of Core.SuccessRequestResult
             | Failure of Core.ErrorRequestResult
 
-        let query (props: DbProperties.T) (name: string) : Async<Result> =
+        let queryMultiple (props: DbProperties.T) (names: string list) : Async<MultipleResult> =
             async {
-                let request = Core.createPut props name
+                do printfn "Querying db information for keys: %A" names
+                let payload = { keys = names}
+                let request = Core.createJsonPost props "_dbs_info" payload
+                let! result = Core.sendRequest props request 
+                let statusCode = result |> Core.statusCodeFromResult
+                let content = match result with | Ok o -> o.content | Error e -> e.reason
+                let r = match statusCode with
+                        | 200 -> try
+                                    MultipleResult.Success <| JsonConvert.DeserializeObject<Response []>(content)
+                                 with
+                                 | :? JsonException as ex  ->
+                                    MultipleResult.Failure <| Core.errorRequestResult (0, ex.Message)
+                        | 404 -> MultipleResult.UnknownDatabase
+                        | _   -> MultipleResult.Unknown <| Core.successResultRequest (statusCode, content)
+                return r
+            }
+
+        // TODO: merge with function above
+        let querySingle (props: DbProperties.T) (name: string) : Async<SingleResult> =
+            async {
+                let request = Core.createGet props name
                 let! result = Core.sendRequest props request 
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason

@@ -17,13 +17,17 @@ let main argv =
         | DbProperties.DbPropertiesCreateResult.Valid p ->
             match! Core.authenticate p with
             | Ok _ ->
+                (*
                 let! exists = Database.Exists.query p "test-db"
                 let result = match exists with
                              | Database.Exists.Result.Exists -> "exists"
                              | Database.Exists.Result.DoesNotExist -> "does not exist"
                              | Database.Exists.Result.RequestError e -> "request error: " + e.reason
                 //let result = exists |> Result.mapBoth (fun b -> b |> string) (fun e -> e |> string) //|> (fun (r: Result<string, string>) -> match r with Ok a -> a | Error b -> b)
-                do printfn "%s" result
+                *)
+                let! result = Database.Details.queryMultiple p ["test-db"] //match! Database.Details.querySingle "test-db" with
+                            //| Database.Details.SingleResult.Failure e ->
+                do printfn "%A" result
                 return 0
                 (*
                 let! x = Database.all p
