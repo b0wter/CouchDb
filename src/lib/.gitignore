@@ -1,0 +1,10 @@
+out/
+bin/
+obj/
+scripts/credentials.sh
+.idea/
+src/Database/
+Backend.sln.DotSettings.user
+create_nuget.log
+nuget-org-key
+b0wter.fsharp.nuspec
