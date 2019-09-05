@@ -115,10 +115,18 @@ module Core =
     /// Creates a post request containing a json serialized payload.
     /// </summary>
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) =
+        let jsonConverters = System.Collections.Generic.List<Newtonsoft.Json.JsonConverter> ([ FifteenBelow.Json.OptionConverter () :> Newtonsoft.Json.JsonConverter ] |> Seq.ofList)
+        let jsonSettings = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+                                                                  Converters = jsonConverters,
+                                                                  Formatting = Newtonsoft.Json.Formatting.Indented,
+                                                                  NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
         fun () ->
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            let json = content |> Newtonsoft.Json.JsonConvert.SerializeObject
-            Http.AsyncRequest(url, body = TextRequest json, cookieContainer = DefaultCookieContainer, headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ] )
+            let json = Newtonsoft.Json.JsonConvert.SerializeObject(content, jsonSettings)
+            let binary = System.Text.Encoding.UTF8.GetBytes(json)
+            do printfn "Serialized object:"
+            do printfn "%s" json
+            Http.AsyncRequest(url, body = BinaryUpload binary, cookieContainer = DefaultCookieContainer, headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ] )
 
     /// <summary>
     /// Creates a put request without a body.

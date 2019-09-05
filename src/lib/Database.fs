@@ -172,6 +172,7 @@ module Database =
             async {
                 do printfn "Querying db information for keys: %A" names
                 let payload = { keys = names}
+
                 let request = Core.createJsonPost props "_dbs_info" payload
                 let! result = Core.sendRequest props request 
                 let statusCode = result |> Core.statusCodeFromResult
@@ -219,6 +220,43 @@ module Database =
         let query (props: DbProperties.T) : Async<Result> =
             async {
                 return failwith "AllDocuments is not yet implemented!"
+            }
+
+
+    module AddDocument =
+        type Response = {
+            id: string
+            ok: bool
+            rev: string
+        }
+
+        type Result
+            = Created of Response
+            | Accepted of Response
+            | InvalidDatabaseName 
+            | Unauthorized
+            | DatabaseDoesNotExist
+            | DocumentIdConflict
+            | Failure of Core.ErrorRequestResult
+
+        let query (props: DbProperties.T) (dbName: string) (obj: obj) =
+            async {
+                let request = Core.createJsonPost props dbName obj
+                let! result = Core.sendRequest props request
+                let content = match result with | Ok o -> o.content | Error e -> e.reason
+                match result |> Core.statusCodeFromResult with
+                | 201 | 202 ->
+                    try
+                        let response = JsonConvert.DeserializeObject<Response>(content)
+                        return Created response
+                    with
+                    | :? JsonException as ex ->
+                        return Failure <| Core.errorRequestResult (0, ex.Message)
+                | 400 -> return InvalidDatabaseName
+                | 401 -> return Unauthorized
+                | 404 -> return DatabaseDoesNotExist
+                | 409 -> return DocumentIdConflict
+                | x -> return Failure <| Core.errorRequestResult (x, content)
             }
 
     
