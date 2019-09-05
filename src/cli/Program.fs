@@ -33,8 +33,9 @@ let main argv =
                 //let! result = Server.Info.query p
                 let addToDb = fun x -> Database.AddDocument.query p "test-db" x |> Async.RunSynchronously
 
-                let platoon = data.platoons |> List.last
-                let result = Database.AddDocument.query p "test-db" platoon |> Async.RunSynchronously
+                //let platoon = data.platoons |> List.last
+                //let result = Database.AddDocument.query p "test-db" platoon |> Async.RunSynchronously
+                let result = Database.AllDocuments.query p "test-db" |> Async.RunSynchronously
 
                 do printfn "%A" result
 

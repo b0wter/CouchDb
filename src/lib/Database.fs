@@ -208,18 +208,37 @@ module Database =
 
 
     module AllDocuments =
+        type ResponseRowValue = {
+            rev: string
+        }
+        type ResponseRow = {
+            id: System.Guid
+            key: string
+            value: ResponseRowValue
+        }
         type Response = {
             offset: int
-            rows: obj []
+            rows: ResponseRow []
+            total_rows: int
         }
 
         type Result
             = Success of Response
             | Failure of Core.ErrorRequestResult
 
-        let query (props: DbProperties.T) : Async<Result> =
+        let query (props: DbProperties.T) (dbName: string) : Async<Result> =
             async {
-                return failwith "AllDocuments is not yet implemented!"
+                let request = Core.createGet props (sprintf "%s/_all_docs" dbName)
+                let! result = Core.sendRequest props request
+                let statusCode = result |> Core.statusCodeFromResult
+                let content = match result with | Ok o -> o.content | Error e -> e.reason
+                match statusCode with
+                    | 200 -> try
+                                 let json = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(content)
+                                 return Success json
+                             with
+                             | :? JsonException as ex -> return Failure <| Core.errorRequestResult (statusCode, content)
+                    | _ -> return Failure <| Core.errorRequestResult (statusCode, content)
             }
 
 
