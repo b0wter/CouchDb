@@ -14,7 +14,7 @@ Databases endpoint
 | Endpoint                | HEAD | GET | POST | PUT | DELETE |
 |-------------------------|------|-----|------|-----|--------|
 | /db                     | ✔️    | ✔️   | ✔️    | ✔️   | ✔️      |
-| /db/_all_docs           |      | ✔️   | ❌    |     |        |
+| /db/_all_docs           |      | ✔️   | ✔️    |     |        |
 | /db/_design_docs        |      | ❌   | ❌    |     |        |
 | /db/_bulk_get           |      |     | ❌    |     |        |
 | /db/_bulk_docs          |      |     | ❌    |     |        |
