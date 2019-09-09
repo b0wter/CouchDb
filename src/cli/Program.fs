@@ -35,7 +35,12 @@ let main argv =
 
                 //let platoon = data.platoons |> List.last
                 //let result = Database.AddDocument.query p "test-db" platoon |> Async.RunSynchronously
-                let result = Database.AllDocuments.query p "test-db" |> Async.RunSynchronously
+                //let result = Database.AllDocuments.query p "test-db" |> Async.RunSynchronously
+                //let! result = Server.Details.query p ["test-db2"]
+
+                let! result = Database.AllDocuments.queryAll p "test-db"
+                //let! result = Database.AllDocuments.querySelected p "test-db" [ "791f157c2e2003dd065c12973d043781" ]
+                //let! result = Database.AllDocuments.querySelected p "test-db" [ "garbage :D" ]
 
                 do printfn "%A" result
 

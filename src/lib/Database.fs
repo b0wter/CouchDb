@@ -119,94 +119,6 @@ module Database =
             }
             
 
-    module Details =
-        type Cluster = {
-            n: int
-            q: int
-            r: int
-            w: int
-        }
-
-        type Other = {
-            data_size: int
-        }
-
-        type Sizes = {
-            active: int
-            external: int
-            file: int
-        }
-
-        type Response = {
-            cluster: Cluster
-            compact_running: bool
-            data_size: int
-            db_name: string
-            disk_format_version: int
-            disk_size: int
-            doc_count: int
-            doc_del_count: int
-            instance_start_time: string
-            purge_seq: string
-            sizes: Sizes
-            update_seq: string
-        }
-
-        type MultipleNames = {
-            keys: string list
-        }
-
-        type MultipleResult
-            = Success of Response []
-            | UnknownDatabase
-            | Unknown of Core.SuccessRequestResult
-            | Failure of Core.ErrorRequestResult
-
-        type SingleResult
-            = Success of Response
-            | UnknownDatabase
-            | Unknown of Core.SuccessRequestResult
-            | Failure of Core.ErrorRequestResult
-
-        let queryMultiple (props: DbProperties.T) (names: string list) : Async<MultipleResult> =
-            async {
-                do printfn "Querying db information for keys: %A" names
-                let payload = { keys = names}
-
-                let request = Core.createJsonPost props "_dbs_info" payload
-                let! result = Core.sendRequest props request 
-                let statusCode = result |> Core.statusCodeFromResult
-                let content = match result with | Ok o -> o.content | Error e -> e.reason
-                let r = match statusCode with
-                        | 200 -> try
-                                    MultipleResult.Success <| JsonConvert.DeserializeObject<Response []>(content)
-                                 with
-                                 | :? JsonException as ex  ->
-                                    MultipleResult.Failure <| Core.errorRequestResult (0, ex.Message)
-                        | 404 -> MultipleResult.UnknownDatabase
-                        | _   -> MultipleResult.Unknown <| Core.successResultRequest (statusCode, content)
-                return r
-            }
-
-        // TODO: merge with function above
-        let querySingle (props: DbProperties.T) (name: string) : Async<SingleResult> =
-            async {
-                let request = Core.createGet props name
-                let! result = Core.sendRequest props request 
-                let statusCode = result |> Core.statusCodeFromResult
-                let content = match result with | Ok o -> o.content | Error e -> e.reason
-                let r = match statusCode with
-                        | 200 -> try
-                                    Success <| JsonConvert.DeserializeObject<Response>(content)
-                                 with
-                                 | :? JsonException as ex  ->
-                                    Failure <| Core.errorRequestResult (0, ex.Message)
-                        | 404 -> UnknownDatabase
-                        | _   -> Unknown <| Core.successResultRequest (statusCode, content)
-                return r
-            }
-
-
     module AllDocuments =
         type ResponseRowValue = {
             rev: string
@@ -214,10 +126,10 @@ module Database =
         type ResponseRow = {
             id: System.Guid
             key: string
-            value: ResponseRowValue
+            value: ResponseRowValue option
         }
         type Response = {
-            offset: int
+            offset: int option
             rows: ResponseRow []
             total_rows: int
         }
@@ -226,21 +138,35 @@ module Database =
             = Success of Response
             | Failure of Core.ErrorRequestResult
 
-        let query (props: DbProperties.T) (dbName: string) : Async<Result> =
+        type KeyCollection = {
+            keys: string list
+        }
+
+        let private query (props: DbProperties.T) (dbName: string) (request: unit -> Async<FSharp.Data.HttpResponse>) =
             async {
-                let request = Core.createGet props (sprintf "%s/_all_docs" dbName)
+                
                 let! result = Core.sendRequest props request
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
                 match statusCode with
                     | 200 -> try
-                                 let json = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(content)
+                                 let json = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(content, b0wter.FSharp.Utilities.Json.jsonSettings)
                                  return Success json
                              with
-                             | :? JsonException as ex -> return Failure <| Core.errorRequestResult (statusCode, content)
+                             | :? JsonException as ex -> 
+                                do printfn "Encountered a json deserialisation error."
+                                return Failure <| Core.errorRequestResult (statusCode, sprintf "Error: %s %s JSON: %s" ex.Message System.Environment.NewLine content)
                     | _ -> return Failure <| Core.errorRequestResult (statusCode, content)
             }
 
+        let queryAll (props: DbProperties.T) (dbName: string) : Async<Result> =
+            let request = Core.createGet props (sprintf "%s/_all_docs" dbName)
+            query props dbName request
+
+        let querySelected (props: DbProperties.T) (dbName: string) (keys: string list) : Async<Result> =
+            let keyCollection = { keys = keys }
+            let request = Core.createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection
+            query props dbName request
 
     module AddDocument =
         type Response = {

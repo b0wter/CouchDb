@@ -102,6 +102,22 @@ module Core =
                     do printfn "Exception indicates a non-protocol error (e.g. connection refused). Continue evaluation with status code 0!"
                     return Error <| errorRequestResult (0, ex.Message)
         }
+
+    /// <summary>
+    /// Wraps a status code and string contents. This may represent a success as well as an error.
+    /// </summary>
+    type QueryResult = {
+        statusCode: int
+        content: string
+    }
+
+    /// <summary>
+    /// Extracts the status code and the content from a RequestResult.
+    /// </summary>
+    let statusCodeAndContent (result: Result<SuccessRequestResult, ErrorRequestResult>) =
+        let statusCode = result |> statusCodeFromResult
+        let content = match result with | Ok o -> o.content | Error e -> e.reason
+        { statusCode = statusCode; content = content }
     
     /// <summary>
     /// Creates a post request with the given form values.
@@ -115,14 +131,9 @@ module Core =
     /// Creates a post request containing a json serialized payload.
     /// </summary>
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) =
-        let jsonConverters = System.Collections.Generic.List<Newtonsoft.Json.JsonConverter> ([ FifteenBelow.Json.OptionConverter () :> Newtonsoft.Json.JsonConverter ] |> Seq.ofList)
-        let jsonSettings = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
-                                                                  Converters = jsonConverters,
-                                                                  Formatting = Newtonsoft.Json.Formatting.Indented,
-                                                                  NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
         fun () ->
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            let json = Newtonsoft.Json.JsonConvert.SerializeObject(content, jsonSettings)
+            let json = Newtonsoft.Json.JsonConvert.SerializeObject(content, b0wter.FSharp.Utilities.Json.jsonSettings)
             let binary = System.Text.Encoding.UTF8.GetBytes(json)
             do printfn "Serialized object:"
             do printfn "%s" json
