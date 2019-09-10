@@ -18,7 +18,7 @@ Databases endpoint
 | /db/_design_docs        |      | ❌   | ❌    |     |        |
 | /db/_bulk_get           |      |     | ❌    |     |        |
 | /db/_bulk_docs          |      |     | ❌    |     |        |
-| /db/_find               |      |     | 👨‍💻    |     |        |
+| /db/_find               |      |     | 👨‍💻*   |     |        |
 | /db/_index              |      | ❌   | ❌    |     | ❌      |
 | /db/_explain            |      |     | ❌    |     |        |
 | /db/_shards             |      | ❌   |      |     |        |
@@ -36,6 +36,8 @@ Databases endpoint
 | /db/_revs_diff          |      |     | ❌    |     |        |
 | /db/_revs_limit         |      | ❌   |      | ❌   |        |
 
+
+* The ```_find``` endpoint is not yet fully implemented. It currently only allows the user to query for equality. However, multiple selectors are supported as well as subfield matching.
 
 Server endpoint
 ---------------
