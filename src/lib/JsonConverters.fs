@@ -16,11 +16,32 @@ namespace b0wter.CouchDb.Lib
             override this.WriteJson(writer, value, serializer) =
                 let castValue = value :?> Find.Selector
                 let object = Newtonsoft.Json.Linq.JObject()
-                let prop = Newtonsoft.Json.Linq.JProperty(castValue.Name, castValue.TranslateValue())
+                let prop = Newtonsoft.Json.Linq.JProperty(castValue.Name, castValue.TranslatedValue)
+                do object.Add(prop)
+                do object.WriteTo(writer)
+
+            override this.ReadJson(reader, objectType, existingValue, serializer) =
+                failwith "Reading this type (Selector) is not supported."
+        let findSelectorConverter = FindSelectorConverter () :> JsonConverter
+
+        type FindSortConverter() =
+            inherit JsonConverter()
+
+            let comparisonType = typedefof<Find.Sorting>
+
+            override this.CanConvert(t) =
+                // Check wether the given type is derived from the Selector-type.
+                typeof<Find.Selector>.IsAssignableFrom(t)
+
+            override this.WriteJson(writer, value, serializer) =
+                failwith "Not yet implemented!"
+                let castValue = value :?> Find.Selector
+                let object = Newtonsoft.Json.Linq.JObject()
+                let prop = Newtonsoft.Json.Linq.JProperty(castValue.Name, castValue.TranslatedValue)
                 do object.Add(prop)
                 do object.WriteTo(writer)
 
             override this.ReadJson(reader, objectType, existingValue, serializer) =
                 failwith "Reading this type (Selector) is not supported."
 
-        let findSelectorConverter = FindSelectorConverter () :> JsonConverter
+        let findSortConverter = FindSortConverter () :> JsonConverter

@@ -50,15 +50,24 @@ module Find =
     //       Make an optional converter method parameter ('a -> string)
 
     [<AbstractClass>]
-    type Selector(name: string) =
-        member this.Name = name
-        abstract member TranslateValue: unit -> string
+    type Selector() =
+        abstract member Name: string
+        abstract member TranslatedValue: string
 
     type TypedSelector<'a>(name, value: 'a, translator: 'a -> string) = 
-        inherit Selector(name)
+        inherit Selector()
+        override this.Name = name
         member this.Value = value
         member this.Translator = translator
-        override this.TranslateValue () =
+        override this.TranslatedValue =
+            sprintf "%s" (this.Value |> this.Translator)
+
+    type TypedSubFieldSelector<'a>(name, parents: string list, value: 'a, translator: 'a -> string) =
+        inherit Selector()
+        override this.Name = System.String.Join(".", parents |> Seq.ofList) + "." + name
+        member this.Value = value
+        member this.Translator = translator
+        override this.TranslatedValue =
             sprintf "%s" (this.Value |> this.Translator)
 
     type Expression = {

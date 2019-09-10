@@ -41,7 +41,8 @@ let main argv =
                 //let! result = Database.AllDocuments.queryAll p "test-db"
                 //let! result = Database.AllDocuments.querySelected p "test-db" [ "791f157c2e2003dd065c12973d043781" ]
                 //let! result = Database.AllDocuments.querySelected p "test-db" [ "garbage :D" ]
-                let findSelector = Find.TypedSelector("name", "4. Zug", id) //Selector.StringSelector { Selector.TypedSelector.property = "name"; Selector.TypedSelector.value = "4. Zug" }
+                //let findSelector = Find.TypedSelector("name", "4. Zug", id) //Selector.StringSelector { Selector.TypedSelector.property = "name"; Selector.TypedSelector.value = "4. Zug" }
+                let findSelector = Find.TypedSubFieldSelector("name", ["this"; "is"; "nested"], "4. Zug", id)
                 let findParams = Find.createExpression findSelector
                 let! result = Database.Find.query<SharedEntities.Models.Platoon.T> p "test-db" findParams
 
