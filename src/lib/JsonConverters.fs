@@ -7,14 +7,14 @@ namespace b0wter.CouchDb.Lib
         type FindSelectorConverter() =
             inherit JsonConverter()
 
-            let comparisonType = typedefof<Selector.Selector>
+            let comparisonType = typedefof<Find.Selector>
 
             override this.CanConvert(t) =
                 // Check wether the given type is derived from the Selector-type.
-                typeof<Selector.Selector>.IsAssignableFrom(t)
+                typeof<Find.Selector>.IsAssignableFrom(t)
 
             override this.WriteJson(writer, value, serializer) =
-                let castValue = value :?> Selector.Selector
+                let castValue = value :?> Find.Selector
                 let object = Newtonsoft.Json.Linq.JObject()
                 let prop = Newtonsoft.Json.Linq.JProperty(castValue.Name, castValue.TranslateValue())
                 do object.Add(prop)

@@ -227,7 +227,7 @@ module Database =
             | JsonError of Core.JsonDeserialisationError
             | Failure of Core.ErrorRequestResult
 
-        let query<'a> (props: DbProperties.T) (dbName: string) (expression: Selector.Expression) =
+        let query<'a> (props: DbProperties.T) (dbName: string) (expression: Find.Expression) =
             async {
                 let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) (Some Json.findSelectorConverter) expression
                 let! result = Core.sendRequest props request

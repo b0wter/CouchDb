@@ -1,6 +1,6 @@
 namespace b0wter.CouchDb.Lib
 
-module Selector =
+module Find =
 
     type TypeField
         = Null
