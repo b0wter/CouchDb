@@ -19,8 +19,8 @@ module Utilities =
                                                                   Formatting = Newtonsoft.Json.Formatting.Indented,
                                                                   NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
 
-        let jsonSettingsWithCustomConverter (custom: JsonConverter) = 
-            let converters = (custom :: defaultConverters) |> converterListToIList
+        let jsonSettingsWithCustomConverter (customs: JsonConverter list) = 
+            let converters = (customs @ defaultConverters) |> converterListToIList
             Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
                                                    Converters = converters,
                                                    Formatting = Newtonsoft.Json.Formatting.Indented,

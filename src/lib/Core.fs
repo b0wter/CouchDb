@@ -131,13 +131,13 @@ module Core =
     /// Takes a string and deserialises its content.
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
-    let deserializeJson<'TResult> (customConverter: Newtonsoft.Json.JsonConverter option) (content: string) : Result<'TResult, JsonDeserialisationError> =
+    let deserializeJson<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserialisationError> =
         try
-            Ok <| match customConverter with
-                  | Some c ->
-                    Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, c |> Utilities.Json.jsonSettingsWithCustomConverter)
-                  | None ->
+            Ok <| match customConverters with
+                  | [] ->
                     Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Utilities.Json.jsonSettings)
+                  | converters ->
+                    Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
         with
         | :? Newtonsoft.Json.JsonException as ex ->
             Error { json = content; reason = ex.Message }
@@ -147,7 +147,7 @@ module Core =
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
     let deserializeJsonRequestResult<'TResult> (result: SuccessRequestResult) : Result<'TResult, JsonDeserialisationError> =
-        deserializeJson None result.content
+        deserializeJson [] result.content
 
     let analyseRequestResult (result: Result<SuccessRequestResult, ErrorRequestResult>) =
         failwith "Not implemented!"
@@ -160,12 +160,12 @@ module Core =
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer)
 
-    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter option) (content: obj) =
+    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter list) (content: obj) =
         fun () ->
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             let json = match customConverter with
-                        | None -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
-                        | Some c -> Newtonsoft.Json.JsonConvert.SerializeObject(content, c |> Utilities.Json.jsonSettingsWithCustomConverter)
+                        | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
+                        | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
             let binary = System.Text.Encoding.UTF8.GetBytes(json)
             do printfn "Serialized object:"
             do printfn "%s" json
@@ -175,7 +175,7 @@ module Core =
     /// Creates a post request containing a json serialized payload.
     /// </summary>
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) =
-        createCustomJsonPost p path None content
+        createCustomJsonPost p path [] content
 
     /// <summary>
     /// Creates a put request without a body.

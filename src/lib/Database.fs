@@ -151,7 +151,7 @@ module Database =
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
                 match statusCode with
                     | 200 -> 
-                            match Core.deserializeJson<Response> None content with
+                            match Core.deserializeJson<Response> [] content with
                             | Ok r -> return Success r
                             | Error e -> return Failure <| Core.errorRequestResult (statusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json)
                     | _ -> return Failure <| Core.errorRequestResult (statusCode, content)
@@ -229,13 +229,13 @@ module Database =
 
         let query<'a> (props: DbProperties.T) (dbName: string) (expression: Find.Expression) =
             async {
-                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) (Some Json.findSelectorConverter) expression
+                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) [Json.findSelectorConverter; Json.findMultiSelectorConverter] expression
                 let! result = Core.sendRequest props request
                 let queryResult = result |> Core.statusCodeAndContent
 
                 match queryResult.statusCode with
                 | 200 ->
-                    match Core.deserializeJson<Response<'a>> None queryResult.content with
+                    match Core.deserializeJson<Response<'a>> [] queryResult.content with
                     | Ok o -> return Success o
                     | Error e -> return JsonError e
                 | 400 | 401 | 500 ->

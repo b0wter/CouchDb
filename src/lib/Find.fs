@@ -50,7 +50,11 @@ module Find =
     //       Make an optional converter method parameter ('a -> string)
 
     [<AbstractClass>]
+    type BaseSelector () = class end
+
+    [<AbstractClass>]
     type Selector() =
+        inherit BaseSelector()
         abstract member Name: string
         abstract member TranslatedValue: string
 
@@ -70,8 +74,12 @@ module Find =
         override this.TranslatedValue =
             sprintf "%s" (this.Value |> this.Translator)
 
+    type MultiSelector(selectors: Selector list) =
+        inherit BaseSelector ()
+        member this.Selectors = selectors
+
     type Expression = {
-        selector: Selector
+        selector: BaseSelector
         limit: int option
         skip: int option
         sort: Sorting option
@@ -87,7 +95,7 @@ module Find =
         *)
     }
 
-    let createExpression (selector: Selector) =
+    let createExpression (selector: BaseSelector) =
         {
             selector = selector
             limit = None
