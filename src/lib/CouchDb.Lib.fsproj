@@ -6,8 +6,9 @@
     <Compile Include="Utilities.fs" />
     <Compile Include="Credentials.fs" />
     <Compile Include="DbProperties.fs" />
-    <Compile Include="Core.fs" />
     <Compile Include="Selector.fs" />
+    <Compile Include="JsonConverters.fs" />
+    <Compile Include="Core.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>

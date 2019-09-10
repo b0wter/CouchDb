@@ -3,6 +3,7 @@ namespace b0wter.CouchDb.Lib
 module Database =
 
     open Newtonsoft.Json
+    open b0wter.FSharp
 
     module Exists =
         type Response = {
@@ -149,13 +150,10 @@ module Database =
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
                 match statusCode with
-                    | 200 -> try
-                                 let json = Newtonsoft.Json.JsonConvert.DeserializeObject<Response>(content, b0wter.FSharp.Utilities.Json.jsonSettings)
-                                 return Success json
-                             with
-                             | :? JsonException as ex -> 
-                                do printfn "Encountered a json deserialisation error."
-                                return Failure <| Core.errorRequestResult (statusCode, sprintf "Error: %s %s JSON: %s" ex.Message System.Environment.NewLine content)
+                    | 200 -> 
+                            match Core.deserializeJson<Response> None content with
+                            | Ok r -> return Success r
+                            | Error e -> return Failure <| Core.errorRequestResult (statusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json)
                     | _ -> return Failure <| Core.errorRequestResult (statusCode, content)
             }
 
@@ -215,9 +213,9 @@ module Database =
         }
 
         type Response<'a> = {
-            docs: 'a []
+            docs: 'a list
             warning: string option
-            execution_stats: ExecutionStats
+            execution_stats: ExecutionStats option
             bookmarks: string option
         }
 
@@ -226,9 +224,25 @@ module Database =
             | InvalidRequest of Core.ErrorRequestResult
             | NotAuthorized of Core.ErrorRequestResult
             | QueryExecutionError of Core.ErrorRequestResult
+            | JsonError of Core.JsonDeserialisationError
+            | Failure of Core.ErrorRequestResult
 
-        let query (props: DbProperties.T)  =
+        let query<'a> (props: DbProperties.T) (dbName: string) (expression: Selector.Expression) =
+            async {
+                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) (Some Json.findSelectorConverter) expression
+                let! result = Core.sendRequest props request
+                let queryResult = result |> Core.statusCodeAndContent
+
+                match queryResult.statusCode with
+                | 200 ->
+                    match Core.deserializeJson<Response<'a>> None queryResult.content with
+                    | Ok o -> return Success o
+                    | Error e -> return JsonError e
+                | 400 | 401 | 500 ->
+                    return InvalidRequest <| Core.errorRequestResult (queryResult.statusCode, queryResult.content)
+                | _ ->
+                    return Failure <| Core.errorRequestResult (queryResult.statusCode, queryResult.content)
+            }
             // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
             // this is currently not in use.
             
-            0
