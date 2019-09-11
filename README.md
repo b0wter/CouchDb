@@ -119,7 +119,9 @@ let findWithMultipleSelectors () =
 	}
 ```
 
-If you need more control over the search expression you can create the `b0wter.CouchDb.Lib.Find.Expression` yourself instead of using the premade `Find.createExpression`. In case you only require a single selector the previous example boils down to this:
+If you need more control over the search expression you can create the `b0wter.CouchDb.Lib.Find.Expression` yourself instead of using the premade `Find.createExpression`. 
+
+In case you only require a single selector the previous example boils down to this:
 
 ```
 let findWithSingleSelectors () =
@@ -130,3 +132,5 @@ let findWithSingleSelectors () =
 		do printfn "%A" result
 	}
 ```
+
+The last parameter of a `TypedSelector` is a translator function that translates the argument (second parameter) to a string. In the above examples it is easy since it's already a string. So we can use the identity function.
