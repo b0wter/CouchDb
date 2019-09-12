@@ -55,10 +55,11 @@ let main argv =
                                     b0wter.CouchDb.Lib.Mango.ConditionalOperator.parents = []; 
                                     b0wter.CouchDb.Lib.Mango.ConditionalOperator.operation = Mango.Condition.Equal (Mango.DataType.String "4. Zug")
                 }
-                let expression = Mango.createExpression (Mango.Operator.Conditional conditional)
-                let conditionalConverter = MangoConverters.ConditionalJsonConverter ()
+                let combination = Mango.CombinationOperator.And [ conditional |> Mango.Operator.Conditional ] |> Mango.Operator.Combinator
+                let combination2 = Mango.CombinationOperator.And [ combination ] |> Mango.Operator.Combinator
+                let expression = Mango.createExpression combination2 //(Mango.Operator.Conditional combination)
                 let operatorConverter = MangoConverters.OperatorJsonConverter() :> Newtonsoft.Json.JsonConverter
-                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ conditionalConverter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
+                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ operatorConverter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
                 do printfn "%s" serialized
 

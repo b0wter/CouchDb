@@ -44,7 +44,6 @@ namespace b0wter.CouchDb.Lib
 
         let private conditionalOperatorToJObject (c: ConditionalOperator) =
             let object = JObject()
-            let name = if c.parents.IsEmpty then c.name else System.String.Join(".", c.parents |> Seq.ofList) + "." + c.name
             let jProperty = match c.operation with
                             | Less x                    -> dataTypeAndNameToJProperty x "$lt"
                             | LessOrEqual x             -> dataTypeAndNameToJProperty x "$lte"
@@ -64,6 +63,7 @@ namespace b0wter.CouchDb.Lib
             do object.Add(jProperty)
             object
 
+        [<System.Obsolete("Everything moved to the OperatorJsonConverter.")>]
         type ConditionalJsonConverter() =
             inherit Newtonsoft.Json.JsonConverter()
 
@@ -77,18 +77,39 @@ namespace b0wter.CouchDb.Lib
                 let castValue = value :?> ConditionalOperator
                 let jObject = castValue |> conditionalOperatorToJObject
 
-                //let parentJProperty = JProperty(castValue.name, jObject)
-                //do printfn "===Conditional Json Converter==="
-                //do printfn "%s" <| parentJProperty.ToString()
-                //do parentJProperty.WriteTo(writer)
-
                 let parentJObject = JObject()
                 do parentJObject.Add(castValue.name, jObject)
                 do parentJObject.WriteTo(writer)
 
 
-        let private combinationToJProperty = 0
+        let rec private combinationToJObject (combinator: CombinationOperator) : JObject =
+            let matchOperator (o: Operator) =
+                match o with
+                | Combinator combinator -> combinator |> combinationToJObject
+                | Conditional conditional -> let elementSelector = conditional |> conditionalOperatorToJObject
+                                             let name = if conditional.parents.IsEmpty then conditional.name else System.String.Join(".", conditional.parents |> Seq.ofList) + "." + conditional.name
+                                             let parent = JObject()
+                                             do parent.Add(name, elementSelector)
+                                             parent
 
+            let operatorsToJObjects (os: Operator list) =
+                os |> List.map matchOperator
+
+            let property =  match combinator with
+                            | And x -> JProperty("$and", x |> operatorsToJObjects)
+                            | Or x -> JProperty("$or", x |> operatorsToJObjects)
+                            | Not x -> JProperty("$not", x |> matchOperator)
+                            | Nor x -> JProperty("$nor", x |> operatorsToJObjects)
+                            | All x -> JProperty("$all", x |> operatorsToJObjects)
+                            | ElementMatch x -> JProperty("$elemMatch", x |> matchOperator) // TODO: is this correct? should not only be conditionals here?
+                            | AllMatch x -> JProperty("$allMatch", x |> matchOperator)
+            
+            let jObject = JObject()
+            do jObject.Add(property)
+            jObject
+
+
+        [<System.Obsolete("Everything moved to the OperatorJsonConverter.")>]
         type CombinationJsonConverter() =
             inherit Newtonsoft.Json.JsonConverter()
 
@@ -99,7 +120,9 @@ namespace b0wter.CouchDb.Lib
                 failwith "Reading this type (ConditionalOperator) is not supported."
 
             override this.WriteJson(writer, value, _) =
-                failwith "Not yet implemented."
+                let castValue = value :?> CombinationOperator
+                let jObject = castValue |> combinationToJObject
+                jObject.WriteTo(writer)
 
 
         type OperatorJsonConverter() =
@@ -112,16 +135,21 @@ namespace b0wter.CouchDb.Lib
                 failwith "Reading this type (ConditionalOperator) is not supported."
 
             override this.WriteJson(writer, value, _) =
-                (*
-                let serialized = JObject.FromObject(value)
-                do printfn "===JOBJECT==="
-                do printfn "%A" serialized
-                *)
                 let castObject = value :?> Operator
                 match castObject with
-                | Operator.Combinator combinator -> failwith "not implemented"
                 | Operator.Conditional conditional -> 
-                    let jObject = JObject.FromObject(conditional)
+                    // TODO: this is a nasty hack that needs to be addressed
+                    let converter = ConditionalJsonConverter () :> Newtonsoft.Json.JsonConverter
+                    let settings = Utilities.Json.jsonSettingsWithCustomConverter [ converter ]
+                    let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(conditional, settings)
+                    let jObject = JObject.Parse(serialized)
+                    do jObject.WriteTo(writer)
+                | Operator.Combinator combinator -> 
+                    // TODO: this is a nasty hack that needs to be addressed
+                    let converter = CombinationJsonConverter () :> Newtonsoft.Json.JsonConverter
+                    let settings = Utilities.Json.jsonSettingsWithCustomConverter [ converter ]
+                    let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(combinator, settings)
+                    let jObject = JObject.Parse(serialized)
                     do jObject.WriteTo(writer)
                     
 
