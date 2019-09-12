@@ -48,7 +48,33 @@ let main argv =
                 let findParams = Find.createExpression multiSelector
                 let! result = Database.Find.query<SharedEntities.Models.Platoon.T> p "test-db" findParams
 
-                do printfn "%A" result
+                //do printfn "%A" result
+
+                let conditional = { 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.name = "name"; 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.parents = []; 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.operation = Mango.Condition.Equal (Mango.DataType.String "4. Zug")
+                }
+                let expression = Mango.createExpression (Mango.Operator.Conditional conditional)
+                let conditionalConverter = MangoConverters.ConditionalJsonConverter ()
+                let operatorConverter = MangoConverters.OperatorJsonConverter() :> Newtonsoft.Json.JsonConverter
+                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ conditionalConverter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
+                let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
+                do printfn "%s" serialized
+
+                (*
+                //let inProperty = MangoConverters.dataTypesToJProperty "$in" [ Mango.DataType.Bool false; Mango.DataType.String "my string"; Mango.DataType.Int 16 ]
+                let conditional = { 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.name = "name"; 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.parents = []; 
+                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.operation = Mango.Condition.In [ Mango.DataType.Bool false; Mango.DataType.String "my string"; Mango.DataType.Int 16 ]
+                }
+                let expression = Mango.createExpression (Mango.Operator.Conditional conditional)
+                let converter = MangoConverters.ConditionalJsonConverter ()
+                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ converter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
+                let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
+                do printfn "%s" serialized 
+                *)
 
                 //let savedPlatoons = data.platoons |> List.map addToDb
                 //let savedAssignments = data.assignments |> List.map addToDb

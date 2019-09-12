@@ -79,7 +79,7 @@ module Mango =
         /// <summary>
         /// Check whether the field exists or not, regardless of its value. The bool sets wether to check for existance or non-existance.
         /// </summary>
-        | Exists of (bool * DataType)
+        | Exists of bool
         /// <summary>
         /// Check the document field’s type. See <see cref="TypeField"/> for possible field types.
         /// </summary>
@@ -87,11 +87,11 @@ module Mango =
         /// <summary>
         /// The document field must exist in the list provided.
         /// </summary>
-        | In of DataType []
+        | In of DataType list
         /// <summary>
         /// The document field not must exist in the list provided.
         /// </summary>
-        | NotIn of DataType []
+        | NotIn of DataType list
         /// <summary>
         /// Special condition to match the length of an array field in a document. Non-array fields cannot match this condition.
         /// </summary>
@@ -190,3 +190,20 @@ module Mango =
             - stale
         *)
     }
+
+    /// <summary>
+    /// Creates an <see cref="Expression"> with default settings for all fields but the selector.
+    /// </summary>
+    let createExpression (operator: Operator) =
+        {
+            selector = operator
+            limit = None
+            skip = None
+            sort = None
+            use_index = None
+            r = 1
+            bookmark = None
+            update = None
+            stable = None
+            execution_stats = None
+        }   

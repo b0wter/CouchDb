@@ -8,8 +8,8 @@
     <Compile Include="DbProperties.fs" />
     <Compile Include="Find.fs" />
     <Compile Include="Mango.fs" />
-    <Compile Include="JsonConverters.fs" />
     <Compile Include="MangoConverters.fs" />
+    <Compile Include="JsonConverters.fs" />
     <Compile Include="Core.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Server.fs" />
