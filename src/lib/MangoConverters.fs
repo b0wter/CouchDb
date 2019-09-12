@@ -19,7 +19,7 @@ namespace b0wter.CouchDb.Lib
             | Date d            -> JProperty(operation, d.ToString("yyyy-mm-DD"))
             | Id i              -> JProperty(operation, i.ToString())
 
-        let private typeFieldToString (t: Mango.TypeField) =
+        let private typeFieldToString (t: TypeField) =
             match t with
             | Null -> "null"
             | Boolean -> "boolean"

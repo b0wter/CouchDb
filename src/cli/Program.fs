@@ -41,12 +41,6 @@ let main argv =
                 //let! result = Database.AllDocuments.queryAll p "test-db"
                 //let! result = Database.AllDocuments.querySelected p "test-db" [ "791f157c2e2003dd065c12973d043781" ]
                 //let! result = Database.AllDocuments.querySelected p "test-db" [ "garbage :D" ]
-                let findSelector1 = Find.TypedSelector("name", "4. Zug", id) //Selector.StringSelector { Selector.TypedSelector.property = "name"; Selector.TypedSelector.value = "4. Zug" }
-                let findSelector2 = Find.TypedSelector("type", "platoon", id) //Selector.StringSelector { Selector.TypedSelector.property = "name"; Selector.TypedSelector.value = "4. Zug" }
-                let multiSelector = Find.MultiSelector([findSelector1; findSelector2])
-                //let findSelector = Find.TypedSubFieldSelector("name", ["this"; "is"; "nested"], "4. Zug", id)
-                let findParams = Find.createExpression multiSelector
-                let! result = Database.Find.query<SharedEntities.Models.Platoon.T> p "test-db" findParams
 
                 //do printfn "%A" result
 
@@ -58,10 +52,14 @@ let main argv =
                 let combination = Mango.CombinationOperator.And [ conditional |> Mango.Operator.Conditional ] |> Mango.Operator.Combinator
                 let combination2 = Mango.CombinationOperator.And [ combination ] |> Mango.Operator.Combinator
                 let expression = Mango.createExpression combination2 //(Mango.Operator.Conditional combination)
+                let! result = Database.Find.query p "test-db" expression
+                do printfn "%A" result
+                (*
                 let operatorConverter = MangoConverters.OperatorJsonConverter() :> Newtonsoft.Json.JsonConverter
                 let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ operatorConverter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
                 do printfn "%s" serialized
+                *)
 
                 (*
                 //let inProperty = MangoConverters.dataTypesToJProperty "$in" [ Mango.DataType.Bool false; Mango.DataType.String "my string"; Mango.DataType.Int 16 ]

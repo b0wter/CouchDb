@@ -227,9 +227,9 @@ module Database =
             | JsonError of Core.JsonDeserialisationError
             | Failure of Core.ErrorRequestResult
 
-        let query<'a> (props: DbProperties.T) (dbName: string) (expression: Find.Expression) =
+        let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
             async {
-                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) [Json.findSelectorConverter; Json.findMultiSelectorConverter] expression
+                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.ExpressionJsonConverter () :> JsonConverter ] expression
                 let! result = Core.sendRequest props request
                 let queryResult = result |> Core.statusCodeAndContent
 
