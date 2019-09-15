@@ -134,3 +134,18 @@ let findWithSingleSelectors () =
 ```
 
 The last parameter of a `TypedSelector` is a translator function that translates the argument (second parameter) to a string. In the above examples it is easy since it's already a string. So we can use the identity function.
+
+Id and revision properties
+--------------------------
+In order to do any meaningful PUT/POST operations your records need to define an `_id` and a `_rev` property. You can name these fields whatever you like. However, you have to add the `[<JsonProperty("_id")]` and `[<JsonProperty("_rev")]` attribute.
+```
+type MyRecord = {
+	[<JsonProperty("_id")>]
+	myId: System.Guid
+	[<JsonProperty("_rev")>]
+	myRevision: string
+	myA: int
+	myB: float }
+}
+```
+In case you miss these attributes CouchDb will assign these values on it's own. But since their names are unknown to the deserializer these values will never be used. Thus, updating a document will result in the creation of a new document!
