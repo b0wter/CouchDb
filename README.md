@@ -149,3 +149,5 @@ type MyRecord = {
 }
 ```
 In case you miss these attributes CouchDb will assign these values on it's own. But since their names are unknown to the deserializer these values will never be used. Thus, updating a document will result in the creation of a new document!
+
+Why use this approach? I could define interfaces are make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
