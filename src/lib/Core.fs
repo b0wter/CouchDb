@@ -68,6 +68,7 @@ module Core =
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
     let sendRequest (p: DbProperties.T) (request: unit -> Async<HttpResponse>) : Async<Result<SuccessRequestResult, ErrorRequestResult>> =
+        // TODO: Maybe add the `silentHttpErrors` flag to all outgoing request. This will make it so that error status codes do not generate exceptions.
         async {
             try 
                 let! response = request ()
@@ -151,6 +152,17 @@ module Core =
 
     let analyseRequestResult (result: Result<SuccessRequestResult, ErrorRequestResult>) =
         failwith "Not implemented!"
+
+    /// <summary>
+    /// Stores the query parameters. ToString() will be called on all values.
+    /// </summary>
+    type QueryParameters = (string * obj) list
+
+    /// <summary>
+    /// Maps the list of query parameters (whose values are of type object) to strings by calling to string on them.
+    /// </summary>
+    let private formatQueryParameters (parameters: QueryParameters) : (string * string) list =
+        parameters |> List.map (fun (key, value) -> (key, value |> string))
     
     /// <summary>
     /// Creates a post request with the given form values.
@@ -160,8 +172,9 @@ module Core =
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer)
 
-    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter list) (content: obj) =
+    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter list) (content: obj) (queryParameters: QueryParameters) =
         fun () ->
+            let queryParamters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             let json = match customConverter with
                         | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
@@ -169,42 +182,51 @@ module Core =
             let binary = System.Text.Encoding.UTF8.GetBytes(json)
             do printfn "Serialized object:"
             do printfn "%s" json
-            Http.AsyncRequest(url, body = BinaryUpload binary, cookieContainer = DefaultCookieContainer, headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ] )
+            Http.AsyncRequest(url, 
+                              body = BinaryUpload binary, 
+                              cookieContainer = DefaultCookieContainer, 
+                              headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ],
+                              query = queryParamters
+                            )
 
     /// <summary>
     /// Creates a post request containing a json serialized payload.
     /// </summary>
-    let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) =
-        createCustomJsonPost p path [] content
+    let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
+        createCustomJsonPost p path [] content queryParameters
 
     /// <summary>
     /// Creates a put request without a body.
     /// </summary>
-    let createPut (p: DbProperties.T) (path: HttpPath) =
+    let createPut (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
+            let queryParamters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "PUT")
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "PUT", query = queryParamters)
 
-    let createGet (p: DbProperties.T) (path: HttpPath) =
+    let createGet (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
+            let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer)
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, query = queryParameters)
 
     /// <summary>
     /// Creates a simple HEAD request.
     /// </summary>
-    let createHead (p: DbProperties.T) (path: HttpPath) =
+    let createHead (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
+            let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "HEAD")
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "HEAD", query = queryParameters)
 
     /// <summary>
     /// Creates a simple DELETE request.
     /// </summary>
-    let createDelete (p: DbProperties.T) (path: HttpPath) =
+    let createDelete (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
+            let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "DELETE")
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "DELETE", query = queryParameters)
 
     /// <summary>
     /// Sends an authentication request to the database.

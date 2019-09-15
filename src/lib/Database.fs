@@ -17,7 +17,7 @@ module Database =
 
         let query (props: DbProperties.T) (name: string) : Async<Result> =
             async {
-                let request = Core.createHead props name
+                let request = Core.createHead props name []
                 match! Core.sendRequest props request with
                 | Ok o ->
                     let exists = o.statusCode = 200
@@ -42,7 +42,7 @@ module Database =
         /// </summary>
         let query (props: DbProperties.T) : Async<Result> =
             async {
-                let request = Core.createGet props "_all_dbs"
+                let request = Core.createGet props "_all_dbs" []
                 match! Core.sendRequest props request with
                 | Ok o ->
                     try
@@ -71,10 +71,19 @@ module Database =
         let TrueCreateResult = { ok = true}
         let FalseCreateResult = { ok = false}
 
-        let query (props: DbProperties.T) (name: string) : Async<Result> =
+        /// <summary>
+        /// Runs a PUT query that will create a new database. The database name may only consist of the following characters:
+        /// a-z, 0-9, _, $, (, ), +, -, /
+        /// The name *must* begin with a lower-case letter.
+        /// 
+        /// `q`: Shards, aka the number of range partitions. Default is 8, unless overridden in the cluster config.
+        /// 
+        /// `n`: Replicas. The number of copies of the database in the cluster. The default is 3, unless overridden in the cluster config .
+        /// </summary>
+        let query (props: DbProperties.T) (name: string) (q: int) (n: int) : Async<Result> =
             async {
-                let request = Core.createPut props name
-                let! result = Core.sendRequest props request 
+                let request = Core.createPut props name []
+                let! result = Core.sendRequest props request
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
                 let r = match statusCode with
@@ -105,7 +114,7 @@ module Database =
 
         let query (props: DbProperties.T) (name: string) : Async<Result> =
             async {
-                let request = Core.createPut props name
+                let request = Core.createPut props name []
                 let! result = Core.sendRequest props request 
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
@@ -145,7 +154,7 @@ module Database =
 
         let private query (props: DbProperties.T) (dbName: string) (request: unit -> Async<FSharp.Data.HttpResponse>) =
             async {
-                
+                let request = Core.createGet props (sprintf "%s/_all_docs" dbName) []
                 let! result = Core.sendRequest props request
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
@@ -158,12 +167,12 @@ module Database =
             }
 
         let queryAll (props: DbProperties.T) (dbName: string) : Async<Result> =
-            let request = Core.createGet props (sprintf "%s/_all_docs" dbName)
+            let request = Core.createGet props (sprintf "%s/_all_docs" dbName) []
             query props dbName request
 
         let querySelected (props: DbProperties.T) (dbName: string) (keys: string list) : Async<Result> =
             let keyCollection = { keys = keys }
-            let request = Core.createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection
+            let request = Core.createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection []
             query props dbName request
 
     module AddDocument =
@@ -184,7 +193,7 @@ module Database =
 
         let query (props: DbProperties.T) (dbName: string) (obj: obj) =
             async {
-                let request = Core.createJsonPost props dbName obj
+                let request = Core.createJsonPost props dbName obj []
                 let! result = Core.sendRequest props request
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
                 match result |> Core.statusCodeFromResult with
@@ -229,9 +238,11 @@ module Database =
 
         let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
             async {
-                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.ExpressionJsonConverter () :> JsonConverter ] expression
+                let request = Core.createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.OperatorJsonConverter () :> JsonConverter ] expression []
                 let! result = Core.sendRequest props request
                 let queryResult = result |> Core.statusCodeAndContent
+
+                do printfn "Response content:%s%s" System.Environment.NewLine queryResult.content
 
                 match queryResult.statusCode with
                 | 200 ->

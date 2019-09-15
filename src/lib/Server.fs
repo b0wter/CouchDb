@@ -24,7 +24,7 @@ module Server =
 
         let query (props: DbProperties.T) : Async<Result> =
             async {
-                let request = Core.createGet props "/"
+                let request = Core.createGet props "/" []
                 match! Core.sendRequest props request with
                 | Ok o ->
                     do printfn "%s" o.content
@@ -99,7 +99,7 @@ module Server =
                 do printfn "Querying db information for keys: %A" names
                 let payload = { keys = names}
 
-                let request = Core.createJsonPost props "_dbs_info" payload
+                let request = Core.createJsonPost props "_dbs_info" payload []
                 let! result = Core.sendRequest props request 
                 let statusCode = result |> Core.statusCodeFromResult
                 let content = match result with | Ok o -> o.content | Error e -> e.reason
