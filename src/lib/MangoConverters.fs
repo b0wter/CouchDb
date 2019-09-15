@@ -151,16 +151,3 @@ namespace b0wter.CouchDb.Lib
                     let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(combinator, settings)
                     let jObject = JObject.Parse(serialized)
                     do jObject.WriteTo(writer)
-                    
-
-        type ExpressionJsonConverter() =
-            inherit Newtonsoft.Json.JsonConverter()
-
-            override this.CanConvert(t) =
-                typeof<Expression>.IsAssignableFrom(t)
-
-            override this.ReadJson(reader, objectType, existingValue, serializer) =
-                failwith "Reading this type (ConditionalOperator) is not supported."
-
-            override this.WriteJson(writer, value, _) =
-                failwith "Not yet implemented."
