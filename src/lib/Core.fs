@@ -67,7 +67,7 @@ module Core =
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendRequest (p: DbProperties.T) (request: unit -> Async<HttpResponse>) : Async<Result<SuccessRequestResult, ErrorRequestResult>> =
+    let sendRequest (request: unit -> Async<HttpResponse>) : Async<Result<SuccessRequestResult, ErrorRequestResult>> =
         // TODO: Maybe add the `silentHttpErrors` flag to all outgoing request. This will make it so that error status codes do not generate exceptions.
         async {
             try 
@@ -96,9 +96,9 @@ module Core =
                         let! content = b0wter.FSharp.Streams.readToEndAsync (System.Text.Encoding.UTF8) (response.GetResponseStream()) 
                         return Ok <| successResultRequest (response.StatusCode |> int, content)
                     with
-                    | :? InvalidCastException ->
-                        do printfn "WebException could not be cast into a HttpWebResponse."
-                        return Error <| errorRequestResult (0, "Internal error with casting WebException.")
+                    | :? InvalidCastException as e ->
+                        do printfn "WebException could not be cast into a HttpWebResponse. Details: %s | Parent: %s" e.Message ex.Message
+                        return Error <| errorRequestResult (0, sprintf "Internal error with casting WebException. Details: %s | Parent: %s" e.Message ex.Message)
                 else
                     do printfn "Exception indicates a non-protocol error (e.g. connection refused). Continue evaluation with status code 0!"
                     return Error <| errorRequestResult (0, ex.Message)
@@ -170,7 +170,7 @@ module Core =
     let createFormPost (p: DbProperties.T) (path: HttpPath) (formValues: seq<string * string>) =
         fun () ->
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer)
+            Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer, silentHttpErrors = true)
 
     let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter list) (content: obj) (queryParameters: QueryParameters) =
         fun () ->
@@ -202,13 +202,13 @@ module Core =
         fun () ->
             let queryParamters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "PUT", query = queryParamters)
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "PUT", query = queryParamters, silentHttpErrors = true)
 
     let createGet (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
             let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, query = queryParameters)
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, query = queryParameters, silentHttpErrors = true)
 
     /// <summary>
     /// Creates a simple HEAD request.
@@ -217,7 +217,7 @@ module Core =
         fun () ->
             let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "HEAD", query = queryParameters)
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "HEAD", query = queryParameters, silentHttpErrors = true)
 
     /// <summary>
     /// Creates a simple DELETE request.
@@ -226,7 +226,7 @@ module Core =
         fun () ->
             let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "DELETE", query = queryParameters)
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "DELETE", query = queryParameters, silentHttpErrors = true)
 
     /// <summary>
     /// Sends an authentication request to the database.
@@ -236,8 +236,7 @@ module Core =
     let authenticate (p: DbProperties.T) =
         async {
             let credentials = [ ("username", p.credentials.username); ("password", p.credentials.password) ] |> Seq.ofList
-            let form = FormValues credentials
             let request = createFormPost p "_session" credentials 
-            return! (sendRequest p request)
+            return! (sendRequest request)
         }
         
