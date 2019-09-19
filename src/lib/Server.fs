@@ -3,6 +3,7 @@ namespace b0wter.CouchDb.Lib
 module Server =
 
     open Newtonsoft.Json
+    open b0wter.CouchDb.Lib.Core
 
     module Info =
         type VendorInfo = {
@@ -20,18 +21,18 @@ module Server =
 
         type Result
             = Success of Response
-            | Failure of Core.ErrorRequestResult
+            | Failure of ErrorRequestResult
 
         let query (props: DbProperties.T) : Async<Result> =
             async {
-                let request = Core.createGet props "/" []
-                match! Core.sendRequest props request with
+                let request = createGet props "/" []
+                match! sendRequest request with
                 | Ok o ->
                     do printfn "%s" o.content
                     try
                         return Success <| JsonConvert.DeserializeObject<Response>(o.content)
                     with
-                    | :? JsonException as ex -> return Failure <| Core.errorRequestResult (0, ex.Message)
+                    | :? JsonException as ex -> return Failure <| errorRequestResult (0, ex.Message)
                 | Error e ->
                     return Failure e
             }
@@ -88,27 +89,34 @@ module Server =
             /// <summary>
             /// Returned if the keys-field is missing or the number of requested keys exceeded the server's maximum allowed number of keys.
             /// </summary>
-            | KeyError of Core.ErrorRequestResult
+            | KeyError of ErrorRequestResult
             /// <summary>
             /// Generic error case. Refer to the status code and reason for more details.
             /// </summary>
-            | Failure of Core.ErrorRequestResult
+            | Failure of ErrorRequestResult
 
+        /// <summary>
+        /// Returns detailed information for all databases (`names` parameter).
+        /// <summary>
         let query (props: DbProperties.T) (names: string list) : Async<Result> =
             async {
                 do printfn "Querying db information for keys: %A" names
-                let payload = { keys = names}
+                if names.IsEmpty then
+                    return Core.errorRequestResult (400, "The list of names is empty. The request was NOT send to the server")
+                           |> Result.KeyError
+                else
+                    let payload = { keys = names}
 
-                let request = Core.createJsonPost props "_dbs_info" payload []
-                let! result = Core.sendRequest props request 
-                let statusCode = result |> Core.statusCodeFromResult
-                let content = match result with | Ok o -> o.content | Error e -> e.reason
-                match statusCode with
-                | 200 -> try
-                            return Success <| JsonConvert.DeserializeObject<Response []>(content)
-                         with
-                         | :? JsonException as ex  ->
-                            return Failure <| Core.errorRequestResult (0, ex.Message)
-                | 400 -> return KeyError <| Core.errorRequestResult (400, content)
-                | _   -> return Failure <| Core.errorRequestResult (statusCode, content)
+                    let request = createJsonPost props "_dbs_info" payload []
+                    let! result = sendRequest request 
+                    let statusCode = result |> statusCodeFromResult
+                    let content = match result with | Ok o -> o.content | Error e -> e.reason
+                    match statusCode with
+                    | 200 -> try
+                                return Success <| JsonConvert.DeserializeObject<Response []>(content, Utilities.Json.jsonSettings)
+                             with
+                             | :? JsonException as ex  ->
+                                return Failure <| errorRequestResult (0, ex.Message)
+                    | 400 -> return KeyError <| errorRequestResult (400, content)
+                    | _   -> return Failure <| errorRequestResult (statusCode, content)
             }
