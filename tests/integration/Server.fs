@@ -1,25 +1,17 @@
 namespace b0wter.CouchDb.Tests.Integration
-open FsUnit
-open Xunit
 
 module Tests =
 
-    open System
     open Xunit
-    open FsUnit
     open FsUnit.Xunit
     open b0wter.CouchDb.Lib
 
     type Server() =
-        let isAuthenticated = Initialization.authenticateCouchDbClient() |> Async.RunSynchronously 
-        let isInitialized = Initialization.deleteAllDatabases() |> Async.RunSynchronously 
-        
-        let failIfNotInitialized () =
-            if isAuthenticated && isInitialized then () else failwith "The initialization has failed."
+        inherit Utilities.CleanDatabaseTests()
         
         [<Fact>]
-        let ``Retrieving server info returns valid server infos`` () =
-            failIfNotInitialized()
+        member this.``Retrieving server info returns valid server infos`` () =
+            this.FailIfNotInitialized()
             // This tests every field to make sure that the names of the fields match the names of the response fields.
             async {
                 let! result = Server.Info.query Initialization.defaultDbProperties
@@ -36,8 +28,8 @@ module Tests =
             }
             
         [<Fact>]
-        let ``Retrieving server details for existing databases returns database infos`` () =
-            failIfNotInitialized()
+        member this.``Retrieving server details for existing databases returns database infos`` () =
+            this.FailIfNotInitialized()
             async {
                 // This method checks the properties:
                 //    - db_name
@@ -68,8 +60,8 @@ module Tests =
             }
             
         [<Fact>]
-        let ``Retrieving server details for non-existing database returns no database infos`` () =
-            failIfNotInitialized()
+        member this.``Retrieving server details for non-existing database returns no database infos`` () =
+            this.FailIfNotInitialized()
             async {
                 let! result = Server.Details.query Initialization.defaultDbProperties [ "unknown-db-1"; "unknown-db-2" ]
                 match result with
@@ -81,8 +73,8 @@ module Tests =
             }
             
         [<Fact>]
-        let ``Retrieving server details without supplying keys returns an error`` () =
-            failIfNotInitialized()
+        member this.``Retrieving server details without supplying keys returns an error`` () =
+            this.FailIfNotInitialized()
             async {
                 let! result = Server.Details.query Initialization.defaultDbProperties [ ]
                 match result with

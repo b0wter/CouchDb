@@ -7,9 +7,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Initialization.fs" />
-    <Compile Include="CouchDbFixture.fs" />
-    <Compile Include="Server.fs" />
     <Compile Include="Utilities.fs" />
+    <Compile Include="Server.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="b0wter.FSharp" Version="3.0.0" />
