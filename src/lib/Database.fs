@@ -19,6 +19,7 @@ module Database =
 
         let query (props: DbProperties.T) (name: string) : Async<Result> =
             async {
+                if System.String.IsNullOrWhiteSpace(name) then return RequestError <| errorRequestResult (0, "You need to set a database name.") else
                 let request = createHead props name []
                 match! sendRequest request with
                 | Ok o ->

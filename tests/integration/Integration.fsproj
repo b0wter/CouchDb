@@ -6,9 +6,9 @@
     <ProjectReference Include="..\..\src\lib\CouchDb.Lib.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="README.md" />
     <Compile Include="Initialization.fs" />
     <Compile Include="Utilities.fs" />
-    <Compile Include="Server.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="b0wter.FSharp" Version="3.0.0" />
@@ -19,6 +19,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="README.md" />
+    <Compile Include="Server\Info.fs" />
+    <Compile Include="Server\Details.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Database\Exists.fs" />
   </ItemGroup>
 </Project>
