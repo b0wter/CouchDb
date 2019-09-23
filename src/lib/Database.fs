@@ -84,6 +84,7 @@ module Database =
         /// </summary>
         let query (props: DbProperties.T) (name: string) (q: int option) (n: int option) : Async<Result> =
             async {
+                if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| errorRequestResult (0, "You need to set a database name.") else
                 let parameters =
                     [
                         (if q.IsSome then Some ("q", q.Value :> obj) else None)

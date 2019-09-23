@@ -47,4 +47,16 @@ module Create =
                 | _ -> false
                 |> should be True
             }
+            
+        [<Fact>]
+        member this.``Creating a new database with an empty name returns InvalidDbName-result`` () =
+            this.FailIfNotInitialized ()
+            async {
+                let dbName = ""
+                let! result = Database.Create.query Initialization.defaultDbProperties dbName None None
+                match result with
+                | Database.Create.Result.InvalidDbName _ -> true
+                | _ -> false
+                |> should be True
+            }
 
