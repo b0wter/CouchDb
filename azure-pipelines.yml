@@ -16,6 +16,7 @@ variables:
 
 steps:
 - task: Bash@3
+  displayName: "Install docker-compose"
   inputs:
     targetType: 'inline'
     script: |
@@ -25,13 +26,23 @@ steps:
       docker-compose up -d
       cd -
 
+steps:
+- task: Bash@3
+  displayName: "Restore nuget packages"
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet restore
+
 - task: DotNetCoreCLI@2
+  displayName: "Build the solution"
   inputs:
     command: 'build'
     projects: 'CouchDb.sln'
     arguments: '-c "Release"'
 
 - task: DotNetCoreCLI@2
+  displayName: "Run all tests"
   inputs:
     command: 'test'
     projects: 'CouchDb.sln'
