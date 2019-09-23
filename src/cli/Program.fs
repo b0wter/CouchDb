@@ -5,8 +5,8 @@ open b0wter.FSharp
 let main argv =
     async {
         
-        let json = System.IO.File.ReadAllText("/home/b0wter/downloads/test_data.json")
-        let data = Newtonsoft.Json.JsonConvert.DeserializeObject<SharedEntities.Models.ArrangedDocumentContents.T>(json)
+        //let json = System.IO.File.ReadAllText("/home/b0wter/downloads/test_data.json")
+        //let data = Newtonsoft.Json.JsonConvert.DeserializeObject<SharedEntities.Models.ArrangedDocumentContents.T>(json)
         
         let credentials = Credentials.create ("admin", "password")
         let props = DbProperties.create ("localhost", 5984, credentials, DbProperties.ConnectionType.Http)

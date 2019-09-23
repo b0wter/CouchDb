@@ -20,10 +20,4 @@
     <ProjectReference Include="..\lib\CouchDb.Lib.fsproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="SharedEntities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\stimpack\src\shared_entities\bin\Release\netstandard2.0\SharedEntities.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
