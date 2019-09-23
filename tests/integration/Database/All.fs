@@ -20,10 +20,10 @@ module All =
                     let! result = Database.All.query Initialization.defaultDbProperties
                     match result with
                     | Database.All.Result.Success s ->
-                        if dbNames = s then true else false
-                    | Database.All.Result.Failure _ ->
-                        false
-                    |> should equal true
+                        s |> should haveLength dbNames.Length
+                        dbNames |> List.iter (fun x -> s |> should contain x)
+                    | Database.All.Result.Failure e ->
+                        failwith <| sprintf "Request returned an error (status code: %i): %s" e.statusCode e.reason
                 | false ->
                    return failwith "The database creation (preparation) failed."
             }
