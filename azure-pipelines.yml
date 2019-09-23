@@ -28,7 +28,6 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      sleep 120
       cd tests/integration
       docker-compose up -d
       sleep 120
@@ -63,7 +62,7 @@ steps:
     script: |
       HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
       docker run --name couchdb_tests -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest
-      docker cp couchdb_tests:/output/integration.xml /output/
+      docker cp couchdb_tests:/output/integration.xml output/
 
 - task: PublishTestResults@2
   displayName: "Publish test results to the Azure dashboard"
