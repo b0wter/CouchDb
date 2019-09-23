@@ -28,7 +28,7 @@ module Details =
                         info.disk_size |> should be (greaterThan 0)
                     | None -> failwith <| sprintf "The response does not contain a proper Info instance for database: '%s'." response.key
                     
-                do Initialization.createDatabases [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously |> should be True
+                do if Initialization.createDatabases [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously = true then () else failwith "The database preparation failed."
                     
                 let! result = Server.Details.query Initialization.defaultDbProperties [ "test-db-1"; "test-db-2" ]
                 match result with
