@@ -52,7 +52,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      docker run --rm -it -v /tmp/couchdbresults:/output:z  couchdb-lib:latest
+      docker run --rm -v /tmp/couchdbresults:/output:z  couchdb-lib:latest
 
 - task: PublishTestResults@2
   displayName: "Publish test results to the Azure dashboard"
