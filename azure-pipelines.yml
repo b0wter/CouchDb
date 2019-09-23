@@ -54,3 +54,9 @@ steps:
     script: |
       docker run --rm -it -v /tmp/couchdbresults:/output:z  couchdb-lib:latest
 
+- task: PublishTestResults@2
+  displayName: "Publish test results to the Azure dashboard"
+  inputs:
+    testResultsFormat: 'XUnit'
+    testResultsFiles: '/output/*.xml'
+    failTaskOnFailedTests: true
