@@ -28,8 +28,10 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+      sleep 120
       cd tests/integration
       docker-compose up -d
+      sleep 120
       cd -
 
 - task: Bash@3
@@ -48,7 +50,7 @@ steps:
       chmod -R 777 output
 
 - task: Bash@3
-  displayName: "Build docker container"
+  displayName: "Run tests in container"
   inputs:
     targetType: 'inline'
     script: |
