@@ -35,6 +35,13 @@ steps:
       cd -
 
 - task: Bash@3
+  displayName: "Test CouchDb connection"
+  inputs:
+    targetType: 'inline'
+    script: |
+      curl localhost:5984
+
+- task: Bash@3
   displayName: "Build docker container"
   inputs:
     targetType: 'inline'
