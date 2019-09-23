@@ -9,5 +9,3 @@ module Utilities =
         
         member this.FailIfNotInitialized () =
             if this.IsAuthenticated && this.IsInitialized then () else failwith "The initialization has failed."
-        
-

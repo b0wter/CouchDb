@@ -6,7 +6,11 @@
     <ProjectReference Include="..\..\src\lib\CouchDb.Lib.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="README.md" />
+    <Compile Include="Configuration.fs" />
     <Compile Include="Initialization.fs" />
     <Compile Include="Utilities.fs" />
   </ItemGroup>
@@ -14,6 +18,9 @@
     <PackageReference Include="b0wter.FSharp" Version="3.0.0" />
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
     <PackageReference Include="FsUnit.xUnit" Version="3.4.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.console" Version="2.4.1" />

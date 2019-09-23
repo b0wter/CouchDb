@@ -4,6 +4,7 @@ open System.Collections.Generic
 open b0wter.CouchDb.Lib
 open b0wter.FSharp
 open b0wter.FSharp.Operators
+open Microsoft.Extensions.Configuration
 
 module Initialization =
 
@@ -15,8 +16,16 @@ module Initialization =
     /// <summary>
     /// Default db properties (localhost and default port).
     /// </summary>
-    let defaultDbProperties = 
-        match DbProperties.create ("localhost", 5984, defaultCredentials, DbProperties.ConnectionType.Http) with
+    let defaultDbProperties =
+        let configurationRoot = Configuration.getConfigurationRoot ()
+        let host = configurationRoot.GetValue<string>("couchdb_host")
+        let port = configurationRoot.GetValue<int>("couchdb_port")
+        let user = configurationRoot.GetValue<string>("couchdb_user")
+        let password = configurationRoot.GetValue<string>("couchdb_password")
+        let credentials = Credentials.create(user, password)
+        do printfn "Created default connection: %s:%i" host port
+        //match DbProperties.create ("localhost", 5984, defaultCredentials, DbProperties.ConnectionType.Http) with
+        match DbProperties.create (host, port, credentials, DbProperties.ConnectionType.Http) with
         | DbProperties.DbPropertiesCreateResult.Valid properties -> properties
         | DbProperties.DbPropertiesCreateResult.HostIsEmpty -> failwith "Host name is emty."
         | DbProperties.DbPropertiesCreateResult.PortIsInvalid -> failwith "Invalid port"
