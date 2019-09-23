@@ -8,6 +8,5 @@
 # integration tests
 cd /app/tests/integration
 dotnet test --no-build --test-adapter-path:. --logger:xunit
-ll
-cp TestResults/*.xml /output
+cp TestResults/*.xml /output/integration.xml
 cd -

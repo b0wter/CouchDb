@@ -62,7 +62,8 @@ steps:
     targetType: 'inline'
     script: |
       HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
-      docker run --rm -v /tmp/couchdbresults:/output:z -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest
+      docker run --name couchdb_tests -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest
+      docker cp couchdb_tests:/output/integration.xml /output/
 
 - task: PublishTestResults@2
   displayName: "Publish test results to the Azure dashboard"
