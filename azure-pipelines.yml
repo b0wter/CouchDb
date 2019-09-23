@@ -68,5 +68,5 @@ steps:
   displayName: "Publish test results to the Azure dashboard"
   inputs:
     testResultsFormat: 'XUnit'
-    testResultsFiles: '/output/*.xml'
+    testResultsFiles: 'output/*.xml'
     failTaskOnFailedTests: true
