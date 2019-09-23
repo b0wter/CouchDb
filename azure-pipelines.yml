@@ -22,26 +22,35 @@ steps:
     script: |
       sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
       sudo chmod +x /usr/local/bin/docker-compose
+
+- task: Bash@3
+  displayName: "Start a CouchDb instance"
+  inputs:
+    targetType: 'inline'
+    script: |
       cd tests/integration
       docker-compose up -d
       cd -
 
 - task: Bash@3
-  displayName: "Restore nuget packages"
+  displayName: "Build docker container"
   inputs:
     targetType: 'inline'
     script: |
-      dotnet restore
+      docker build -t couchdb-lib .
 
-- task: DotNetCoreCLI@2
-  displayName: "Build the solution"
+- task: Bash@3
+  displayName: "Create test result output folder"
   inputs:
-    command: 'build'
-    projects: 'CouchDb.sln'
-    arguments: '-c "Release"'
+    targetType: 'inline'
+    script: |
+      mkdir output
+      chmod -R 777 output
 
-- task: DotNetCoreCLI@2
-  displayName: "Run all tests"
+- task: Bash@3
+  displayName: "Build docker container"
   inputs:
-    command: 'test'
-    projects: 'CouchDb.sln'
+    targetType: 'inline'
+    script: |
+      docker run --rm -it -v /tmp/couchdbresults:/output:z  couchdb-lib:latest
+
