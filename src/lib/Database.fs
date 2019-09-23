@@ -68,7 +68,6 @@ module Database =
             | InvalidDbName of ErrorRequestResult
             | Unauthorized of ErrorRequestResult
             | AlreadyExists of ErrorRequestResult
-            | HttpError of ErrorRequestResult
             | Unknown of SuccessRequestResult
 
         let TrueCreateResult = { ok = true}
