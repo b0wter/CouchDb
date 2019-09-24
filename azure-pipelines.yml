@@ -36,7 +36,7 @@ steps:
     script: |
       cd tests/integration
       docker-compose up -d
-      sleep 120
+      scripts/up-test.sh localhost 5984
       cd -
 
 - task: Bash@3
