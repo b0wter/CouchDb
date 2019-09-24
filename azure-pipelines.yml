@@ -36,15 +36,7 @@ steps:
     script: |
       cd tests/integration
       docker-compose up -d
-      scripts/up-test.sh localhost 5984
       cd -
-
-- task: Bash@3
-  displayName: "Test CouchDb connection"
-  inputs:
-    targetType: 'inline'
-    script: |
-      curl localhost:5984
 
 - task: Bash@3
   displayName: "Build docker container"
@@ -60,6 +52,13 @@ steps:
     script: |
       mkdir output
       chmod -R 777 output
+
+- task: Bash@3
+  displayName: "Wait for CouchDb to be online"
+  inputs:
+    targetType: 'inline'
+    script: |
+      scripts/up-test.sh localhost 5984
 
 - task: Bash@3
   displayName: "Run tests in container"
