@@ -22,12 +22,11 @@ If you are in doubt please submit an issue!
 Features
 =======
 
-General
--------
-
-| Feature        | Status |
-|----------------|--------|
-| Authentication | ✔️      |
+| Authentication | Status |
+|--------|--------|
+| Cookie | ✔️      |
+| Basic  | ❌      |
+| Proxy  | ❌      |
 
 
 Databases endpoint
@@ -151,6 +150,10 @@ let findWithSingleSelectors () =
 
 The last parameter of a `TypedSelector` is a translator function that translates the argument (second parameter) to a string. In the above examples it is easy since it's already a string. So we can use the identity function.
 
+More examples
+-------------
+Please take a look at the [integration tests](https://github.com/b0wter/CouchDb/tree/master/tests/integration) for more examples. Each query is run at least once.
+
 Id and revision properties
 --------------------------
 In order to do any meaningful PUT/POST operations your records need to define an `_id` and a `_rev` property. You can name these fields whatever you like. However, you have to add the `[<JsonProperty("_id")]` and `[<JsonProperty("_rev")]` attribute.
@@ -198,7 +201,7 @@ $ docker run --rm -it -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pas
 
 There are two ways to run the tests. If you have the dotnet sdk installed you can use the `dotnet test` command, otherwise you'll have to rely on a `Dockerfile`.
 
-### Use dotnet cli
+#### Use dotnet cli
 If you just want to see the results of the test just run the following command in the repository root:
 ```
 $ dotnet test
@@ -209,7 +212,7 @@ $ dotnet test --test-adapter-path:. --logger:xunit
 ```
 instead. The results will be stored in `tests/integration/TestResults/TestResults.xml`.
 
-### Use docker
+#### Use docker
 The repository root contains a `Dockerfile` that compiles its contents. You will need to first build the image and then run it:
 ```
 $ docker build -t couchdb-lib .
@@ -224,3 +227,16 @@ $ docker cp couchdb_tests:/output/integration.xml <YOUR_LOCAL_FOLDER>
 $ docker rm couchdb_tests
 ```
 after the tests have finished.
+
+### Why not use a new container instance for each test?
+
+The latest version of the CouchDb Docker image takes several minutes to start.
+This prohibits any useful use of fresh containers for every tests.
+Once this issue has been fixed I will look into changing the behaviour.
+
+### Can't the tests start the container?
+
+I am currently looking into using 
+[Docker.Net](https://github.com/microsoft/Docker.DotNet) to 
+automatically create and run the docker container. However, this work
+is not finished yet.
