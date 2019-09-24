@@ -1,10 +1,26 @@
 Current Status
 ==============
 
-[![Build Status](https://b0wter.visualstudio.com/b0wter.CouchDb/_apis/build/status/b0wter.CouchDb?branchName=master)](https://b0wter.visualstudio.com/b0wter.CouchDb/_build/latest?definitionId=28&branchName=master)
+Current state of the integration tests: [![Build Status](https://b0wter.visualstudio.com/b0wter.CouchDb/_apis/build/status/b0wter.CouchDb?branchName=master)](https://b0wter.visualstudio.com/b0wter.CouchDb/_build/latest?definitionId=28&branchName=master)
 
 This project is currently in development and by no means production ready! Please consult the tables below to see which features are supported. The endpoints refer to the endpoints listed in the official CouchDb documentation.
 Since this library is in its infancy there is no nuget package available. I plan to add automated builds after completing the basic feature set.
+
+Contributing
+------------
+Contributions (bug fixes, features, ...) are welcome! Please submit a pull request. I will merge the PR if it satisfies the following requirements:
+
+ * The integration tests succeed.
+ * You have added tests (if it's a new feature) or
+ * You have fixed tests (it it's a bugfix)
+ * The new methods/member have XML documentation tags
+ * I am convinced it will not break anything :)
+
+If you are in doubt please submit an issue!
+
+
+Features
+=======
 
 General
 -------
@@ -150,6 +166,63 @@ type MyRecord = {
 	myB: float }
 }
 ```
-In case you miss these attributes CouchDb will assign these values on it's own. But since their names are unknown to the deserializer these values will never be used. Thus, updating a document will result in the creation of a new document!
+In case you miss these attributes CouchDb will assign these values on its own. But since their names are unknown to the deserializer these values will never be used. Thus, updating a document will result in the creation of a new document!
 
 Why use this approach? I could define interfaces are make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
+
+Tests
+=====
+
+Integration tests
+-----------------
+The repository comes with a project for integration tests. These tests require you to have a couchdb server running. You need to set the connection details either in `tests/integration/appsettings.json` or pass them as environment variables, e.g.:
+```
+COUCHDB_HOST=localhost
+COUCHDB_PORT=5984
+COUCHDB_USER=admin
+COUCHDB_PASSWORD=password
+```
+
+### Running a local CouchDb server
+
+The two recommended ways to start a local CouchDb instance use docker. If you want to install CouchDb on your local system please consult the os specific instructions on the CouchDb page.
+
+#### Using docker-compose
+There is a `docker-compose.yml` in `tests/integration`. Simply change into that directory and run `docker-compose up` to start a server on the default port (5984), username "admin" and password "password".
+
+#### Using docker run
+The following command is the same as running the `docker-compose.yml`. It will automatically destroy the container on exit.
+```
+$ docker run --rm -it -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password
+``` 
+
+### Running the tests
+
+There are two ways to run the tests. If you have the dotnet sdk installed you can use the `dotnet test` command, otherwise you'll have to rely on a `Dockerfile`.
+
+### Use dotnet cli
+If you just want to see the results of the test just run the following command in the repository root:
+```
+$ dotnet test
+```
+If you want to generate an XML result file use:
+```
+$ dotnet test --test-adapter-path:. --logger:xunit
+```
+instead. The results will be stored in `tests/integration/TestResults/TestResults.xml`.
+
+### Use docker
+The repository root contains a `Dockerfile` that compiles its contents. You will need to first build the image and then run it:
+```
+$ docker build -t couchdb-lib .
+$ HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+$ docker run --rm --name couchdb-tests -it -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest
+```
+This will show you the test results in the terminal and delete the container after running the tests. You *must* supply the ip address of the CouchDb server even if it's running on localhost since localhost inside the test container is not the same as localhost on your machine! The given command expects the CouchDb to run as a docker container with exposed port (5984).
+
+Test results are automatically generated. To retrieve them you can either mount a local folder to `/output` in the container or remove the `--rm` flag and run
+```
+$ docker cp couchdb_tests:/output/integration.xml <YOUR_LOCAL_FOLDER>
+$ docker rm couchdb_tests
+```
+after the tests have finished.
