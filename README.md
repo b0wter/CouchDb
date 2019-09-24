@@ -1,7 +1,7 @@
 Current Status
 ==============
 
-Current state of the integration tests: [![Build Status](https://b0wter.visualstudio.com/b0wter.CouchDb/_apis/build/status/b0wter.CouchDb?branchName=master)](https://b0wter.visualstudio.com/b0wter.CouchDb/_build/latest?definitionId=28&branchName=master)
+[![Build Status](https://b0wter.visualstudio.com/b0wter.CouchDb/_apis/build/status/b0wter.CouchDb?branchName=master)](https://b0wter.visualstudio.com/b0wter.CouchDb/_build/latest?definitionId=28&branchName=master)
 
 This project is currently in development and by no means production ready! Please consult the tables below to see which features are supported. The endpoints refer to the endpoints listed in the official CouchDb documentation.
 Since this library is in its infancy there is no nuget package available. I plan to add automated builds after completing the basic feature set.
@@ -57,8 +57,6 @@ Databases endpoint
 | /db/_revs_diff          |      |     | ❌    |     |        |
 | /db/_revs_limit         |      | ❌   |      | ❌   |        |
 
-
-* The ```_find``` endpoint is not yet fully implemented. It currently only allows the user to query for equality. However, multiple selectors are supported as well as subfield matching.
 
 Server endpoint
 ---------------
