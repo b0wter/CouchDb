@@ -126,7 +126,8 @@ module Initialization =
                         | Database.Delete.Result.Accepted deleted -> return deleted.ok
                         | Database.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.reason
                         | Database.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.reason
-                        | Database.Delete.Result.InvalidDatabase x -> return failwith <| sprintf "Could not delete database because of an InvalidDatabase error. Details: %s" x.reason
+                        | Database.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.reason
+                        | Database.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.reason
                     })
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
