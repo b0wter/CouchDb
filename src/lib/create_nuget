@@ -29,8 +29,5 @@ echo "Restoring projects."
 dotnet restore
 echo "Building release."
 dotnet build -c "Release"
-cd -
 echo "Packing release."
 dotnet pack -c "Release" 	
-echo "Pushing to nuget.org"
-#dotnet nuget push lib/Release/b0wter.CouchDb.*.nupkg -k $NUGET_ORG_KEY -s https://api.nuget.org/v3/index.json | tee create_nuget.log
