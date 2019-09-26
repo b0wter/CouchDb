@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+NUGET_ORG_KEY=garbage
+
+rm b0wter.couchdb.nuspec
+set -e
+
+if [ -z "$NUGET_ORG_KEY" ]
+then
+	echo "\$NUGET_ORG_KEY is empty. Cannot continue."
+	exit 1
+else
+	echo "\$NUGET_ORG_KEY is set, no need to do anything"
+fi
+
+GIT_TAG=$(git describe --tags --abbrev=0)
+GIT_MESSAGE=$(sed 's/ /\\ /g' <<< $(git log -1 --pretty=%B | tr '\n' ' '))
+echo "Latest tag: $GIT_TAG; Latest commit: $GIT_MESSAGE"
+echo "Creating temporary nuspec file from template."
+sed "s/%VERSION%/$GIT_TAG/g" b0wter.couchdb.nuspec.template > b0wter.couchdb.nuspec
+sed -i 's/%RELEASE_NOTES%/'"$GIT_MESSAGE"'/g' b0wter.couchdb.nuspec
+
+echo "Deleting obj and bin folders."
+rm -rf bin obj lib
+set -e
+echo "Cleaning project."
+dotnet clean
+echo "Restoring projects."
+dotnet restore
+echo "Building release."
+dotnet build -c "Release"
+cd -
+echo "Packing release."
+dotnet pack -c "Release" 	
+echo "Pushing to nuget.org"
+#dotnet nuget push lib/Release/b0wter.CouchDb.*.nupkg -k $NUGET_ORG_KEY -s https://api.nuget.org/v3/index.json | tee create_nuget.log
