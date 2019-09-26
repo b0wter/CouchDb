@@ -68,6 +68,7 @@ steps:
       HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
       docker run --name couchdb_tests -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest test
       docker cp couchdb_tests:/output/integration.xml output/
+      docker rm couchdb_tests
 
 - task: PublishTestResults@2
   displayName: "Publish test results to the Azure dashboard"
@@ -86,6 +87,7 @@ steps:
       HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
       docker run --name couchdb_tests -e NUGET_ORG_KEY=$NUGET_ORG_KEY couchdb-lib:latest nuget
       docker cp couchdb_tests:/output/couchdb.nupkg $(Build.ArtifactStagingDirectory)
+      docker rm couchdb_tests
 
 - task: PublishBuildArtifacts@1
   inputs:
