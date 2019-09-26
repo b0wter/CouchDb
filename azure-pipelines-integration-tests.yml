@@ -75,3 +75,18 @@ steps:
     testResultsFormat: 'XUnit'
     testResultsFiles: 'output/*.xml'
     failTaskOnFailedTests: true
+
+- task: Bash@3
+  displayName: "Create a nuget package"
+  inputs:
+    targetType: 'inline'
+    script: |
+      cd src/lib
+      ./create_nuget
+      cp bin/Release/netstandard2.0/*.nupkg $(Build.ArtifactStagingDirectory)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'nuget-package'
+    publishLocation: 'Container'
