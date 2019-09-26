@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-NUGET_ORG_KEY=garbage
-
 rm b0wter.couchdb.nuspec
 set -e
 
@@ -20,14 +18,5 @@ echo "Creating temporary nuspec file from template."
 sed "s/%VERSION%/$GIT_TAG/g" b0wter.couchdb.nuspec.template > b0wter.couchdb.nuspec
 sed -i 's/%RELEASE_NOTES%/'"$GIT_MESSAGE"'/g' b0wter.couchdb.nuspec
 
-echo "Deleting obj and bin folders."
-rm -rf bin obj lib
-set -e
-echo "Cleaning project."
-dotnet clean
-echo "Restoring projects."
-dotnet restore
-echo "Building release."
-dotnet build -c "Release"
 echo "Packing release."
-dotnet pack -c "Release" 	
+dotnet pack -c "Release" --no-build

@@ -29,12 +29,3 @@ module Utilities =
             async {
                 return! toRun ()
             }
-
-    let unionCases<'a> () =
-        if FSharpType.IsUnion(typeof<'a>) then
-            let cases = FSharpType.GetUnionCases typeof<'a>
-            
-            FsUnit.CustomMatchers.True
-            0
-        else
-            1

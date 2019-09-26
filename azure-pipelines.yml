@@ -66,7 +66,7 @@ steps:
     targetType: 'inline'
     script: |
       HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
-      docker run --name couchdb_tests -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest
+      docker run --name couchdb_tests -e COUCHDB_HOST=$HOSTIP couchdb-lib:latest test
       docker cp couchdb_tests:/output/integration.xml output/
 
 - task: PublishTestResults@2
@@ -78,12 +78,14 @@ steps:
 
 - task: Bash@3
   displayName: "Create a nuget package"
+  env:
+    NUGET_ORG_KEY: $(NUGET_KEY)
   inputs:
     targetType: 'inline'
     script: |
-      cd src/lib
-      ./create_nuget
-      cp bin/Release/netstandard2.0/*.nupkg $(Build.ArtifactStagingDirectory)
+      HOSTIP=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+      docker run --name couchdb_tests -e NUGET_ORG_KEY=$NUGET_ORG_KEY couchdb-lib:latest nuget
+      docker cp couchdb_tests:/output/couchdb.nupkg $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
   inputs:
