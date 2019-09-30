@@ -2,9 +2,6 @@ namespace b0wter.CouchDb.Tests.Integration
 
 module Utilities =
     
-    open Microsoft.FSharp.Quotations.Patterns
-    open Microsoft.FSharp.Reflection
-    
     [<AbstractClass>]
     type CleanDatabaseTests() =
         member this.IsAuthenticated = Initialization.authenticateCouchDbClient() |> Async.RunSynchronously 
@@ -29,3 +26,4 @@ module Utilities =
             async {
                 return! toRun ()
             }
+            
