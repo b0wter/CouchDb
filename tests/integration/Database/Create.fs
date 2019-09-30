@@ -1,5 +1,4 @@
 namespace b0wter.CouchDb.Tests.Integration.Database
-open System.Data
 
 module Create =
     

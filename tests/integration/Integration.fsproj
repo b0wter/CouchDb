@@ -36,7 +36,7 @@
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />
     <Compile Include="Server\Info.fs" />
-    <Compile Include="Server\Details.fs" />
+    <Compile Include="Server\DbsInfo.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\Exists.fs" />
