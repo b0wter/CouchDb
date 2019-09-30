@@ -1,4 +1,5 @@
 namespace b0wter.CouchDb.Tests.Integration.Database
+open System.Data
 
 module Create =
     
@@ -6,6 +7,7 @@ module Create =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
+    open CustomMatchers
     
     type Tests() =
         inherit Utilities.CleanDatabaseTests()
@@ -15,10 +17,7 @@ module Create =
             async {
                 let dbName = "test-db-1"
                 let! result = Database.Create.query Initialization.defaultDbProperties dbName None None
-                match result with
-                | Database.Create.Result.Created _ | Database.Create.Result.Accepted _ -> true
-                | _ -> false
-                |> should be True
+                result |> should be (ofCase <@ Database.Create.Result.Created, Database.Create.Result.Accepted @>)
             }
 
         [<Fact>]
@@ -26,10 +25,7 @@ module Create =
             async {
                 let dbName = "00-this-[is]-{an}-inv@lid-name"
                 let! result = Database.Create.query Initialization.defaultDbProperties dbName None None
-                match result with
-                | Database.Create.Result.InvalidDbName _ -> true
-                | _ -> false
-                |> should be True
+                result |> should be (ofCase <@ Database.Create.Result.InvalidDbName @>)
             }
 
         [<Fact>]
@@ -39,10 +35,7 @@ module Create =
                 let createCommand = fun () -> Database.Create.query Initialization.defaultDbProperties dbName None None
                 do createCommand () |> Async.RunSynchronously |> ignore
                 let! result = createCommand ()
-                match result with
-                | Database.Create.Result.AlreadyExists _ -> true
-                | _ -> false
-                |> should be True
+                result |> should be (ofCase <@ Database.Create.Result.AlreadyExists @>)
             }
             
         [<Fact>]
@@ -50,9 +43,6 @@ module Create =
             async {
                 let dbName = ""
                 let! result = Database.Create.query Initialization.defaultDbProperties dbName None None
-                match result with
-                | Database.Create.Result.InvalidDbName _ -> true
-                | _ -> false
-                |> should be True
+                result |> should be (ofCase <@ Database.Create.Result.InvalidDbName @>)
             }
 

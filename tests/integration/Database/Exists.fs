@@ -6,6 +6,7 @@ module Exists =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
+    open CustomMatchers
     
     type Tests() =
         inherit Utilities.CleanDatabaseTests()
@@ -17,11 +18,7 @@ module Exists =
                match! Initialization.createDatabases dbNames with
                | true ->
                    let! result = Database.Exists.query Initialization.defaultDbProperties dbNames.Head
-                   match result with
-                   | Database.Exists.Result.Exists -> true
-                   | Database.Exists.Result.DoesNotExist -> false
-                   | Database.Exists.Result.RequestError _ -> false
-                   |> should equal true
+                   result |> should be (ofCase<@ Database.Exists.Result.Exists @>)
                | false ->
                    return failwith "The database creation (preparation) failed."
             }
@@ -31,11 +28,7 @@ module Exists =
             async {
                let dbName = "non-existing-db-1"
                let! result = Database.Exists.query Initialization.defaultDbProperties dbName
-               match result with
-               | Database.Exists.Result.Exists -> false
-               | Database.Exists.Result.DoesNotExist -> true
-               | Database.Exists.Result.RequestError _ -> false
-               |> should equal true
+               result |> should be (ofCase <@ Database.Exists.DoesNotExist @>)
             }
 
         [<Fact>]
@@ -43,9 +36,5 @@ module Exists =
             async {
                let dbName = ""
                let! result = Database.Exists.query Initialization.defaultDbProperties dbName
-               match result with
-               | Database.Exists.Result.Exists -> false
-               | Database.Exists.Result.DoesNotExist -> false
-               | Database.Exists.Result.RequestError _ -> true
-               |> should equal true
+               result |> should be (ofCase <@ Database.Exists.RequestError @>)
             }
