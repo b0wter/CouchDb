@@ -11,7 +11,6 @@ module Info =
         
         [<Fact>]
         member this.``Retrieving server info returns valid server infos`` () =
-            this.FailIfNotInitialized()
             // This tests every field to make sure that the names of the fields match the names of the response fields.
             async {
                 let! result = Server.Info.query Initialization.defaultDbProperties

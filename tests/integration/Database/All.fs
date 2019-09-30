@@ -12,7 +12,6 @@ module All =
 
         [<Fact>]
         member this.``Querying all databases on a prefilled database returns all databases`` () =
-            this.FailIfNotInitialized ()
             async {
                 let dbNames = [ "test-db-1"; "test-db-2"; "test-db-3" ]
                 match! Initialization.createDatabases dbNames with
@@ -30,7 +29,6 @@ module All =
 
         [<Fact>]
         member this.``Querying empty server returns empty list`` () =
-            this.FailIfNotInitialized ()
             async {
                 let! result = Database.All.query Initialization.defaultDbProperties
                 match result with

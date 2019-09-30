@@ -12,7 +12,6 @@ module Exists =
 
         [<Fact>]
         member this.``Querying for an existing database returns Exists-result`` () =
-            this.FailIfNotInitialized()
             async {
                let dbNames = [ "exists-test-db-1"; "exists-test-db-2" ]
                match! Initialization.createDatabases dbNames with
@@ -29,7 +28,6 @@ module Exists =
             
         [<Fact>]
         member this.``Querying for a non-existing database returns DoesNotExist-result`` () =
-            this.FailIfNotInitialized()
             async {
                let dbName = "non-existing-db-1"
                let! result = Database.Exists.query Initialization.defaultDbProperties dbName
@@ -42,7 +40,6 @@ module Exists =
 
         [<Fact>]
         member this.``Querying with an empty database name returns RequestError-result`` () =
-            this.FailIfNotInitialized()
             async {
                let dbName = ""
                let! result = Database.Exists.query Initialization.defaultDbProperties dbName

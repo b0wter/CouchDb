@@ -11,7 +11,6 @@ module Details =
     
         [<Fact>]
         member this.``Retrieving server details for existing databases returns database infos`` () =
-            this.FailIfNotInitialized()
             async {
                 // This method checks the properties:
                 //    - db_name
@@ -43,7 +42,6 @@ module Details =
             
         [<Fact>]
         member this.``Retrieving server details for non-existing database returns no database infos`` () =
-            this.FailIfNotInitialized()
             async {
                 let! result = Server.Details.query Initialization.defaultDbProperties [ "unknown-db-1"; "unknown-db-2" ]
                 match result with
@@ -56,7 +54,6 @@ module Details =
             
         [<Fact>]
         member this.``Retrieving server details without supplying keys returns an error`` () =
-            this.FailIfNotInitialized()
             async {
                 let! result = Server.Details.query Initialization.defaultDbProperties [ ]
                 match result with

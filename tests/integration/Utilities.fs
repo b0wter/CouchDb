@@ -2,15 +2,28 @@ namespace b0wter.CouchDb.Tests.Integration
 
 module Utilities =
     
+    /// <summary>
+    /// Is used as a base class to contain tests.
+    /// Since Xunit creates a new instance for each test the
+    /// database will always be clean.
+    /// </summary>
     [<AbstractClass>]
     type CleanDatabaseTests() =
-        member this.IsAuthenticated = Initialization.authenticateCouchDbClient() |> Async.RunSynchronously 
-        member this.IsInitialized = Initialization.deleteAllDatabases() |> Async.RunSynchronously 
-        
-        member this.FailIfNotInitialized () =
-            if this.IsAuthenticated && this.IsInitialized then () else failwith "The initialization has failed."
-            
+        let authenticated = Initialization.authenticateCouchDbClient() |> Async.RunSynchronously
+        let cleaned = Initialization.deleteAllDatabases() |> Async.RunSynchronously 
+        do if authenticated && cleaned then
+            ()
+           else
+            failwith <| sprintf "The database preparation failed (authenticated: %b; cleaned: %b)!" authenticated cleaned 
     
+    /// <summary>
+    /// Cleans the database and prefills with databases prior
+    /// to running a query against it.
+    /// </summary>
+    /// <remarks>
+    /// Uses a special method to run the tests since not all tests
+    /// may require the same databases.
+    /// </remarks>
     [<AbstractClass>]
     type PrefilledDatabaseTests() =
         inherit CleanDatabaseTests ()
