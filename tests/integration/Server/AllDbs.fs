@@ -1,6 +1,6 @@
-namespace b0wter.CouchDb.Tests.Integration.Database
+namespace b0wter.CouchDb.Tests.Integration.Server
 
-module All =
+module AllDbs =
     
     open FsUnit.Xunit
     open Xunit
@@ -16,12 +16,12 @@ module All =
                 let dbNames = [ "test-db-1"; "test-db-2"; "test-db-3" ]
                 match! Initialization.createDatabases dbNames with
                 | true ->
-                    let! result = Database.All.query Initialization.defaultDbProperties
+                    let! result = Server.AllDbs.query Initialization.defaultDbProperties
                     match result with
-                    | Database.All.Result.Success s ->
+                    | Server.AllDbs.Result.Success s ->
                         s |> should haveLength dbNames.Length
                         dbNames |> List.iter (fun x -> s |> should contain x)
-                    | Database.All.Result.Failure e ->
+                    | Server.AllDbs.Result.Failure e ->
                         failwith <| sprintf "Request returned an error (status code: %i): %s" e.statusCode e.reason
                 | false ->
                    return failwith "The database creation (preparation) failed."
@@ -30,10 +30,10 @@ module All =
         [<Fact>]
         member this.``Querying empty server returns empty list`` () =
             async {
-                let! result = Database.All.query Initialization.defaultDbProperties
+                let! result = Server.AllDbs.query Initialization.defaultDbProperties
                 match result with
-                | Database.All.Result.Success s ->
+                | Server.AllDbs.Result.Success s ->
                     s |> should be Empty
-                | Database.All.Result.Failure _ ->
+                | Server.AllDbs.Result.Failure _ ->
                     failwith "The result is not empty when it should be."
             }

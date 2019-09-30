@@ -19,7 +19,7 @@ module Details =
                 // for proper values to determine if it contains useful information.
                 // Note that the CouchDb server should not return information for databases it cannot find and thus
                 // this test should not be necessary).
-                let validateInfo (response: Server.Details.Response) =
+                let validateInfo (response: Server.DbsInfo.Response) =
                     match response.info with
                     | Some info ->
                         info.db_name |> should not' <| be NullOrEmptyString
@@ -29,37 +29,37 @@ module Details =
                     
                 do if Initialization.createDatabases [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously = true then () else failwith "The database preparation failed."
                     
-                let! result = Server.Details.query Initialization.defaultDbProperties [ "test-db-1"; "test-db-2" ]
+                let! result = Server.DbsInfo.query Initialization.defaultDbProperties [ "test-db-1"; "test-db-2" ]
                 match result with
-                | Server.Details.Result.Success response ->
+                | Server.DbsInfo.Result.Success response ->
                     do response.Length |> should equal 2
                     do response |> Array.iter validateInfo
-                | Server.Details.Result.KeyError _ ->
+                | Server.DbsInfo.Result.KeyError _ ->
                     failwith "Returned a KeyError where a Success was expected."
-                | Server.Details.Result.Failure f ->
+                | Server.DbsInfo.Result.Failure f ->
                     failwith <| sprintf "Returned a Failure where a Success was expected. Reason: %s" f.reason
             }
             
         [<Fact>]
         member this.``Retrieving server details for non-existing database returns no database infos`` () =
             async {
-                let! result = Server.Details.query Initialization.defaultDbProperties [ "unknown-db-1"; "unknown-db-2" ]
+                let! result = Server.DbsInfo.query Initialization.defaultDbProperties [ "unknown-db-1"; "unknown-db-2" ]
                 match result with
-                | Server.Details.Result.Success s ->
+                | Server.DbsInfo.Result.Success s ->
                     do s.Length |> should equal 2
                     do s |> Array.forall (fun x -> x.info.IsNone) |> should be True
-                | Server.Details.Result.KeyError e -> failwith <| sprintf "Encountered a KeyError response. This request needs to set keys! Details :%s" e.reason
-                | Server.Details.Result.Failure e -> failwith <| sprintf "Encountered an error, details: %s" e.reason
+                | Server.DbsInfo.Result.KeyError e -> failwith <| sprintf "Encountered a KeyError response. This request needs to set keys! Details :%s" e.reason
+                | Server.DbsInfo.Result.Failure e -> failwith <| sprintf "Encountered an error, details: %s" e.reason
             }
             
         [<Fact>]
         member this.``Retrieving server details without supplying keys returns an error`` () =
             async {
-                let! result = Server.Details.query Initialization.defaultDbProperties [ ]
+                let! result = Server.DbsInfo.query Initialization.defaultDbProperties [ ]
                 match result with
-                | Server.Details.Result.Success s -> failwith <| sprintf "Returned success for a request that should have failed. Details: %A" s
-                | Server.Details.Result.KeyError x -> x.statusCode |> should equal 400
-                | Server.Details.Result.Failure x -> failwith <| sprintf "The request failed in an unexpected way. Details: %s" x.reason
+                | Server.DbsInfo.Result.Success s -> failwith <| sprintf "Returned success for a request that should have failed. Details: %A" s
+                | Server.DbsInfo.Result.KeyError x -> x.statusCode |> should equal 400
+                | Server.DbsInfo.Result.Failure x -> failwith <| sprintf "The request failed in an unexpected way. Details: %s" x.reason
             }
     
     

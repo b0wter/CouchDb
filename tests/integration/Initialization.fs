@@ -115,8 +115,8 @@ module Initialization =
     /// </summary>
     let deleteAllDatabases () =
         async {
-            match! Database.All.query defaultDbProperties with
-            | Database.All.Result.Success dbNames ->
+            match! Server.AllDbs.query defaultDbProperties with
+            | Server.AllDbs.Result.Success dbNames ->
                 do printfn "Found the following databases: %A" dbNames
                 if dbNames.IsEmpty then return true else
                 let deleteResult = dbNames |> List.map (fun name ->
@@ -131,7 +131,7 @@ module Initialization =
                     })
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
-            | Database.All.Result.Failure f ->
+            | Server.AllDbs.Result.Failure f ->
                 return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.reason
                 
         }
