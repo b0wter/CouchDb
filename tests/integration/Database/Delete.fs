@@ -39,6 +39,6 @@ module Delete =
             let toRun = fun () ->
                 async {
                     let! result = Database.Delete.query Initialization.defaultDbProperties dbName
-                    result |> should be (ofCase<@ Database.Delete.Result.Accepted @>) // matcher //expr //(Utilities.caseCustomMatcher (<@ Database.Delete.Result.NotFound @>))
+                    result |> should be (ofCase<@ Database.Delete.Result.NotFound @>) // matcher //expr //(Utilities.caseCustomMatcher (<@ Database.Delete.Result.NotFound @>))
                 }
             this.Run toRun
