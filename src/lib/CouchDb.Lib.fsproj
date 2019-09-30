@@ -12,7 +12,6 @@
     <Compile Include="Mango.fs" />
     <Compile Include="MangoConverters.fs" />
     <Compile Include="Core.fs" />
-    <Compile Include="Database.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FifteenBelow.Json.Core" Version="1.0.0" />
@@ -26,5 +25,13 @@
     <Compile Include="Server\AllDbs.fs" />
     <Compile Include="Server\Info.fs" />
     <Compile Include="Server\DbsInfo.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Database\Exists.fs" />
+    <Compile Include="Database\Create.fs" />
+    <Compile Include="Database\Delete.fs" />
+    <Compile Include="Database\AllDocuments.fs" />
+    <Compile Include="Database\AddDocument.fs" />
+    <Compile Include="Database\Find.fs" />
   </ItemGroup>
 </Project>
