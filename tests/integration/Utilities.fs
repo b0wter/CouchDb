@@ -25,9 +25,22 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type PrefilledDatabaseTests() =
+    type PrefilledDatabaseTests(dbNames: string list) =
         inherit CleanDatabaseTests ()
+        do Initialization.createDatabases dbNames
+           |> Async.RunSynchronously
+           |> (fun x -> if x then printfn "Prefilled database is ok."
+                        else failwith "Could not create the required databases.")
         
+        /// <summary>
+        /// Instatiate without creating databases.
+        /// </summary>
+        new() = PrefilledDatabaseTests([])
+        
+        /// <summary>
+        /// Will run create queries for each supplied database name
+        /// and the `toRun` afterwards.
+        /// </summary>
         member this.RunWithDatabases dbNames (toRun: unit -> Async<unit>) =
             async {
                 match! Initialization.createDatabases dbNames with
@@ -35,6 +48,9 @@ module Utilities =
                 | false -> return failwith "The database preparation failed!"
             } |> Async.RunSynchronously
             
+        /// <summary>
+        /// Runs `toRun` without creating any additional databases.
+        /// </summary>
         member this.Run (toRun: unit -> Async<unit>) =
             async {
                 return! toRun ()
