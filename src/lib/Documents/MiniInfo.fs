@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Documents.Info
+namespace b0wter.CouchDb.Lib.Documents
 
 //
 // Queries: /{db}/{docid} [HEAD]

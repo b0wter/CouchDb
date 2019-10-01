@@ -25,7 +25,11 @@ module AllDocuments =
 
     type Result
         = Success of Response
-        | Failure of ErrorRequestResult
+        | BadRequest of ErrorRequestResult
+        | Unauthorized of ErrorRequestResult
+        | NotFound of ErrorRequestResult
+        | JsonDeserialisationError of ErrorRequestResult
+        | Unknown of ErrorRequestResult
 
     type KeyCollection = {
         keys: string list
@@ -34,12 +38,15 @@ module AllDocuments =
     let private query (request: unit -> Async<FSharp.Data.HttpResponse>) =
         async {
             let! result = (sendRequest request) |> Async.map (fun x -> x :> IRequestResult)
-            match result.StatusCode with
-                | Some 200 -> 
+            return match result.StatusCode with
+                   | Some 200 -> 
                         match deserializeJson<Response> [] result.Body with
-                        | Ok r -> return Success r
-                        | Error e -> return Failure <| errorRequestResult (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json, Some result.Headers)
-                | _ -> return Failure <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
+                        | Ok r    -> Success r
+                        | Error e -> JsonDeserialisationError <| errorRequestResult (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json, Some result.Headers)
+                   | Some 400     -> BadRequest <| errorFromIRequestResult result
+                   | Some 401     -> Unauthorized <| errorFromIRequestResult result
+                   | Some 404     -> NotFound <| errorFromIRequestResult result
+                   | _            -> Unknown <| errorFromIRequestResult result
         }
 
     let queryAll (props: DbProperties.T) (dbName: string) : Async<Result> =
