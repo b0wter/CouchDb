@@ -209,7 +209,8 @@ module Core =
                               body = BinaryUpload binary, 
                               cookieContainer = DefaultCookieContainer, 
                               headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ],
-                              query = queryParamters
+                              query = queryParamters,
+                              silentHttpErrors = true
                             )
 
     /// <summary>
