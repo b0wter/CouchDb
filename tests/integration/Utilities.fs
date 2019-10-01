@@ -38,6 +38,11 @@ module Utilities =
         new() = PrefilledDatabaseTests([])
         
         /// <summary>
+        /// Instantiates with a single database.
+        /// </summary>
+        new(dbName: string) = PrefilledDatabaseTests([dbName])
+        
+        /// <summary>
         /// Will run create queries for each supplied database name
         /// and the `toRun` afterwards.
         /// </summary>
@@ -47,12 +52,4 @@ module Utilities =
                 | true -> return! toRun ()
                 | false -> return failwith "The database preparation failed!"
             } |> Async.RunSynchronously
-            
-        /// <summary>
-        /// Runs `toRun` without creating any additional databases.
-        /// </summary>
-        member this.Run (toRun: unit -> Async<unit>) =
-            async {
-                return! toRun ()
-            }
             

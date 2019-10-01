@@ -1,13 +1,12 @@
 namespace b0wter.CouchDb.Tests.Integration.Database
-open b0wter.CouchDb.Tests.Integration
 
 module Delete =
     
     open FsUnit.Xunit
     open Xunit
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
     open b0wter.CouchDb.Tests.Integration.CustomMatchers
+    open b0wter.CouchDb.Tests.Integration
     
     type Tests() =
         inherit Utilities.PrefilledDatabaseTests()
@@ -36,9 +35,7 @@ module Delete =
         [<Fact>]
         member this.``Deleting an database with invalid name results a NotFound-result`` () =
             let dbName = "00-this-[is]-{an}-inv@lid-name"
-            let toRun = fun () ->
-                async {
-                    let! result = Database.Delete.query Initialization.defaultDbProperties dbName
-                    result |> should be (ofCase<@ Database.Delete.Result.NotFound @>) 
-                }
-            this.Run toRun
+            async {
+                let! result = Database.Delete.query Initialization.defaultDbProperties dbName
+                result |> should be (ofCase<@ Database.Delete.Result.NotFound @>) 
+            }
