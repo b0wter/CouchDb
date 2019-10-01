@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>b0wter.CouchDb.Tests.Integration</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\lib\CouchDb.Lib.fsproj" />
@@ -42,6 +43,7 @@
     <Compile Include="Database\Exists.fs" />
     <Compile Include="Database\Create.fs" />
     <Compile Include="Database\Delete.fs" />
+    <Compile Include="Database\AllDocuments.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
