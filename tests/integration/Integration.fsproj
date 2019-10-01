@@ -46,9 +46,9 @@
     <Compile Include="Database\AllDocuments.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="Documents\Info.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Documents\Info.fs" />
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
