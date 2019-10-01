@@ -78,6 +78,12 @@ module Core =
     /// </summary>
     let errorRequestResult (statusCode, reason, headers: Headers option) =
         { statusCode = statusCode; reason = reason; headers = match headers with Some h -> h | None -> Map.empty }
+        
+    /// <summary>
+    /// Interprets an IRequestResult as an ErrorRequestResult.
+    /// </summary>
+    let errorFromIRequestResult (r: IRequestResult) =
+        { statusCode = r.StatusCode; reason = r.Body; headers = r.Headers }
 
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
