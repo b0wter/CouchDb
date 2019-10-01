@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Database
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.FSharp
 open Newtonsoft.Json
 
 module Find =
@@ -35,20 +36,20 @@ module Find =
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.OperatorJsonConverter () :> JsonConverter ] expression []
-            let! result = sendRequest request
-            let queryResult = result |> statusCodeAndContent
+            let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
+            let queryResult = { QueryResult.content = result.Body; QueryResult.statusCode = result.StatusCode }
 
             do printfn "Response content:%s%s" System.Environment.NewLine queryResult.content
 
             match queryResult.statusCode with
-            | 200 ->
+            | Some 200 ->
                 match deserializeJson<Response<'a>> [] queryResult.content with
                 | Ok o -> return Success o
                 | Error e -> return JsonError e
-            | 400 | 401 | 500 ->
-                return InvalidRequest <| errorRequestResult (queryResult.statusCode, queryResult.content)
+            | Some 400 | Some 401 | Some 500 ->
+                return InvalidRequest <| errorRequestResult (queryResult.statusCode, queryResult.content, None)
             | _ ->
-                return Failure <| errorRequestResult (queryResult.statusCode, queryResult.content)
+                return Failure <| errorRequestResult (queryResult.statusCode, queryResult.content, None)
         }
         // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
         // this is currently not in use.

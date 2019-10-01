@@ -7,6 +7,7 @@ namespace b0wter.CouchDb.Lib.Server
     open Newtonsoft.Json
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
+    open b0wter.FSharp
     
     module DbsInfo =
         type Cluster = {
@@ -72,21 +73,18 @@ namespace b0wter.CouchDb.Lib.Server
             async {
                 do printfn "Querying db information for keys: %A" names
                 if names.IsEmpty then
-                    return Core.errorRequestResult (400, "The list of names is empty. The request was NOT send to the server")
+                    return Core.errorRequestResult (None, "The list of names is empty. The request was NOT send to the server", None)
                            |> Result.KeyError
                 else
                     let payload = { keys = names}
-
                     let request = createJsonPost props "_dbs_info" payload []
-                    let! result = sendRequest request 
-                    let statusCode = result |> statusCodeFromResult
-                    let content = match result with | Ok o -> o.content | Error e -> e.reason
-                    match statusCode with
-                    | 200 -> try
-                                return Success <| JsonConvert.DeserializeObject<Response []>(content, Utilities.Json.jsonSettings)
-                             with
-                             | :? JsonException as ex  ->
-                                return Failure <| errorRequestResult (0, ex.Message)
-                    | 400 -> return KeyError <| errorRequestResult (400, content)
-                    | _   -> return Failure <| errorRequestResult (statusCode, content)
+                    let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
+                    match result.StatusCode with
+                    | Some 200 -> try
+                                    return Success <| JsonConvert.DeserializeObject<Response []>(result.Body, Utilities.Json.jsonSettings)
+                                  with
+                                    | :? JsonException as ex  ->
+                                        return Failure <| errorRequestResult (result.StatusCode, ex.Message, Some result.Headers)
+                    | Some 400 -> return KeyError <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
+                    | _   -> return Failure <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
             }

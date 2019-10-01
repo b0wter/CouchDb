@@ -6,6 +6,7 @@ module AllDbs =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
+    open b0wter.FSharp.Operators
     
     type Tests() =
         inherit Utilities.CleanDatabaseTests()
@@ -22,7 +23,7 @@ module AllDbs =
                         s |> should haveLength dbNames.Length
                         dbNames |> List.iter (fun x -> s |> should contain x)
                     | Server.AllDbs.Result.Failure e ->
-                        failwith <| sprintf "Request returned an error (status code: %i): %s" e.statusCode e.reason
+                        failwith <| sprintf "Request returned an error (status code: %i): %s" (e.statusCode |?| -1) e.reason
                 | false ->
                    return failwith "The database creation (preparation) failed."
             }

@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Database
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.FSharp
 
 module AllDocuments =
     type ResponseRowValue = {
@@ -30,28 +31,25 @@ module AllDocuments =
         keys: string list
     }
 
-    let private query (props: DbProperties.T) (dbName: string) (request: unit -> Async<FSharp.Data.HttpResponse>) =
+    let private query (request: unit -> Async<FSharp.Data.HttpResponse>) =
         async {
-            let request = createGet props (sprintf "%s/_all_docs" dbName) []
-            let! result = sendRequest request
-            let statusCode = result |> statusCodeFromResult
-            let content = match result with | Ok o -> o.content | Error e -> e.reason
-            match statusCode with
-                | 200 -> 
-                        match deserializeJson<Response> [] content with
+            let! result = (sendRequest request) |> Async.map (fun x -> x :> IRequestResult)
+            match result.StatusCode with
+                | Some 200 -> 
+                        match deserializeJson<Response> [] result.Body with
                         | Ok r -> return Success r
-                        | Error e -> return Failure <| errorRequestResult (statusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json)
-                | _ -> return Failure <| errorRequestResult (statusCode, content)
+                        | Error e -> return Failure <| errorRequestResult (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json, Some result.Headers)
+                | _ -> return Failure <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
         }
 
     let queryAll (props: DbProperties.T) (dbName: string) : Async<Result> =
         let request = createGet props (sprintf "%s/_all_docs" dbName) []
-        query props dbName request
+        query request
 
     let querySelected (props: DbProperties.T) (dbName: string) (keys: string list) : Async<Result> =
         let keyCollection = { keys = keys }
         let request = createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection []
-        query props dbName request
+        query request
 
 
 

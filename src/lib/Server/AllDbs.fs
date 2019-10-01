@@ -22,12 +22,12 @@ namespace b0wter.CouchDb.Lib.Server
             async {
                 let request = createGet props "_all_dbs" []
                 match! sendRequest request with
-                | Ok o ->
+                | SuccessResult s ->
                     try
-                        return Success <| JsonConvert.DeserializeObject<string list>(o.content)
+                        return Success <| JsonConvert.DeserializeObject<string list>(s.content)
                     with
-                    | :? JsonException as ex -> return Failure <| errorRequestResult (0, ex.Message)
-                | Error e ->
+                    | :? JsonException as ex -> return Failure <| errorRequestResult (None, ex.Message, None)
+                | ErrorResult e ->
                     return Failure e
             }
 

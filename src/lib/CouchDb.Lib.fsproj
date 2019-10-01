@@ -27,11 +27,14 @@
     <Compile Include="Server\DbsInfo.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\Exists.fs" />
-    <Compile Include="Database\Create.fs" />
-    <Compile Include="Database\Delete.fs" />
-    <Compile Include="Database\AllDocuments.fs" />
-    <Compile Include="Database\AddDocument.fs" />
-    <Compile Include="Database\Find.fs" />
+    <Compile Include="Databases\Exists.fs" />
+    <Compile Include="Databases\Create.fs" />
+    <Compile Include="Databases\Delete.fs" />
+    <Compile Include="Databases\AllDocuments.fs" />
+    <Compile Include="Databases\AddDocument.fs" />
+    <Compile Include="Databases\Find.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Documents\Info.fs" />
   </ItemGroup>
 </Project>

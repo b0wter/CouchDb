@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Database
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.FSharp.Operators
 
 module Exists =
     type Response = {
@@ -19,15 +20,15 @@ module Exists =
 
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return RequestError <| errorRequestResult (0, "You need to set a database name.") else
+            if System.String.IsNullOrWhiteSpace(name) then return RequestError <| errorRequestResult (None, "You need to set a database name.", None) else
             let request = createHead props name []
             match! sendRequest request with
-            | Ok o ->
-                let exists = o.statusCode = 200
+            | SuccessResult o ->
+                let exists = o.statusCode = Some 200
                 return if exists then Exists else DoesNotExist
-            | Error e when e.statusCode = 404 ->
+            | ErrorResult e when e.statusCode = Some 404 ->
                 return DoesNotExist
-            | Error e ->
-                do printfn "Statuscode: %i" e.statusCode
+            | ErrorResult e ->
+                do printfn "Statuscode: %s" (e.statusCode |> Option.map string |?| "<no status code available>")
                 return RequestError e
         }

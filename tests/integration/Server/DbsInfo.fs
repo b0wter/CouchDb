@@ -1,10 +1,11 @@
 namespace b0wter.CouchDb.Tests.Integration.Server
 
-module Details =
+module DbsInfo =
     open Xunit
     open FsUnit.Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
+    open CustomMatchers
     
     type Tests() =
         inherit Utilities.CleanDatabaseTests()
@@ -56,10 +57,7 @@ module Details =
         member this.``Retrieving server details without supplying keys returns an error`` () =
             async {
                 let! result = Server.DbsInfo.query Initialization.defaultDbProperties [ ]
-                match result with
-                | Server.DbsInfo.Result.Success s -> failwith <| sprintf "Returned success for a request that should have failed. Details: %A" s
-                | Server.DbsInfo.Result.KeyError x -> x.statusCode |> should equal 400
-                | Server.DbsInfo.Result.Failure x -> failwith <| sprintf "The request failed in an unexpected way. Details: %s" x.reason
+                result |> should be (ofCase <@ Server.DbsInfo.Result.KeyError @>)
             }
     
     

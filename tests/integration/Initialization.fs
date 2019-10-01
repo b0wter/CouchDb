@@ -42,8 +42,8 @@ module Initialization =
         async {
             let! result = Core.authenticate defaultDbProperties 
             match result with
-            | Ok _ -> return true
-            | Error e -> return failwith <| e.reason
+            | Core.SuccessResult _ -> return true
+            | Core.ErrorResult e -> return failwith <| e.reason
         }
     
     /// <summary>

@@ -20,7 +20,7 @@ let main argv =
             return 1
         | DbProperties.DbPropertiesCreateResult.Valid p ->
             match! Core.authenticate p with
-            | Ok _ ->
+            | Core.SuccessResult _ ->
                 (*
                 let! exists = Database.Exists.query p "test-db"
                 let result = match exists with
@@ -95,8 +95,8 @@ let main argv =
                     do printfn "%s" reason
                     return 1
                     *)
-            | Error e ->
-                printfn "Fehlerhafte Anfrage: %s (%i)" e.reason e.statusCode
+            | Core.ErrorResult e ->
+                printfn "Fehlerhafte Anfrage: %s (%i)" e.reason (defaultArg e.statusCode 0)
                 return 1
     } |> Async.RunSynchronously
     

@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Database
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.FSharp
 
 
 module Delete =
@@ -35,16 +36,14 @@ module Delete =
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
             let request = createDelete props name []
-            let! result = sendRequest request 
-            let statusCode = result |> statusCodeFromResult
-            let content = match result with | Ok o -> o.content | Error e -> e.reason
-            let r = match statusCode with
-                    | 200 -> Deleted TrueCreateResult
-                    | 202 -> Accepted TrueCreateResult
-                    | 400 -> BadRequest <| errorRequestResult (statusCode, content)
-                    | 401 -> Unauthorized <| errorRequestResult (statusCode, content)
-                    | 404 -> NotFound <| errorRequestResult (statusCode, content)
-                    | _   -> Unknown <| errorRequestResult (statusCode, content)
+            let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
+            let r = match result.StatusCode with
+                    | Some 200 -> Deleted TrueCreateResult
+                    | Some 202 -> Accepted TrueCreateResult
+                    | Some 400 -> BadRequest <| errorRequestResult (result.StatusCode, result.Body, None)
+                    | Some 401 -> Unauthorized <| errorRequestResult (result.StatusCode, result.Body, None)
+                    | Some 404 -> NotFound <| errorRequestResult (result.StatusCode, result.Body, None)
+                    | _   -> Unknown <| errorRequestResult (result.StatusCode, result.Body, None)
             return r
         }
         

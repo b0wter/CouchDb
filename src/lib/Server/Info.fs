@@ -30,13 +30,13 @@ namespace b0wter.CouchDb.Lib.Server
             async {
                 let request = createGet props "/" []
                 match! sendRequest request with
-                | Ok o ->
-                    do printfn "%s" o.content
+                | SuccessResult s ->
+                    do printfn "%s" s.content
                     try
-                        return Success <| JsonConvert.DeserializeObject<Response>(o.content)
+                        return Success <| JsonConvert.DeserializeObject<Response>(s.content)
                     with
-                    | :? JsonException as ex -> return Failure <| errorRequestResult (0, ex.Message)
-                | Error e ->
+                    | :? JsonException as ex -> return Failure <| errorRequestResult (s.statusCode, ex.Message, Some s.headers)
+                | ErrorResult e ->
                     return Failure e
             }
 

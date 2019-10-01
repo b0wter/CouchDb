@@ -5,29 +5,36 @@ module Core =
     open System
     open FSharp.Data
     open System.Net
+    open System.Linq
 
     type HttpPath = string
-
+    type Headers = Map<string, string>
+    type StatusCode = int option
+    
     let DefaultCookieContainer = CookieContainer()
-
+    
     /// <summary>
     /// Wraps a status code and a response body (string) as a record.
     /// </summary>
     type SuccessRequestResult = {
-        statusCode: int
+        statusCode: StatusCode
         content: string
+        headers: Headers
     }
 
     /// <summary>
     /// Wraps a status code and an error reason as a record.
     /// </summary>
     type ErrorRequestResult = {
-        statusCode: int
+        statusCode: StatusCode
         reason: string
+        headers: Headers
     }
 
     type IRequestResult = 
-        abstract member StatusCode: int
+        abstract member StatusCode: StatusCode
+        abstract member Headers: Headers
+        abstract member Body: string
 
     type RequestResult =
         | SuccessResult of SuccessRequestResult
@@ -37,11 +44,19 @@ module Core =
                 match this with
                 | SuccessResult s -> s.statusCode
                 | ErrorResult e -> e.statusCode
+            member this.Headers =
+                match this with
+                | SuccessResult s -> s.headers
+                | ErrorResult e -> e.headers
+            member this.Body =
+                match this with
+                | SuccessResult s -> s.content
+                | ErrorResult e -> e.reason
 
-    let statusCodeFromResult (r: Result<SuccessRequestResult, ErrorRequestResult>) : int =
+    let statusCodeFromResult (r: RequestResult) : StatusCode =
         match r with
-        | Ok s    -> s.statusCode
-        | Error e -> e.statusCode
+        | SuccessResult s    -> s.statusCode
+        | ErrorResult e -> e.statusCode
 
     /// <summary>
     /// Addes the path to the base url and adds a slash if necessary.
@@ -55,69 +70,71 @@ module Core =
     /// <summary>
     /// Creates an SuccessRequestResult.
     /// </summary>
-    let successResultRequest (statusCode, content) =
-        { statusCode = statusCode; content = content }
+    let successResultRequest (statusCode, content, headers) =
+        { statusCode = statusCode; content = content; headers = headers }
 
     /// <summary>
     /// Creates an ErrorRequestResult.
     /// </summary>
-    let errorRequestResult (statusCode, reason) =
-        { statusCode = statusCode; reason = reason }
+    let errorRequestResult (statusCode, reason, headers: Headers option) =
+        { statusCode = statusCode; reason = reason; headers = match headers with Some h -> h | None -> Map.empty }
 
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendRequest (request: unit -> Async<HttpResponse>) : Async<Result<SuccessRequestResult, ErrorRequestResult>> =
+    let sendRequest (request: unit -> Async<HttpResponse>) : Async<RequestResult> =
         // TODO: Maybe add the `silentHttpErrors` flag to all outgoing request. This will make it so that error status codes do not generate exceptions.
         async {
             try 
                 let! response = request ()
                 let status = response.StatusCode
                 do printfn "Received HTTP response with status code: %i" status
-
+                
                 return if status < 400 then
                         match response.Body with
-                        | Binary _ -> Error (errorRequestResult (status, "Binary payloads are not supported at the moment."))
-                        | Text t   -> Ok (successResultRequest (status, t))
+                        | Binary _ -> ErrorResult (errorRequestResult (Some status, "Binary payloads are not supported at the moment.", None))
+                        | Text t   -> SuccessResult (successResultRequest (Some status, t, response.Headers))
                        else
                         match response.Body with
-                        | Binary _ -> Error (errorRequestResult (status, "Binary responses are currently not supported."))
-                        | Text t   -> Ok (successResultRequest (status, t))
+                        | Binary _ -> ErrorResult (errorRequestResult (Some status, "Binary responses are currently not supported.", None))
+                        | Text t   -> SuccessResult (successResultRequest (Some status, t, response.Headers))
             with
             | :? Http.HttpRequestException as ex ->
                 do printfn "Encountered a HttpRequestException! %s" ex.Message
-                return Error <| errorRequestResult (0, ex.Message)
+                return ErrorResult <| errorRequestResult (None, ex.Message, None)
             | :? WebException as ex ->
                 do printfn "Encountered a WebException! %s" ex.Message
                 if ex.Status = WebExceptionStatus.ProtocolError then
                     try
                         let response = ex.Response :?> HttpWebResponse
+                        //let headers = [0..response.Headers.Count - 1] |> List.collect ()
+                        let headers = seq { for i in [0..response.Headers.Count - 1] do yield (response.Headers.Keys.[i], response.Headers.Get(i)) } |> Map.ofSeq
                         do printfn "WebException contained a HttpWebResponse with status code %i. Will continue evaluation." (response.StatusCode |> int)
                         let! content = b0wter.FSharp.Streams.readToEndAsync (System.Text.Encoding.UTF8) (response.GetResponseStream()) 
-                        return Ok <| successResultRequest (response.StatusCode |> int, content)
+                        return SuccessResult <| successResultRequest (response.StatusCode |> int |> Some, content, headers)
                     with
                     | :? InvalidCastException as e ->
                         do printfn "WebException could not be cast into a HttpWebResponse. Details: %s | Parent: %s" e.Message ex.Message
-                        return Error <| errorRequestResult (0, sprintf "Internal error with casting WebException. Details: %s | Parent: %s" e.Message ex.Message)
+                        return ErrorResult <| errorRequestResult (None, sprintf "Internal error with casting WebException. Details: %s | Parent: %s" e.Message ex.Message, None)
                 else
                     do printfn "Exception indicates a non-protocol error (e.g. connection refused). Continue evaluation with status code 0!"
-                    return Error <| errorRequestResult (0, ex.Message)
+                    return ErrorResult <| errorRequestResult (None, ex.Message, None)
         }
 
     /// <summary>
     /// Wraps a status code and string contents. This may represent a success as well as an error.
     /// </summary>
     type QueryResult = {
-        statusCode: int
+        statusCode: int option
         content: string
     }
 
     /// <summary>
     /// Extracts the status code and the content from a RequestResult.
     /// </summary>
-    let statusCodeAndContent (result: Result<SuccessRequestResult, ErrorRequestResult>) =
+    let statusCodeAndContent (result: RequestResult) =
         let statusCode = result |> statusCodeFromResult
-        let content = match result with | Ok o -> o.content | Error e -> e.reason
+        let content = match result with | SuccessResult s -> s.content | ErrorResult e -> e.reason
         { statusCode = statusCode; content = content }
 
     /// <summary>
