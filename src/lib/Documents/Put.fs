@@ -44,15 +44,18 @@ module Put =
     /// Unlike the POST /{db}, you must specify the document ID in the request URL.
     /// When updating an existing document, the current document revision must be included in the document 
     /// (i.e. the request body), as the rev query parameter, or in the If-Match request header.
-    let query<'a> (props: DbProperties.T) (dbName: string) (docId: 'a -> System.Guid) (document: 'a) : Async<Result> =
+    let query<'a> (props: DbProperties.T) (dbName: string) (docId: 'a -> System.Guid) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return DbNameMissing
             else if document |> docId = System.Guid.Empty then
                 return DocumentIdMissing
             else
+                let queryParams = match document |> docRev with
+                                  | Some rev -> [ StringQueryParameter("rev", rev) :> BaseQueryParameter ]
+                                  | None -> []
                 let url = (sprintf "%s/%s" dbName (document |> docId |> string)) 
-                let request = createJsonPut props url document []
+                let request = createJsonPut props url document queryParams
                 let! result = sendRequest request
                 let iResult = result :> IRequestResult
                 return match iResult.StatusCode with
