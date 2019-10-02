@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Documents\Info.fs" />
     <Compile Include="Documents\MiniInfo.fs" />
+    <Compile Include="Documents\Put.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
