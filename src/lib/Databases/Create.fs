@@ -7,8 +7,14 @@ namespace b0wter.CouchDb.Lib.Database
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
+open QueryParameters
 
 module Create =
+    
+    module QueryParameters =
+        let ShardRangePartition q = IntQueryParameter("q", q)
+        let Replicas r = IntQueryParameter("r", r)
+    
     type Response = {
         ok: bool
     }
@@ -33,14 +39,9 @@ module Create =
     /// 
     /// `n`: Replicas. The number of copies of the database in the cluster. The default is 3, unless overridden in the cluster config .
     /// </summary>
-    let query (props: DbProperties.T) (name: string) (q: int option) (n: int option) : Async<Result> =
+    let query (props: DbProperties.T) (name: string) (parameters: QueryParameters) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| errorRequestResult (None, "You need to set a database name.", None) else
-            let parameters =
-                [
-                    (if q.IsSome then Some ("q", q.Value :> obj) else None)
-                    (if n.IsSome then Some ("n", n.Value :> obj) else None)
-                ] |> List.choose id
             let request = createPut props name parameters
             let! result = (sendRequest request) |> Async.map (fun x -> x :> IRequestResult)
             let r = match result.StatusCode with

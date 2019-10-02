@@ -1,4 +1,5 @@
 ﻿namespace b0wter.CouchDb.Lib
+open QueryParameters
 
 module Core =
     
@@ -179,13 +180,13 @@ module Core =
     /// <summary>
     /// Stores the query parameters. ToString() will be called on all values.
     /// </summary>
-    type QueryParameters = (string * obj) list
-
+    type QueryParameters = BaseQueryParameter list
+    
     /// <summary>
     /// Maps the list of query parameters (whose values are of type object) to strings by calling to string on them.
     /// </summary>
     let private formatQueryParameters (parameters: QueryParameters) : (string * string) list =
-        parameters |> List.map (fun (key, value) -> (key, value |> string))
+        parameters |> List.map (fun x -> (x.Key, x.AsString))
     
     /// <summary>
     /// Creates a post request with the given form values.
