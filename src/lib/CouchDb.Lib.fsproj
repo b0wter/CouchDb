@@ -36,8 +36,8 @@
     <Compile Include="Databases\Find.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Documents\MiniInfo.fs" />
-    <Compile Include="Documents\Info.fs" />
+    <Compile Include="Documents\Head.fs" />
+    <Compile Include="Documents\Get.fs" />
     <Compile Include="Documents\Put.fs" />
   </ItemGroup>
 </Project>

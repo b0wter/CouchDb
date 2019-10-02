@@ -8,7 +8,7 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 
-module MiniInfo =
+module Head =
     type Response = {
         ETag: string
         Length: int

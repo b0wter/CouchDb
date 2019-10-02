@@ -1,6 +1,6 @@
 namespace b0wter.CouchDb.Tests.Integration.Documents
 
-module MiniInfo =
+module Head =
     
     open FsUnit.Xunit
     open Xunit
@@ -38,8 +38,8 @@ module MiniInfo =
                     do x.id |> should equal (testDocumentWithId._id.ToString())
                     do x.rev |> should not' (be EmptyString)
                     
-                    match! Documents.MiniInfo.query Initialization.defaultDbProperties dbName testDocumentWithId._id with
-                    | Documents.MiniInfo.Result.DocumentExists y ->
+                    match! Documents.Head.query Initialization.defaultDbProperties dbName testDocumentWithId._id with
+                    | Documents.Head.Result.DocumentExists y ->
                         y.ETag |> should equal x.rev
                     | x -> failwith <| sprintf "Expected NotModified but got %s" (x.GetType().FullName)
                     
@@ -51,23 +51,23 @@ module MiniInfo =
         member this.``Retrieving a non-existing document returns NotFound`` () =
             async {
                 let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
-                let! result = Documents.MiniInfo.query Initialization.defaultDbProperties dbName id
-                result |> should be (ofCase<@ Documents.MiniInfo.Result.NotFound @>)
+                let! result = Documents.Head.query Initialization.defaultDbProperties dbName id
+                result |> should be (ofCase<@ Documents.Head.Result.NotFound @>)
             }
                 
         [<Fact>]
         member this.``Retrieving a document without specifying an id returns DocumentIdMissing`` () =
             async {
-                let! result = Documents.MiniInfo.query Initialization.defaultDbProperties dbName null
-                result |> should be (ofCase<@ Documents.MiniInfo.Result.DocumentIdMissing @>)
+                let! result = Documents.Head.query Initialization.defaultDbProperties dbName null
+                result |> should be (ofCase<@ Documents.Head.Result.DocumentIdMissing @>)
             }
                 
         [<Fact>]
         member this.``Retrieving a document without specifying a db name returns DbNameMissing`` () =
             async {
                 let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
-                let! result = Documents.MiniInfo.query Initialization.defaultDbProperties "" id
-                result |> should be (ofCase<@ Documents.MiniInfo.Result.DbNameMissing @>)
+                let! result = Documents.Head.query Initialization.defaultDbProperties "" id
+                result |> should be (ofCase<@ Documents.Head.Result.DbNameMissing @>)
             }
     
     

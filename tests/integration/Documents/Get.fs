@@ -1,7 +1,7 @@
 namespace b0wter.CouchDb.Tests.Integration.Documents
 open b0wter.CouchDb.Tests.Integration
 
-module Info =
+module Get =
     
     open FsUnit.Xunit
     open Xunit
@@ -39,8 +39,8 @@ module Info =
                     do x.id |> should equal (testDocumentWithId._id.ToString())
                     do x.rev |> should not' (be EmptyString)
                     
-                    match! Documents.Info.query<TestDocument> Initialization.defaultDbProperties dbName testDocumentWithId._id [] with
-                    | Documents.Info.Result.DocumentExists x ->
+                    match! Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName testDocumentWithId._id [] with
+                    | Documents.Get.Result.DocumentExists x ->
                         // You cannot check the complete object for equality since the returned result has a revision.
                         x.content._id |> should equal testDocumentWithId._id
                         x.content.myInt |> should equal testDocumentWithId.myInt
@@ -56,23 +56,23 @@ module Info =
         member this.``Retrieving a non-existing document returns NotFound`` () =
             async {
                 let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
-                let! result = Documents.Info.query<TestDocument> Initialization.defaultDbProperties dbName id []
-                result |> should be (ofCase<@ Documents.Info.Result<TestDocument>.NotFound @>)
+                let! result = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName id []
+                result |> should be (ofCase<@ Documents.Get.Result<TestDocument>.NotFound @>)
             }
                 
         [<Fact>]
         member this.``Retrieving a document without specifying an id returns DocumentIdMissing`` () =
             async {
-                let! result = Documents.Info.query<TestDocument> Initialization.defaultDbProperties dbName null []
-                result |> should be (ofCase<@ Documents.Info.Result<TestDocument>.DocumentIdMissing @>)
+                let! result = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName null []
+                result |> should be (ofCase<@ Documents.Get.Result<TestDocument>.DocumentIdMissing @>)
             }
                 
         [<Fact>]
         member this.``Retrieving a document without specifying a db name returns DbNameMissing`` () =
             async {
                 let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
-                let! result = Documents.Info.query<TestDocument> Initialization.defaultDbProperties "" id []
-                result |> should be (ofCase<@ Documents.Info.Result<TestDocument>.DbNameMissing @>)
+                let! result = Documents.Get.query<TestDocument> Initialization.defaultDbProperties "" id []
+                result |> should be (ofCase<@ Documents.Get.Result<TestDocument>.DbNameMissing @>)
             }
     
 

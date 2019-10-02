@@ -48,9 +48,9 @@ module Put =
                     let! second = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId newDocument
                     second |> should be (ofCase <@ Documents.Put.Result.Created @>)
 
-                    let! check = Documents.Info.query<TestDocument> Initialization.defaultDbProperties dbName testDocumentWithId._id []
+                    let! check = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName testDocumentWithId._id []
                     match check with
-                    | Documents.Info.Result.DocumentExists x -> x.content.myInt |> should equal 1337
+                    | Documents.Get.Result.DocumentExists x -> x.content.myInt |> should equal 1337
                     | _ -> failwith "The retrieval of the document (using Documents.Info) failed!"
 
                 | _ -> failwith "Adding the initial document failed."

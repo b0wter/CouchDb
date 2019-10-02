@@ -46,8 +46,8 @@
     <Compile Include="Database\AllDocuments.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Documents\Info.fs" />
-    <Compile Include="Documents\MiniInfo.fs" />
+    <Compile Include="Documents\Get.fs" />
+    <Compile Include="Documents\Head.fs" />
     <Compile Include="Documents\Put.fs" />
   </ItemGroup>
   <ItemGroup>

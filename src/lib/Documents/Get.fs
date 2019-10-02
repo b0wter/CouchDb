@@ -1,7 +1,7 @@
 namespace b0wter.CouchDb.Lib.Documents
 
 //
-// Queries: /{db}/{docid} [HEAD]
+// Queries: /{db}/{docid} [GET]
 //
 
 open Newtonsoft.Json
@@ -10,7 +10,7 @@ open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
 open b0wter.FSharp
 
-module Info =
+module Get =
     
     // TODO: Check if query parameters actually work!
     
