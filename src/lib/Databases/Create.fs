@@ -12,7 +12,9 @@ open QueryParameters
 module Create =
     
     module QueryParameters =
+        /// `q`: Shards, aka the number of range partitions. Default is 8, unless overridden in the cluster config.
         let ShardRangePartition q = IntQueryParameter("q", q)
+        /// `n`: Replicas. The number of copies of the database in the cluster. The default is 3, unless overridden in the cluster config .
         let Replicas r = IntQueryParameter("r", r)
     
     type Response = {
@@ -34,10 +36,6 @@ module Create =
     /// Runs a PUT query that will create a new database. The database name may only consist of the following characters:
     /// a-z, 0-9, _, $, (, ), +, -, /
     /// The name *must* begin with a lower-case letter.
-    /// 
-    /// `q`: Shards, aka the number of range partitions. Default is 8, unless overridden in the cluster config.
-    /// 
-    /// `n`: Replicas. The number of copies of the database in the cluster. The default is 3, unless overridden in the cluster config .
     /// </summary>
     let query (props: DbProperties.T) (name: string) (parameters: QueryParameters) : Async<Result> =
         async {
