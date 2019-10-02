@@ -39,5 +39,6 @@
     <Compile Include="Documents\Head.fs" />
     <Compile Include="Documents\Get.fs" />
     <Compile Include="Documents\Put.fs" />
+    <Compile Include="Documents\Delete.fs" />
   </ItemGroup>
 </Project>
