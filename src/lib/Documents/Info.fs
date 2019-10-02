@@ -28,33 +28,6 @@ module Info =
         let SelectRevision rev = StringQueryParameter("rev", rev)
         let IncludeRevisionInfo = TrueQueryParameter("revs_info")
         
-        (*
-        /// Includes attachments bodies in response.
-        let attachments = ("attachments", true)
-        /// Includes encoding information in attachment stubs if the particular attachment is compressed.
-        let att_encoding_info = ("att_encoding_info", true)
-        /// Includes attachments only since specified revisions. Doesn’t includes attachments for specified revisions.
-        let atts_since (revs: string list) = ("atts_since", revs)
-        /// Includes information about conflicts in document. 
-        let conflicts = ("conflicts", true)
-        /// Includes information about deleted conflicted revisions. 
-        let detected_conflicts = ("detected_conflicts", true)
-        /// orces retrieving latest “leaf” revision, no matter what rev was requested.
-        let latest = ("latest", true)
-        /// Includes last update sequence for the document.
-        let local_seq = ("local_seq", true)
-        /// Acts same as specifying all conflicts, deleted_conflicts and revs_info query parameters. 
-        let meta = ("meta", true)
-        /// Retrieves documents of specified leaf revisions. Additionally, it accepts value as all to return all leaf revisions. 
-        let open_revs (revs: string list) = ("open_revs", revs)
-        /// Retrieves document of specified revision. 
-        let rev (rev: string) = ("rev", rev)
-        /// Includes list of all known document revisions.
-        let revs = ("revs", true)
-        /// Includes detailed information for all known document revisions. 
-        let revs_info = ("revs_info", true)
-        *)
-    
     type MetaFields = {
         /// Deletion flag. Available if document was removed
         _deleted: bool
@@ -128,7 +101,7 @@ module Info =
         async {
             if System.String.IsNullOrWhiteSpace(name) then
                 return DbNameMissing
-            else if id = null then
+            else if id |> isNull then
                 return DocumentIdMissing
             else
                 let request = createGet props (sprintf "%s/%s" name (id |> string)) queryParameters
