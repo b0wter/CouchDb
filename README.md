@@ -79,7 +79,6 @@ Server endpoint
 | /_up                        |      | ❌   |      |     |        |
 | /_uuids                     |      | ❌   |      |     |        |
 | /favicon.ico                |      | ❌   |      |     |        |
-|                             |      |     |      |     |        |
 
 
 Documents endpoint
