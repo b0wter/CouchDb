@@ -82,6 +82,13 @@ Server endpoint
 |                             |      |     |      |     |        |
 
 
+Documents endpoint
+------------------
+| Endpoint           | HEAD | GET | POST | PUT | DELETE |
+|--------------------|------|-----|------|-----|--------|
+| /db/doc            | ✔️    | ✔️   | ❌    | ❌   | ❌      |
+| /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |
+
 How-to
 ======
 Usage of this library is simple.
