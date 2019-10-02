@@ -188,6 +188,14 @@ module Core =
     let private formatQueryParameters (parameters: QueryParameters) : (string * string) list =
         parameters |> List.map (fun x -> (x.Key, x.AsString))
     
+    /// Serializes an object and returns a string representation as well as a binary (UTF8) representation.
+    /// Allows the user to define additional `JsonConverter`.
+    let private serializeAsBinaryJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: obj) =
+        let json = match customConverters with
+                    | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
+                    | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
+        (json, System.Text.Encoding.UTF8.GetBytes(json))
+
     /// <summary>
     /// Creates a post request with the given form values.
     /// </summary>
@@ -196,32 +204,31 @@ module Core =
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             Http.AsyncRequest(url, body = FormValues formValues, cookieContainer = DefaultCookieContainer, silentHttpErrors = true)
 
-    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverter: Newtonsoft.Json.JsonConverter list) (content: obj) (queryParameters: QueryParameters) =
+    /// Creates a POST request containing a json serialized payload. Allows to define additional `JsonConverter`.
+    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: obj) (queryParameters: QueryParameters) =
         fun () ->
             let queryParamters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            let json = match customConverter with
-                        | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
-                        | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
-            let binary = System.Text.Encoding.UTF8.GetBytes(json)
+            let json, binary = serializeAsBinaryJson customConverters content
             do printfn "Serialized object:"
             do printfn "%s" json
             Http.AsyncRequest(url, 
+                              httpMethod = "POST",
                               body = BinaryUpload binary, 
                               cookieContainer = DefaultCookieContainer, 
-                              headers = [ FSharp.Data.HttpRequestHeaders.ContentType HttpContentTypes.Json ],
+                              headers = [ HttpRequestHeaders.ContentType HttpContentTypes.Json ],
                               query = queryParamters,
                               silentHttpErrors = true
                             )
 
     /// <summary>
-    /// Creates a post request containing a json serialized payload.
+    /// Creates a POST request containing a json serialized payload.
     /// </summary>
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
         createCustomJsonPost p path [] content queryParameters
 
     /// <summary>
-    /// Creates a put request without a body.
+    /// Creates a PUT request without a body.
     /// </summary>
     let createPut (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
@@ -229,15 +236,33 @@ module Core =
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "PUT", query = queryParamters, silentHttpErrors = true)
 
+    /// Creates a PUT request with a json payload.
+    let createCustomJsonPut (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: obj) (queryParameters: QueryParameters) =
+        fun () ->
+            let queryParameters = queryParameters |> formatQueryParameters
+            let url = combineUrls (p |> DbProperties.baseEndpoint) path
+            let json, binary = serializeAsBinaryJson customConverters content
+            Http.AsyncRequest(url,
+                              httpMethod = "PUT",
+                              body = BinaryUpload binary,
+                              cookieContainer = DefaultCookieContainer,
+                              headers = [ HttpRequestHeaders.ContentType HttpContentTypes.Json ],
+                              query = queryParameters,
+                              silentHttpErrors = true
+                            )
+
+    /// Creates a simple PUT request without a body.
+    let createJsonPut (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
+        createCustomJsonPut p path [] content queryParameters
+
+    /// Creates a simple GET request.
     let createGet (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
             let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
-            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, query = queryParameters, silentHttpErrors = true)
+            Http.AsyncRequest(url, httpMethod = "GET", cookieContainer = DefaultCookieContainer, query = queryParameters, silentHttpErrors = true)
 
-    /// <summary>
     /// Creates a simple HEAD request.
-    /// </summary>
     let createHead (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
         fun () ->
             let queryParameters = queryParameters |> formatQueryParameters
