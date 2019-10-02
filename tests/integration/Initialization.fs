@@ -143,7 +143,7 @@ module Initialization =
         async {
             let queries = names |> List.map (fun name ->
                 async {
-                    match! Database.Create.query defaultDbProperties name None None with
+                    match! Database.Create.query defaultDbProperties name [] with
                     | Database.Create.Result.Unauthorized _ -> return false
                     | Database.Create.Result.AlreadyExists _ -> return false
                     | Database.Create.Result.InvalidDbName _ -> return false

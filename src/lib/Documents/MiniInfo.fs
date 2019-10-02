@@ -60,11 +60,12 @@ module MiniInfo =
             else if id = null then
                 return DocumentIdMissing
             else
-                let request = createHead props (sprintf "%s/%s" name (obj |> string)) []
+                let request = createHead props (sprintf "%s/%s" name (id |> string)) []
                 let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
+                let trimETag (tag: string) = tag.TrimStart([|'"'|]).TrimEnd([|'"'|])
                 return match result.StatusCode with
-                       | Some 200 -> DocumentExists { ETag = result.Headers.["ETag"]; Length = result.Headers.["Content-Length"] |> int }
-                       | Some 304 -> NotModified { ETag = result.Headers.["ETag"]; Length = result.Headers.["Content-Length"] |> int }
+                       | Some 200 -> DocumentExists { ETag = result.Headers.["ETag"] |> trimETag; Length = result.Headers.["Content-Length"] |> int }
+                       | Some 304 -> NotModified { ETag = result.Headers.["ETag"] |> trimETag; Length = result.Headers.["Content-Length"] |> int }
                        | Some 401 -> NotAuthorized <| errorFromIRequestResult result
                        | Some 404 -> NotFound <| errorFromIRequestResult result
                        | _        -> Failure <| errorFromIRequestResult result

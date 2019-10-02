@@ -11,6 +11,7 @@
     <Compile Include="DbProperties.fs" />
     <Compile Include="Mango.fs" />
     <Compile Include="MangoConverters.fs" />
+    <Compile Include="QueryParameters.fs" />
     <Compile Include="Core.fs" />
   </ItemGroup>
   <ItemGroup>
