@@ -85,7 +85,7 @@ Documents endpoint
 ------------------
 | Endpoint           | HEAD | GET | POST | PUT | DELETE |
 |--------------------|------|-----|------|-----|--------|
-| /db/doc            | ✔️    | ✔️   | ❌    | ✔️   | ❌      |
+| /db/doc            | ✔️    | ✔️   | ❌    | ✔️   | ✔️      |
 | /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |
 
 How-to
