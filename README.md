@@ -22,6 +22,7 @@ If you are in doubt please submit an issue!
 
 Features
 =======
+Note that (optional) query parameter are currently *not supported*! Even for endpoints that are marked as working. Query parameters that are required (like the `rev` parameter for `/db/docid/` `[PUT]`) are supported.
 
 | Authentication | Status |
 |--------|--------|
