@@ -73,7 +73,7 @@ module Put =
             }
 
         [<Fact>]
-        member this.``Putting an existing document twice without setting the rev returns Conflict result`` () =
+        member this.``Putting a document twice without setting the rev returns Conflict result`` () =
             async {
                 let! first = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev testDocumentWithId
                 match first with
