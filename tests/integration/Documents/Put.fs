@@ -42,17 +42,19 @@ module Put =
         [<Fact>]
         member this.``Putting an existing document returns Created and keeps number of documents`` () =
             async {
+                // add the document for the first time
+                //
                 let! first = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev testDocumentWithId
                 match first with
                 | Documents.Put.Result.Created x ->
                     
-                    // add the document for the first time
+                    // add the document for the second time (with an updated rev)
                     //
                     let newDocument = { testDocumentWithId with _rev = Some x.rev; myInt = 1337 }
                     let! second = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev newDocument
                     second |> should be (ofCase <@ Documents.Put.Result.Created @>)
 
-                    // update the document using the rev from the previous step
+                    // retrieve the document and check that is has the new content
                     //
                     let! check = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName testDocumentWithId._id []
                     match check with
@@ -65,6 +67,23 @@ module Put =
                     match count with
                     | Server.DbsInfo.Result.Success s -> s.[0].info.Value.doc_count |> should equal 1
                     | _ -> failwith "Putting the updated document resulted in the creation of a new document!"
+
+                | _ -> failwith "Adding the initial document failed."
+
+            }
+
+        [<Fact>]
+        member this.``Putting an existing document twice without setting the rev returns Conflict result`` () =
+            async {
+                let! first = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev testDocumentWithId
+                match first with
+                | Documents.Put.Result.Created x ->
+                    
+                    // add the document for the first time
+                    //
+                    let newDocument = { testDocumentWithId with myInt = 1337 }
+                    let! second = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev newDocument
+                    second |> should be (ofCase <@ Documents.Put.Result.Conflict @>)
 
                 | _ -> failwith "Adding the initial document failed."
 
