@@ -21,80 +21,8 @@ let main argv =
         | DbProperties.DbPropertiesCreateResult.Valid p ->
             match! Server.Authenticate.query p with
             | Server.Authenticate.Result.Success _ ->
-                (*
-                let! exists = Database.Exists.query p "test-db"
-                let result = match exists with
-                             | Database.Exists.Result.Exists -> "exists"
-                             | Database.Exists.Result.DoesNotExist -> "does not exist"
-                             | Database.Exists.Result.RequestError e -> "request error: " + e.reason
-                //let result = exists |> Result.mapBoth (fun b -> b |> string) (fun e -> e |> string) //|> (fun (r: Result<string, string>) -> match r with Ok a -> a | Error b -> b)
-                *)
-                //let! result = Database.Details.queryMultiple p ["test-db"] //match! Database.Details.querySingle "test-db" with
-                //let! result = Server.Info.query p
-                let addToDb = fun x -> Database.AddDocument.query p "test-db" x |> Async.RunSynchronously
-
-                //let platoon = data.platoons |> List.last
-                //let result = Database.AddDocument.query p "test-db" platoon |> Async.RunSynchronously
-                //let result = Database.AllDocuments.query p "test-db" |> Async.RunSynchronously
-                //let! result = Server.Details.query p ["test-db2"]
-
-                //let! result = Database.AllDocuments.queryAll p "test-db"
-                //let! result = Database.AllDocuments.querySelected p "test-db" [ "791f157c2e2003dd065c12973d043781" ]
-                //let! result = Database.AllDocuments.querySelected p "test-db" [ "garbage :D" ]
-
-                //do printfn "%A" result
-
-                let conditional = { 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.name = "name"; 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.parents = []; 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.operation = Mango.Condition.Equal (Mango.DataType.String "4. Zug")
-                }
-                let combination = Mango.CombinationOperator.And [ conditional |> Mango.Operator.Conditional ] |> Mango.Operator.Combinator
-                let combination2 = Mango.CombinationOperator.And [ combination ] |> Mango.Operator.Combinator
-                let expression = Mango.createExpression combination2 //(Mango.Operator.Conditional combination)
-                let! result = Database.Find.query p "test-db" expression
-                do printfn "%A" result
-                (*
-                let operatorConverter = MangoConverters.OperatorJsonConverter() :> Newtonsoft.Json.JsonConverter
-                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ operatorConverter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
-                let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
-                do printfn "%s" serialized
-                *)
-
-                (*
-                //let inProperty = MangoConverters.dataTypesToJProperty "$in" [ Mango.DataType.Bool false; Mango.DataType.String "my string"; Mango.DataType.Int 16 ]
-                let conditional = { 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.name = "name"; 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.parents = []; 
-                                    b0wter.CouchDb.Lib.Mango.ConditionalOperator.operation = Mango.Condition.In [ Mango.DataType.Bool false; Mango.DataType.String "my string"; Mango.DataType.Int 16 ]
-                }
-                let expression = Mango.createExpression (Mango.Operator.Conditional conditional)
-                let converter = MangoConverters.ConditionalJsonConverter ()
-                let jsonSettings = Utilities.Json.jsonSettingsWithCustomConverter [ converter; FifteenBelow.Json.UnionConverter() :> Newtonsoft.Json.JsonConverter ]
-                let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(expression, jsonSettings)
-                do printfn "%s" serialized 
-                *)
-
-                //let savedPlatoons = data.platoons |> List.map addToDb
-                //let savedAssignments = data.assignments |> List.map addToDb
-
-                
-                //let! result = Database.AddDocument.query p "test-db" test
-                            //| Database.Details.SingleResult.Failure e ->
-                //do printfn "%A" savedPlatoons
-                //do printfn "%A" savedAssignments
-                
+                printfn "Finished program."
                 return 0
-                (*
-                let! x = Database.all p
-                match! Database.all p with
-                | Ok names ->
-                    do printfn "%A" names
-                    return 0
-                | Error reason ->
-                    do printfn "%s" reason
-                    return 1
-                    *)
             | _ ->
                 printfn "Authentifizierung fehlgeschlagen." 
                 return 1
