@@ -5,6 +5,7 @@ namespace b0wter.CouchDb.Lib.Documents
 //
 
 open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 
@@ -25,7 +26,7 @@ module Head =
         | NotModified of Response
         /// <summary>
         /// Read privilege required
-        | NotAuthorized of RequestResult.T
+        | Unauthorized of RequestResult.T
         /// <summary>
         /// Document not found>
         /// </summary>
@@ -33,15 +34,15 @@ module Head =
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
-        | DbNameMissing
+        | DbNameMissing of RequestResult.T
         /// <summary>
         /// Is returned before querying the db if the id is null.
         /// </summary>
-        | DocumentIdMissing
+        | DocumentIdMissing of RequestResult.T
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation.
         /// </summary>
-        | Failure of RequestResult.T
+        | Unknown of RequestResult.T
         
     /// <summary>
     /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
@@ -56,9 +57,9 @@ module Head =
     let query (props: DbProperties.T) (name: string) (id: obj) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then
-                return DbNameMissing
+                return DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else if id = null then
-                return DocumentIdMissing
+                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let request = createHead props (sprintf "%s/%s" name (id |> string)) []
                 let! result = sendRequest request
@@ -66,7 +67,14 @@ module Head =
                 return match result.statusCode with
                        | Some 200 -> DocumentExists { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
                        | Some 304 -> NotModified { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
-                       | Some 401 -> NotAuthorized result
+                       | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result
-                       | _        -> Failure result
+                       | _        -> Unknown result
         }
+        
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | DocumentExists x | NotModified x -> Ok x
+        | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | Unknown e ->
+            Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

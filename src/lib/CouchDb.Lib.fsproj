@@ -14,6 +14,7 @@
     <Compile Include="QueryParameters.fs" />
     <Compile Include="JsonDeserializationError.fs" />
     <Compile Include="RequestResult.fs" />
+    <Compile Include="ErrorRequestResult.fs" />
     <Compile Include="Core.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -22,7 +23,7 @@
     <PackageReference Include="FSharp.Data.GraphQL.Client" Version="1.0.1" />
     <PackageReference Include="FSharpx.Async" Version="1.14.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="b0wter.FSharp" Version="3.1.2" />
+    <PackageReference Include="b0wter.FSharp" Version="3.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />

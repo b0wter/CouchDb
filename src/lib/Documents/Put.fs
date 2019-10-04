@@ -33,24 +33,23 @@ module Put =
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
         | Conflict of RequestResult.T
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing
+        | DbNameMissing of RequestResult.T
         /// Json deserialization failed
         | JsonDeserializationError of RequestResult.T
         /// If the result could not be interpreted.
         | Unknown of RequestResult.T
         /// This endpoint requires the document id to be set.
-        | DocumentIdMissing
+        | DocumentIdMissing of RequestResult.T
 
-    /// The PUT method creates a new named document, or creates a new revision of the existing document. 
     /// Unlike the POST /{db}, you must specify the document ID in the request URL.
     /// When updating an existing document, the current document revision must be included in the document 
     /// (i.e. the request body), as the rev query parameter, or in the If-Match request header.
     let query<'a> (props: DbProperties.T) (dbName: string) (docId: 'a -> System.Guid) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
-                return DbNameMissing
+                return DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else if document |> docId = System.Guid.Empty then
-                return DocumentIdMissing
+                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let queryParams = match document |> docRev with
                                   | Some rev -> [ StringQueryParameter("rev", rev) :> BaseQueryParameter ]
@@ -73,3 +72,10 @@ module Put =
                         | Some 409 -> Conflict result
                         | _ -> Unknown result
         }
+        
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Created x | Accepted x -> Ok x
+        | BadRequest e | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Conflict e | Unknown e ->
+            Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

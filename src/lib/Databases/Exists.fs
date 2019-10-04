@@ -5,6 +5,7 @@ namespace b0wter.CouchDb.Lib.Database
 //
 
 open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp.Operators
 
@@ -13,12 +14,12 @@ module Exists =
     type Result
         = Exists
         | DoesNotExist
-        | DbNameMissing
+        | DbNameMissing of RequestResult.T
         | Unknown of RequestResult.T
 
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing else
+            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createHead props name []
             let! result = sendRequest request
             return match result.statusCode with
@@ -26,3 +27,10 @@ module Exists =
                     | Some 404 -> DoesNotExist
                     | _ -> Unknown result
         }
+        
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Exists -> Ok true
+        | DoesNotExist -> Ok false
+        | DbNameMissing e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

@@ -8,6 +8,7 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 open Newtonsoft.Json
+open b0wter.CouchDb.Lib
 
 module Find =
     type ExecutionStats = {
@@ -26,12 +27,18 @@ module Find =
     }
 
     type Result<'a>
+        /// Request completed successfully
         = Success of Response<'a>
-        | InvalidRequest of RequestResult.T
-        | NotAuthorized of RequestResult.T
+        /// Invalid request
+        | BadRequest of RequestResult.T
+        /// Read permission required
+        | Unauthorized of RequestResult.T
+        /// Query execution error
         | QueryExecutionError of RequestResult.T
-        | JsonError of JsonDeserializationError.T
-        | Failure of RequestResult.T
+        /// If the local deserialization of the servers response failed.
+        | JsonDeserializationError of RequestResult.T
+        /// If the response from the server could not be interpreted.
+        | Unknown of RequestResult.T
 
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
@@ -41,18 +48,23 @@ module Find =
 
             do printfn "Response content:%s%s" System.Environment.NewLine queryResult.content
 
-            match queryResult.statusCode with
-            | Some 200 ->
-                match deserializeJsonWith<Response<'a>> [] queryResult.content with
-                | Ok o -> return Success o
-                | Error e -> return JsonError e
-            | Some 400 | Some 401 | Some 500 ->
-                return InvalidRequest result
-            | _ ->
-                return Failure result
+            return match queryResult.statusCode with
+                    | Some 200 ->
+                        match deserializeJsonWith<Response<'a>> [] queryResult.content with
+                        | Ok o -> Success o
+                        | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                    | Some 400 -> BadRequest result
+                    | Some 401 -> Unauthorized result
+                    | Some 500 -> QueryExecutionError result
+                    | _ ->
+                        Unknown result
         }
         // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
         // this is currently not in use.
         
-
-
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult<'a> (r: Result<'a>) =
+        match r with
+        | Success x -> Ok x
+        | BadRequest e | Unauthorized e | QueryExecutionError e | JsonDeserializationError e | Unknown e ->
+            Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

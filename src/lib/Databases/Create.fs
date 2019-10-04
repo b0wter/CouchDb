@@ -52,4 +52,11 @@ module Create =
                     | _   -> Unknown <| result
             return r
         }
+        
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Created x | Accepted x -> Ok x
+        | InvalidDbName e | Unauthorized e | AlreadyExists e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+    
 

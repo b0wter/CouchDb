@@ -47,5 +47,10 @@ module Delete =
             return r
         }
         
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Deleted x | Accepted x -> Ok x
+        | NotFound e | Unauthorized e | BadRequest e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
 

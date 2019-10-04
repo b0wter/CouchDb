@@ -31,13 +31,15 @@ module Copy =
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
         | Conflict of RequestResult.T
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing
+        | DbNameMissing of RequestResult.T
         /// Json deserialization failed
-        | JsonDeserialisationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.T
         /// If the result could not be interpreted.
         | Unknown of RequestResult.T
         /// This endpoint requires the document id of the destination to be set.
-        | DestinationIdMissing
+        | DestinationIdMissing of RequestResult.T
+        /// This endpoint requires the document id to be set.
+        | DocumentIdMissing of RequestResult.T
     
     /// The COPY (which is non-standard HTTP) copies an existing document to a new or existing document.
     /// Copying a document is only possible within the same database.
@@ -46,7 +48,9 @@ module Copy =
     let query<'a> (props: DbProperties.T) (dbName: string) (docId: System.Guid) (destinationId: System.Guid) (destinationRev: string option) (docRev: string option) : Async<Result> =
         async {
             if destinationId = System.Guid.Empty then
-                return DestinationIdMissing
+                return DestinationIdMissing <| RequestResult.create(None, "You need to supply a non-empty destination id. The query has not been sent to the server.")
+            else if docId = System.Guid.Empty then
+                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let destination = match destinationRev with
                                   | Some rev -> sprintf "%s?rev=%s" (destinationId |> string) rev
@@ -60,14 +64,21 @@ module Copy =
                         | Some 201 ->
                             match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Created response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
                         | Some 202 ->
                             match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
                         | Some 400 -> BadRequest <| result
                         | Some 401 -> Unauthorized <| result
                         | Some 404 -> NotFound <| result
                         | Some 409 -> Conflict <| result
                         | _ -> Unknown <| result
         }
+
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Created x | Accepted x -> Ok x
+        | BadRequest e | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Conflict e | Unknown e | DestinationIdMissing e ->
+            Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

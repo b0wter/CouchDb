@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Documents
 
 open Newtonsoft.Json
 open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
 open b0wter.FSharp
@@ -19,16 +20,16 @@ module Delete =
     }
     
     type Result
-        /// Json deserialization failed
-        = JsonDeserialisationError of RequestResult.T
-        /// Document id is empty
-        | DocumentIdEmpty
-        /// Document rev is empty
-        | DocumentRevEmpty
         /// Document successfully removed (200)
-        | Ok of Response
+        = Ok of Response
         /// Request was accepted, but changes are not yet stored on disk (202)
         | Accepted of Response 
+        /// Json deserialization failed
+        | JsonDeserialisationError of RequestResult.T
+        /// Document id is empty
+        | DocumentIdEmpty of RequestResult.T
+        /// Document rev is empty
+        | DocumentRevEmpty of RequestResult.T
         /// Invalid request body or parameters (400)
         | BadRequest of RequestResult.T 
         /// Write privileges required (401)
@@ -47,9 +48,9 @@ module Delete =
     let query<'a> (props: DbProperties.T) (dbName: string) (docId: System.Guid) (docRev: string) : Async<Result> =
         async {
             if docId = System.Guid.Empty then
-                return DocumentIdEmpty
+                return DocumentIdEmpty <| RequestResult.create(None, "You need to supply a non-empty document id. The query has not been sent to the server.")
             else if System.String.IsNullOrWhiteSpace(docRev) then
-                return DocumentRevEmpty
+                return DocumentRevEmpty <| RequestResult.create(None, "You need to supply a non-empty document rev. The query has not been sent to the server.")
             else
                 let queryParams = [ StringQueryParameter("rev", docRev) :> BaseQueryParameter ]
                 let url = sprintf "%s/%s" dbName (docId |> string)
@@ -71,3 +72,9 @@ module Delete =
                         | _ -> Unknown result
         }
 
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Ok x | Accepted x -> FSharp.Core.Result.Ok x
+        | BadRequest e | NotFound e | Unauthorized e | Conflict e | DocumentIdEmpty e | DocumentRevEmpty e | JsonDeserialisationError e | Unknown e ->
+            FSharp.Core.Result.Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

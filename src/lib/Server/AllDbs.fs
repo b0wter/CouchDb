@@ -4,9 +4,7 @@ namespace b0wter.CouchDb.Lib.Server
     // Queries: /_all_dbs
     //
     
-    open Newtonsoft.Json
     open b0wter.CouchDb.Lib.Core
-    open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Lib
 
@@ -36,5 +34,4 @@ namespace b0wter.CouchDb.Lib.Server
         let asResult (r: Result) =
             match r with
             | Success response -> Ok response
-            | JsonDeserialisationError e -> failwith "not implemented"
-            | Unknown e -> Error e
+            | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

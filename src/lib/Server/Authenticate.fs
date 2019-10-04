@@ -8,6 +8,7 @@ namespace b0wter.CouchDb.Lib.Server
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
 
     module Authenticate =
         type Vendor = {
@@ -28,7 +29,7 @@ namespace b0wter.CouchDb.Lib.Server
             /// Redirect after successful authentication (302)
             | Found of Response
             /// Username or password wasn’t recognized (401)
-            | Unauthorized
+            | Unauthorized of RequestResult.T
             /// Deserialization of the recieved response failed.
             | JsonDeserialisationError of RequestResult.T
             /// Response could not be interpreted.
@@ -49,6 +50,12 @@ namespace b0wter.CouchDb.Lib.Server
                             match deserializeJson<Response> result.content with
                             | Ok r -> Success r
                             | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
-                        | Some 401 -> Unauthorized
+                        | Some 401 -> Unauthorized result
                         | _ -> Unknown result
             }
+            
+        /// Returns the result from the query as a generic `FSharp.Core.Result`.
+        let asResult (r: Result) =
+            match r with
+            | Success response | Found response -> Ok response
+            | Unauthorized e | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

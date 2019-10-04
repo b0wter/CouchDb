@@ -90,3 +90,9 @@ namespace b0wter.CouchDb.Lib.Server
                             | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
                             | _   -> Unknown <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
             }
+            
+        /// Returns the result from the query as a generic `FSharp.Core.Result`.
+        let asResult (r: Result) =
+            match r with
+            | Success response -> Ok response
+            | KeyError e | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

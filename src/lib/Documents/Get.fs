@@ -64,7 +64,7 @@ module Get =
         | NotModified of Response<'a>
         /// <summary>
         /// Read privilege required
-        | NotAuthorized of RequestResult.T
+        | Unauthorized of RequestResult.T
         /// <summary>
         /// Document not found>
         /// </summary>
@@ -72,15 +72,15 @@ module Get =
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
-        | DbNameMissing
+        | DbNameMissing of RequestResult.T
         /// <summary>
         /// Is returned before querying the db if the id is null.
         /// </summary>
-        | DocumentIdMissing
+        | DocumentIdMissing of RequestResult.T
         /// <summary>
         /// Is returned if the query was successful but the local deserialization failed.
         /// </summary>
-        | JsonDeserializationError of JsonDeserializationError.T
+        | JsonDeserializationError of RequestResult.T
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation
         /// or a network level error ocurred.
@@ -97,12 +97,12 @@ module Get =
     ///
     /// The given `id` will be converted to a string using the ToString() method.
     /// </summary>
-    let query<'a> (props: DbProperties.T) (name: string) (id: obj) (queryParameters: BaseQueryParameter list): Async<Result<'a>> =
+    let query<'a> (props: DbProperties.T) (name: string) (id: System.Guid) (queryParameters: BaseQueryParameter list): Async<Result<'a>> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then
-                return DbNameMissing
-            else if id |> isNull then
-                return DocumentIdMissing
+                return DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
+            else if id = System.Guid.Empty then
+                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let request = createGet props (sprintf "%s/%s" name (id |> string)) queryParameters
                 let! result = sendRequest request
@@ -112,9 +112,16 @@ module Get =
                          let meta = result.content |> deserializeJson<MetaFields>
                          match (document, meta) with
                          | (Ok d, Ok m) -> DocumentExists { meta = m; content = d }
-                         | (Error e, _) -> JsonDeserializationError e
-                         | (_, Error e) -> JsonDeserializationError e
-                       | Some 401 -> NotAuthorized result
+                         | (Error e, _) -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                         | (_, Error e) -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                       | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result
                        | _        -> Unknown result
         }
+
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult<'a> (r: Result<'a>) =
+        match r with
+        | DocumentExists x | NotModified x -> Ok x
+        | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Unknown e ->
+            Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)

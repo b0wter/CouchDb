@@ -63,7 +63,7 @@ module Get =
         [<Fact>]
         member this.``Retrieving a document without specifying an id returns DocumentIdMissing`` () =
             async {
-                let! result = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName null []
+                let! result = Documents.Get.query<TestDocument> Initialization.defaultDbProperties dbName System.Guid.Empty []
                 result |> should be (ofCase<@ Documents.Get.Result<TestDocument>.DocumentIdMissing @>)
             }
                 

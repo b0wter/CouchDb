@@ -60,5 +60,10 @@ module AllDocuments =
         let request = createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection []
         query request
 
+    /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    let asResult (r: Result) =
+        match r with
+        | Success x -> Ok x
+        | NotFound e | JsonDeserialisationError e | Unauthorized e | BadRequest e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
 

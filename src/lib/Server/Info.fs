@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Server
     
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
 
     module Info =
         type VendorInfo = {
@@ -36,4 +37,10 @@ namespace b0wter.CouchDb.Lib.Server
                                       | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
                         | _ -> Unknown result
             }
+            
+        /// Returns the result from the query as a generic `FSharp.Core.Result`.
+        let asResult (r: Result) =
+            match r with
+            | Success response -> Ok response
+            | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
