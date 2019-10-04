@@ -7,6 +7,9 @@ namespace b0wter.CouchDb.Lib.Server
     open Newtonsoft.Json
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
     open b0wter.FSharp
     
     module DbsInfo =
@@ -60,11 +63,13 @@ namespace b0wter.CouchDb.Lib.Server
             /// <summary>
             /// Returned if the keys-field is missing or the number of requested keys exceeded the server's maximum allowed number of keys.
             /// </summary>
-            | KeyError of ErrorRequestResult
+            | KeyError of RequestResult.T
+            /// Returned if the local deserialization of the response failed.
+            | JsonDeserialisationError of JsonDeserialisationError
             /// <summary>
             /// Generic error case. Refer to the status code and reason for more details.
             /// </summary>
-            | Failure of ErrorRequestResult
+            | Unknown of RequestResult.T
 
         /// <summary>
         /// Returns detailed information for all databases (`names` parameter).
@@ -73,18 +78,15 @@ namespace b0wter.CouchDb.Lib.Server
             async {
                 do printfn "Querying db information for keys: %A" names
                 if names.IsEmpty then
-                    return Core.errorRequestResult (None, "The list of names is empty. The request was NOT send to the server", None)
-                           |> Result.KeyError
+                    return KeyError <| RequestResult.create (None, "You have not supplied database names. No query was sent to the server.")
                 else
                     let payload = { keys = names}
                     let request = createJsonPost props "_dbs_info" payload []
-                    let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
-                    match result.StatusCode with
-                    | Some 200 -> try
-                                    return Success <| JsonConvert.DeserializeObject<Response []>(result.Body, Utilities.Json.jsonSettings)
-                                  with
-                                    | :? JsonException as ex  ->
-                                        return Failure <| errorRequestResult (result.StatusCode, ex.Message, Some result.Headers)
-                    | Some 400 -> return KeyError <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
-                    | _   -> return Failure <| errorRequestResult (result.StatusCode, result.Body, Some result.Headers)
+                    let! result = sendRequest request 
+                    return match result.statusCode with
+                            | Some 200 -> match deserializeJson result.content with
+                                          | Ok r -> Success r
+                                          | Error e -> JsonDeserialisationError e
+                            | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
+                            | _   -> Unknown <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
             }

@@ -64,11 +64,11 @@ module Get =
         | NotModified of Response<'a>
         /// <summary>
         /// Read privilege required
-        | NotAuthorized of ErrorRequestResult
+        | NotAuthorized of RequestResult.T
         /// <summary>
         /// Document not found>
         /// </summary>
-        | NotFound of ErrorRequestResult
+        | NotFound of RequestResult.T
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
@@ -85,7 +85,7 @@ module Get =
         /// Is returned if the response could not be interpreted as a case specified by the documentation
         /// or a network level error ocurred.
         /// </summary>
-        | Failure of ErrorRequestResult
+        | Unknown of RequestResult.T
         
     /// <summary>
     /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
@@ -106,24 +106,15 @@ module Get =
             else
                 let request = createGet props (sprintf "%s/%s" name (id |> string)) queryParameters
                 let! result = sendRequest request
-                let iResult = result :> IRequestResult
-                let jsonDeserialize = fun result -> match result with
-                                                    | SuccessResult result ->
-                                                        try
-                                                            let content = JsonConvert.DeserializeObject<'a>(result.content, Utilities.Json.jsonSettings)
-                                                            let meta = JsonConvert.DeserializeObject<MetaFields>(result.content, Utilities.Json.jsonSettings)
-                                                            Ok (meta, content)
-                                                        with
-                                                        | :? JsonException as ex -> Error { JsonDeserialisationError.json = result.content; JsonDeserialisationError.reason = ex.Message }
-                                                    | ErrorResult _ -> Error { JsonDeserialisationError.json = ""; JsonDeserialisationError.reason = "The request was unsuccessful, there is no json to parse." }
-                return match iResult.StatusCode with
-                       | Some 200 -> match result |> jsonDeserialize with
-                                     | Ok (meta, content) -> DocumentExists <| { meta = meta; content = content }
-                                     | Error e -> JsonDeserialisationError <| e
-                       | Some 304 -> match result |> jsonDeserialize with
-                                     | Ok (meta, content) -> NotModified <| { meta = meta; content = content }
-                                     | Error e -> JsonDeserialisationError <| e
-                       | Some 401 -> NotAuthorized <| errorFromIRequestResult result
-                       | Some 404 -> NotFound <| errorFromIRequestResult result
-                       | _        -> Failure <| errorFromIRequestResult result
+                return match result.statusCode with
+                       | Some 200 | Some 304 ->
+                         let document = result.content |> deserializeJson<'a>
+                         let meta = result.content |> deserializeJson<MetaFields>
+                         match (document, meta) with
+                         | (Ok d, Ok m) -> DocumentExists { meta = m; content = d }
+                         | (Error e, _) -> JsonDeserialisationError e
+                         | (_, Error e) -> JsonDeserialisationError e
+                       | Some 401 -> NotAuthorized result
+                       | Some 404 -> NotFound result
+                       | _        -> Unknown result
         }

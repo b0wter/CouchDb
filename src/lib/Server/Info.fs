@@ -4,7 +4,6 @@ namespace b0wter.CouchDb.Lib.Server
     // Queries: /
     //
     
-    open Newtonsoft.Json
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
 
@@ -24,19 +23,17 @@ namespace b0wter.CouchDb.Lib.Server
 
         type Result
             = Success of Response
-            | Failure of ErrorRequestResult
+            | JsonDeserialisationError of JsonDeserialisationError
+            | Unknown of RequestResult.T
 
         let query (props: DbProperties.T) : Async<Result> =
             async {
                 let request = createGet props "/" []
-                match! sendRequest request with
-                | SuccessResult s ->
-                    do printfn "%s" s.content
-                    try
-                        return Success <| JsonConvert.DeserializeObject<Response>(s.content)
-                    with
-                    | :? JsonException as ex -> return Failure <| errorRequestResult (s.statusCode, ex.Message, Some s.headers)
-                | ErrorResult e ->
-                    return Failure e
+                let! result = sendRequest request
+                return match result.statusCode with
+                        | Some 200 -> match deserializeJson<Response> result.content with
+                                      | Ok response -> Success response
+                                      | Error r -> JsonDeserialisationError r
+                        | _ -> Unknown result
             }
 

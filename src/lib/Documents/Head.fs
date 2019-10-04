@@ -25,11 +25,11 @@ module Head =
         | NotModified of Response
         /// <summary>
         /// Read privilege required
-        | NotAuthorized of ErrorRequestResult
+        | NotAuthorized of RequestResult.T
         /// <summary>
         /// Document not found>
         /// </summary>
-        | NotFound of ErrorRequestResult
+        | NotFound of RequestResult.T
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
@@ -41,7 +41,7 @@ module Head =
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation.
         /// </summary>
-        | Failure of ErrorRequestResult
+        | Failure of RequestResult.T
         
     /// <summary>
     /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
@@ -61,12 +61,12 @@ module Head =
                 return DocumentIdMissing
             else
                 let request = createHead props (sprintf "%s/%s" name (id |> string)) []
-                let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
+                let! result = sendRequest request
                 let trimETag (tag: string) = tag.TrimStart([|'"'|]).TrimEnd([|'"'|])
-                return match result.StatusCode with
-                       | Some 200 -> DocumentExists { ETag = result.Headers.["ETag"] |> trimETag; Length = result.Headers.["Content-Length"] |> int }
-                       | Some 304 -> NotModified { ETag = result.Headers.["ETag"] |> trimETag; Length = result.Headers.["Content-Length"] |> int }
-                       | Some 401 -> NotAuthorized <| errorFromIRequestResult result
-                       | Some 404 -> NotFound <| errorFromIRequestResult result
-                       | _        -> Failure <| errorFromIRequestResult result
+                return match result.statusCode with
+                       | Some 200 -> DocumentExists { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
+                       | Some 304 -> NotModified { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
+                       | Some 401 -> NotAuthorized result
+                       | Some 404 -> NotFound result
+                       | _        -> Failure result
         }

@@ -19,8 +19,8 @@ let main argv =
             printfn "Port ist ungültig"
             return 1
         | DbProperties.DbPropertiesCreateResult.Valid p ->
-            match! Core.authenticate p with
-            | Core.SuccessResult _ ->
+            match! Server.Authenticate.query p with
+            | Server.Authenticate.Result.Success _ ->
                 (*
                 let! exists = Database.Exists.query p "test-db"
                 let result = match exists with
@@ -95,8 +95,8 @@ let main argv =
                     do printfn "%s" reason
                     return 1
                     *)
-            | Core.ErrorResult e ->
-                printfn "Fehlerhafte Anfrage: %s (%i)" e.reason (defaultArg e.statusCode 0)
+            | _ ->
+                printfn "Authentifizierung fehlgeschlagen." 
                 return 1
     } |> Async.RunSynchronously
     

@@ -5,6 +5,7 @@ namespace b0wter.CouchDb.Lib.Documents
 //
 
 open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
 
@@ -22,19 +23,19 @@ module Copy =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of ErrorRequestResult
+        | BadRequest of RequestResult.T
         /// Read or write privileges required (401)
-        | Unauthorized of ErrorRequestResult
+        | Unauthorized of RequestResult.T
         /// Specified database or document ID or revision doesn’t exists (404)
-        | NotFound of ErrorRequestResult
+        | NotFound of RequestResult.T
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of ErrorRequestResult
+        | Conflict of RequestResult.T
         /// Is returned before querying the db if the database name is empty.
         | DbNameMissing
         /// Json deserialization failed
-        | JsonDeserialisationError of ErrorRequestResult
+        | JsonDeserialisationError of RequestResult.T
         /// If the result could not be interpreted.
-        | Unknown of ErrorRequestResult
+        | Unknown of RequestResult.T
         /// This endpoint requires the document id of the destination to be set.
         | DestinationIdMissing
     
@@ -55,19 +56,18 @@ module Copy =
                 let url = sprintf "%s/%s" dbName (docId |> string)
                 let request = createCopy props url queryParams [ destinationHeader ]
                 let! result = sendRequest request
-                let iresult = result :> IRequestResult
-                return match iresult.StatusCode with
+                return match result.statusCode with
                         | Some 201 ->
-                            match deserializeJson [] iresult.Body with
+                            match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Created response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iresult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iresult.Headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
                         | Some 202 ->
-                            match deserializeJson [] iresult.Body with
+                            match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iresult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iresult.Headers)
-                        | Some 400 -> BadRequest <| errorFromIRequestResult iresult
-                        | Some 401 -> Unauthorized <| errorFromIRequestResult iresult
-                        | Some 404 -> NotFound <| errorFromIRequestResult iresult
-                        | Some 409 -> Conflict <| errorFromIRequestResult iresult
-                        | _ -> Unknown <| errorFromIRequestResult iresult
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                        | Some 400 -> BadRequest <| result
+                        | Some 401 -> Unauthorized <| result
+                        | Some 404 -> NotFound <| result
+                        | Some 409 -> Conflict <| result
+                        | _ -> Unknown <| result
         }

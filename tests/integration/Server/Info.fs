@@ -22,8 +22,10 @@ module Info =
                     response.vendor.name |> should not' <| be NullOrEmptyString
                     response.git_sha |> should not' <| be NullOrEmptyString
                     response.features |> should not' <| be Empty
-                | Server.Info.Result.Failure x ->
-                    failwith x.reason
+                | Server.Info.Result.JsonDeserialisationError e ->
+                    failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                | Server.Info.Result.Unknown x ->
+                    failwith x.content
             }
     
 

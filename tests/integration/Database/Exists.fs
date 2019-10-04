@@ -36,5 +36,5 @@ module Exists =
             async {
                let dbName = ""
                let! result = Database.Exists.query Initialization.defaultDbProperties dbName
-               result |> should be (ofCase <@ Database.Exists.RequestError @>)
+               result |> should be (ofCase <@ Database.Exists.DbNameMissing @>)
             }

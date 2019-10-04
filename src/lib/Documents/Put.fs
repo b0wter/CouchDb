@@ -24,19 +24,19 @@ module Put =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of ErrorRequestResult
+        | BadRequest of RequestResult.T
         /// Write privileges required (401)
-        | Unauthorized of ErrorRequestResult
+        | Unauthorized of RequestResult.T
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of ErrorRequestResult
+        | NotFound of RequestResult.T
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of ErrorRequestResult
+        | Conflict of RequestResult.T
         /// Is returned before querying the db if the database name is empty.
         | DbNameMissing
         /// Json deserialization failed
-        | JsonDeserialisationError of ErrorRequestResult
+        | JsonDeserialisationError of JsonDeserialisationError
         /// If the result could not be interpreted.
-        | Unknown of ErrorRequestResult
+        | Unknown of RequestResult.T
         /// This endpoint requires the document id to be set.
         | DocumentIdMissing
 
@@ -57,19 +57,18 @@ module Put =
                 let url = (sprintf "%s/%s" dbName (document |> docId |> string)) 
                 let request = createJsonPut props url document queryParams
                 let! result = sendRequest request
-                let iResult = result :> IRequestResult
-                return match iResult.StatusCode with
+                return match result.statusCode with
                         | Some 201 ->
-                            match deserializeJson [] iResult.Body with
+                            match deserializeJsonWith [] result.content with
                             | Ok response -> Created response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iResult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iResult.Headers)
+                            | Error e -> JsonDeserialisationError e
                         | Some 202 ->
-                            match deserializeJson [] iResult.Body with
+                            match deserializeJsonWith [] result.content with
                             | Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iResult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iResult.Headers)
-                        | Some 400 -> BadRequest <| errorFromIRequestResult iResult
-                        | Some 401 -> Unauthorized <| errorFromIRequestResult iResult
-                        | Some 404 -> NotFound <| errorFromIRequestResult iResult
-                        | Some 409 -> Conflict <| errorFromIRequestResult iResult
-                        | _ -> Unknown <| errorFromIRequestResult iResult
+                            | Error e -> JsonDeserialisationError e
+                        | Some 400 -> BadRequest result
+                        | Some 401 -> Unauthorized result
+                        | Some 404 -> NotFound result
+                        | Some 409 -> Conflict result
+                        | _ -> Unknown result
         }

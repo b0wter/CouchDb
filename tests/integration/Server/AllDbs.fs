@@ -22,8 +22,10 @@ module AllDbs =
                     | Server.AllDbs.Result.Success s ->
                         s |> should haveLength dbNames.Length
                         dbNames |> List.iter (fun x -> s |> should contain x)
-                    | Server.AllDbs.Result.Failure e ->
-                        failwith <| sprintf "Request returned an error (status code: %i): %s" (e.statusCode |?| -1) e.reason
+                    | Server.AllDbs.Result.JsonDeserialisationError e ->
+                        failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                    | Server.AllDbs.Result.Unknown e ->
+                        failwith <| sprintf "Request returned an error (status code: %i): %s" (e.statusCode |?| -1) e.content
                 | false ->
                    return failwith "The database creation (preparation) failed."
             }
@@ -35,6 +37,8 @@ module AllDbs =
                 match result with
                 | Server.AllDbs.Result.Success s ->
                     s |> should be Empty
-                | Server.AllDbs.Result.Failure _ ->
+                | Server.AllDbs.Result.JsonDeserialisationError e ->
+                    failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                | Server.AllDbs.Result.Unknown _ ->
                     failwith "The result is not empty when it should be."
             }

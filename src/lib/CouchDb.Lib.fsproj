@@ -12,6 +12,7 @@
     <Compile Include="Mango.fs" />
     <Compile Include="MangoConverters.fs" />
     <Compile Include="QueryParameters.fs" />
+    <Compile Include="RequestResult.fs" />
     <Compile Include="Core.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +27,7 @@
     <Compile Include="Server\AllDbs.fs" />
     <Compile Include="Server\Info.fs" />
     <Compile Include="Server\DbsInfo.fs" />
+    <Compile Include="Server\Authenticate.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Databases\Exists.fs" />

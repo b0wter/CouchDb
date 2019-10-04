@@ -13,7 +13,8 @@ namespace b0wter.CouchDb.Lib.Server
 
         type Result
             = Success of Response
-            | Failure of ErrorRequestResult
+            | JsonDeserialisationError of JsonDeserialisationError
+            | Unknown of RequestResult.T
 
         /// <summary>
         /// Returns a list of strings containing the names of all databases.
@@ -21,13 +22,11 @@ namespace b0wter.CouchDb.Lib.Server
         let query (props: DbProperties.T) : Async<Result> =
             async {
                 let request = createGet props "_all_dbs" []
-                match! sendRequest request with
-                | SuccessResult s ->
-                    try
-                        return Success <| JsonConvert.DeserializeObject<string list>(s.content)
-                    with
-                    | :? JsonException as ex -> return Failure <| errorRequestResult (None, ex.Message, None)
-                | ErrorResult e ->
-                    return Failure e
+                let! result = sendRequest request
+                return match result.statusCode with
+                        | Some 200 -> match deserializeJson<Response> result.content with
+                                      | Ok response -> Success response
+                                      | Error r -> JsonDeserialisationError r
+                        | _ -> Unknown result
             }
 

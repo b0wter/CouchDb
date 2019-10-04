@@ -27,29 +27,29 @@ module Find =
 
     type Result<'a>
         = Success of Response<'a>
-        | InvalidRequest of ErrorRequestResult
-        | NotAuthorized of ErrorRequestResult
-        | QueryExecutionError of ErrorRequestResult
+        | InvalidRequest of RequestResult.T
+        | NotAuthorized of RequestResult.T
+        | QueryExecutionError of RequestResult.T
         | JsonError of JsonDeserialisationError
-        | Failure of ErrorRequestResult
+        | Failure of RequestResult.T
 
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.OperatorJsonConverter () :> JsonConverter ] expression []
-            let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
-            let queryResult = { QueryResult.content = result.Body; QueryResult.statusCode = result.StatusCode }
+            let! result = sendRequest request
+            let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
 
             do printfn "Response content:%s%s" System.Environment.NewLine queryResult.content
 
             match queryResult.statusCode with
             | Some 200 ->
-                match deserializeJson<Response<'a>> [] queryResult.content with
+                match deserializeJsonWith<Response<'a>> [] queryResult.content with
                 | Ok o -> return Success o
                 | Error e -> return JsonError e
             | Some 400 | Some 401 | Some 500 ->
-                return InvalidRequest <| errorRequestResult (queryResult.statusCode, queryResult.content, None)
+                return InvalidRequest result
             | _ ->
-                return Failure <| errorRequestResult (queryResult.statusCode, queryResult.content, None)
+                return Failure result
         }
         // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
         // this is currently not in use.

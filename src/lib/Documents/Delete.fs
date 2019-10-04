@@ -20,7 +20,7 @@ module Delete =
     
     type Result
         /// Json deserialization failed
-        = JsonDeserialisationError of ErrorRequestResult
+        = JsonDeserialisationError of RequestResult.T
         /// Document id is empty
         | DocumentIdEmpty
         /// Document rev is empty
@@ -30,15 +30,15 @@ module Delete =
         /// Request was accepted, but changes are not yet stored on disk (202)
         | Accepted of Response 
         /// Invalid request body or parameters (400)
-        | BadRequest of ErrorRequestResult 
+        | BadRequest of RequestResult.T 
         /// Write privileges required (401)
-        | Unauthorized of ErrorRequestResult
+        | Unauthorized of RequestResult.T
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of ErrorRequestResult
+        | NotFound of RequestResult.T
         /// Specified revision is not the latest for target document (409)
-        | Conflict of ErrorRequestResult
+        | Conflict of RequestResult.T
         /// If the result could not be interpreted.
-        | Unknown of ErrorRequestResult
+        | Unknown of RequestResult.T
     
     /// Marks the specified document as deleted by adding a field _deleted with the value true.
     /// Documents with this field will not be returned within requests anymore, but stay in the database.
@@ -55,20 +55,19 @@ module Delete =
                 let url = sprintf "%s/%s" dbName (docId |> string)
                 let request = createDelete props url queryParams
                 let! result = sendRequest request
-                let iresult = result :> IRequestResult
-                return match iresult.StatusCode with
+                return match result.statusCode with
                         | Some 200 ->
-                            match deserializeJson [] iresult.Body with
+                            match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Result.Ok response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iresult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iresult.Headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
                         | Some 202 ->
-                            match deserializeJson [] iresult.Body with
+                            match deserializeJsonWith [] result.content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| errorRequestResult(iresult.StatusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, Some iresult.Headers)
-                        | Some 400 -> BadRequest <| errorFromIRequestResult iresult
-                        | Some 401 -> Unauthorized <| errorFromIRequestResult iresult
-                        | Some 404 -> NotFound <| errorFromIRequestResult iresult
-                        | Some 409 -> Conflict <| errorFromIRequestResult iresult
-                        | _ -> Unknown <| errorFromIRequestResult iresult
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                        | Some 400 -> BadRequest result
+                        | Some 401 -> Unauthorized result
+                        | Some 404 -> NotFound result
+                        | Some 409 -> Conflict result
+                        | _ -> Unknown result
         }
 

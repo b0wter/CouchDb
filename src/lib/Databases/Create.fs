@@ -8,6 +8,7 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 open QueryParameters
+open b0wter.CouchDb.Lib
 
 module Create =
     
@@ -24,10 +25,10 @@ module Create =
     type Result
         = Created of Response
         | Accepted of Response
-        | InvalidDbName of ErrorRequestResult
-        | Unauthorized of ErrorRequestResult
-        | AlreadyExists of ErrorRequestResult
-        | Unknown of ErrorRequestResult
+        | InvalidDbName of RequestResult.T
+        | Unauthorized of RequestResult.T
+        | AlreadyExists of RequestResult.T
+        | Unknown of RequestResult.T
 
     let TrueCreateResult = { ok = true}
     let FalseCreateResult = { ok = false}
@@ -39,16 +40,16 @@ module Create =
     /// </summary>
     let query (props: DbProperties.T) (name: string) (parameters: QueryParameters) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| errorRequestResult (None, "You need to set a database name.", None) else
+            if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| RequestResult.create (None, "You need to set a database name.") else
             let request = createPut props name parameters
-            let! result = (sendRequest request) |> Async.map (fun x -> x :> IRequestResult)
-            let r = match result.StatusCode with
+            let! result = (sendRequest request) 
+            let r = match result.statusCode with
                     | Some 201 -> Created TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult
-                    | Some 400 -> InvalidDbName <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | Some 401 -> Unauthorized <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | Some 412 -> AlreadyExists <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | _   -> Unknown <| errorRequestResult (result.StatusCode, result.Body, None)
+                    | Some 400 -> InvalidDbName <| result
+                    | Some 401 -> Unauthorized <| result
+                    | Some 412 -> AlreadyExists <| result
+                    | _   -> Unknown <| result
             return r
         }
 

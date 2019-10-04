@@ -8,6 +8,8 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 open Newtonsoft.Json
+open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 
 module AddDocument =
     type Response = {
@@ -23,24 +25,24 @@ module AddDocument =
         | Unauthorized
         | DatabaseDoesNotExist
         | DocumentIdConflict
-        | Failure of ErrorRequestResult
+        | Failure of RequestResult.T
 
     let query (props: DbProperties.T) (dbName: string) (obj: obj) =
         async {
             let request = createJsonPost props dbName obj []
-            let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
-            match result.StatusCode with
+            let! result = sendRequest request 
+            match result.statusCode with
             | Some 201 | Some 202 ->
                 try
                     // TODO: remove the explicit JsonConvert and use something from Core
-                    let response = JsonConvert.DeserializeObject<Response>(result.Body)
+                    let response = JsonConvert.DeserializeObject<Response>(result.content)
                     return Created response
                 with
                 | :? JsonException as ex ->
-                    return Failure <| errorRequestResult (None, ex.Message, Some result.Headers)
+                    return Failure <| RequestResult.createWithHeaders (None, ex.Message, result.headers)
             | Some 400 -> return InvalidDatabaseName
             | Some 401 -> return Unauthorized
             | Some 404 -> return DatabaseDoesNotExist
             | Some 409 -> return DocumentIdConflict
-            | x -> return Failure <| errorRequestResult (x, result.Body, Some result.Headers)
+            | x -> return Failure <| RequestResult.createWithHeaders (x, result.content, result.headers)
         }

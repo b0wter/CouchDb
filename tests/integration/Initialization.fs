@@ -40,10 +40,13 @@ module Initialization =
     /// </summary>
     let authenticateCouchDbClient () =
         async {
-            let! result = Core.authenticate defaultDbProperties 
+            let! result = Server.Authenticate.query defaultDbProperties 
             match result with
-            | Core.SuccessResult _ -> return true
-            | Core.ErrorResult e -> return failwith <| e.reason
+            | Server.Authenticate.Result.Success _ -> return true
+            | Server.Authenticate.Result.Found _ -> return true 
+            | Server.Authenticate.Result.Unauthorized _ -> return failwith "Unknown username/password"
+            | Server.Authenticate.Result.JsonDeserialisationError _ -> return failwith "JsonDeserialization of the servers response failed."
+            | Server.Authenticate.Result.Unknown x -> return failwith <| sprintf "Unkown error occured: %s" x.content
         }
     
     /// <summary>
@@ -124,15 +127,17 @@ module Initialization =
                         match! Database.Delete.query defaultDbProperties name with
                         | Database.Delete.Result.Deleted deleted -> return deleted.ok
                         | Database.Delete.Result.Accepted deleted -> return deleted.ok
-                        | Database.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.reason
-                        | Database.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.reason
-                        | Database.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.reason
-                        | Database.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.reason
+                        | Database.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.content
+                        | Database.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.content
+                        | Database.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.content
+                        | Database.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.content
                     })
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
-            | Server.AllDbs.Result.Failure f ->
-                return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.reason
+            | Server.AllDbs.Result.JsonDeserialisationError f ->
+                return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed, json: %s | reason: %s" f.json f.reason
+            | Server.AllDbs.Result.Unknown f ->
+                return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.content
                 
         }
         

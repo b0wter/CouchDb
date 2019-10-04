@@ -28,22 +28,22 @@ module Delete =
     type Result
         = Deleted of Response
         | Accepted of Response
-        | NotFound of ErrorRequestResult
-        | BadRequest of ErrorRequestResult
-        | Unauthorized of ErrorRequestResult
-        | Unknown of ErrorRequestResult
+        | NotFound of RequestResult.T
+        | BadRequest of RequestResult.T
+        | Unauthorized of RequestResult.T
+        | Unknown of RequestResult.T
 
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
             let request = createDelete props name []
-            let! result = sendRequest request |> Async.map (fun x -> x :> IRequestResult)
-            let r = match result.StatusCode with
+            let! result = sendRequest request
+            let r = match result.statusCode with
                     | Some 200 -> Deleted TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult
-                    | Some 400 -> BadRequest <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | Some 401 -> Unauthorized <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | Some 404 -> NotFound <| errorRequestResult (result.StatusCode, result.Body, None)
-                    | _   -> Unknown <| errorRequestResult (result.StatusCode, result.Body, None)
+                    | Some 400 -> BadRequest result
+                    | Some 401 -> Unauthorized result
+                    | Some 404 -> NotFound result
+                    | _   -> Unknown result
             return r
         }
         
