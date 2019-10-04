@@ -40,5 +40,6 @@
     <Compile Include="Documents\Get.fs" />
     <Compile Include="Documents\Put.fs" />
     <Compile Include="Documents\Delete.fs" />
+    <Compile Include="Documents\Copy.fs" />
   </ItemGroup>
 </Project>

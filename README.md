@@ -84,10 +84,10 @@ Server endpoint
 
 Documents endpoint
 ------------------
-| Endpoint           | HEAD | GET | POST | PUT | DELETE |
-|--------------------|------|-----|------|-----|--------|
-| /db/doc            | ✔️    | ✔️   | ❌    | ✔️   | ✔️      |
-| /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |
+| Endpoint           | HEAD | GET | POST | PUT | DELETE | COPY |
+|--------------------|------|-----|------|-----|--------|------|
+| /db/doc            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️   |
+| /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |      |
 
 How-to
 ======

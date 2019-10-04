@@ -174,9 +174,6 @@ module Core =
     let deserializeJsonRequestResult<'TResult> (result: SuccessRequestResult) : Result<'TResult, JsonDeserialisationError> =
         deserializeJson [] result.content
 
-    let analyseRequestResult (result: Result<SuccessRequestResult, ErrorRequestResult>) =
-        failwith "Not implemented!"
-
     /// <summary>
     /// Stores the query parameters. ToString() will be called on all values.
     /// </summary>
@@ -226,6 +223,15 @@ module Core =
     /// </summary>
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
         createCustomJsonPost p path [] content queryParameters
+        
+    /// <summary>
+    /// Creates a COPY request without a body (this is a custom HTTP method defined by CouchDb).
+    /// </summary>
+    let createCopy (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) (headers: (string * string) list) =
+        fun () ->
+            let queryParamters = queryParameters |> formatQueryParameters
+            let url = combineUrls (p |> DbProperties.baseEndpoint) path
+            Http.AsyncRequest(url, cookieContainer = DefaultCookieContainer, httpMethod = "COPY", query = queryParamters, silentHttpErrors = true, headers = headers)
 
     /// <summary>
     /// Creates a PUT request without a body.
