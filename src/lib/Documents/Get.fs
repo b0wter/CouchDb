@@ -80,7 +80,7 @@ module Get =
         /// <summary>
         /// Is returned if the query was successful but the local deserialization failed.
         /// </summary>
-        | JsonDeserialisationError of JsonDeserialisationError
+        | JsonDeserializationError of JsonDeserializationError.T
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation
         /// or a network level error ocurred.
@@ -112,8 +112,8 @@ module Get =
                          let meta = result.content |> deserializeJson<MetaFields>
                          match (document, meta) with
                          | (Ok d, Ok m) -> DocumentExists { meta = m; content = d }
-                         | (Error e, _) -> JsonDeserialisationError e
-                         | (_, Error e) -> JsonDeserialisationError e
+                         | (Error e, _) -> JsonDeserializationError e
+                         | (_, Error e) -> JsonDeserializationError e
                        | Some 401 -> NotAuthorized result
                        | Some 404 -> NotFound result
                        | _        -> Unknown result

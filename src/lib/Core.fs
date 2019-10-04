@@ -6,7 +6,7 @@ module Core =
     open System
     open FSharp.Data
     open System.Net
-    open System.Linq
+    open Utilities
 
     type HttpPath = string
     
@@ -81,18 +81,10 @@ module Core =
     }
 
     /// <summary>
-    /// Wraps an error reason and the corresponding json in a record.
-    /// </summary>
-    type JsonDeserialisationError = {
-        json: string
-        reason: string
-    }
-
-    /// <summary>
     /// Takes a string and deserialises its content.
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
-    let deserializeJsonWith<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserialisationError> =
+    let deserializeJsonWith<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserializationError.T> =
         do printfn "Deserializing to type: %s" typeof<'TResult>.FullName
         try
             let result = Ok <| match customConverters with
@@ -111,7 +103,7 @@ module Core =
     /// Takes a SuccessRequestResult and deserialises its content.
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
-    let deserializeJson<'TResult> (content: string) : Result<'TResult, JsonDeserialisationError> =
+    let deserializeJson<'TResult> (content: string) : Result<'TResult, JsonDeserializationError.T> =
         deserializeJsonWith<'TResult> [] content
 
     /// <summary>

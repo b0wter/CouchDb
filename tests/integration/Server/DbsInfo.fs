@@ -38,7 +38,7 @@ module DbsInfo =
                 | Server.DbsInfo.Result.KeyError _ ->
                     failwith "Returned a KeyError where a Success was expected."
                 | Server.DbsInfo.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
                 | Server.DbsInfo.Result.Unknown f ->
                     failwith <| sprintf "Returned a Failure where a Success was expected. Reason: %s" f.content
             }
@@ -54,7 +54,7 @@ module DbsInfo =
                 | Server.DbsInfo.Result.KeyError e -> failwith <| sprintf "Encountered a KeyError response. This request needs to set keys! Details :%s" e.content
                 | Server.DbsInfo.Result.Unknown e -> failwith <| sprintf "Encountered an error, details: %s" e.content
                 | Server.DbsInfo.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
             }
             
         [<Fact>]

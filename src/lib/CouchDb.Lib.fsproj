@@ -12,6 +12,7 @@
     <Compile Include="Mango.fs" />
     <Compile Include="MangoConverters.fs" />
     <Compile Include="QueryParameters.fs" />
+    <Compile Include="JsonDeserializationError.fs" />
     <Compile Include="RequestResult.fs" />
     <Compile Include="Core.fs" />
   </ItemGroup>

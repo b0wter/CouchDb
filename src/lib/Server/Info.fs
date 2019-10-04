@@ -23,7 +23,7 @@ namespace b0wter.CouchDb.Lib.Server
 
         type Result
             = Success of Response
-            | JsonDeserialisationError of JsonDeserialisationError
+            | JsonDeserialisationError of RequestResult.T
             | Unknown of RequestResult.T
 
         let query (props: DbProperties.T) : Async<Result> =
@@ -33,7 +33,7 @@ namespace b0wter.CouchDb.Lib.Server
                 return match result.statusCode with
                         | Some 200 -> match deserializeJson<Response> result.content with
                                       | Ok response -> Success response
-                                      | Error r -> JsonDeserialisationError r
+                                      | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
                         | _ -> Unknown result
             }
 

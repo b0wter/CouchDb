@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Documents
 
 open Newtonsoft.Json
 open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
 open b0wter.FSharp
@@ -34,7 +35,7 @@ module Put =
         /// Is returned before querying the db if the database name is empty.
         | DbNameMissing
         /// Json deserialization failed
-        | JsonDeserialisationError of JsonDeserialisationError
+        | JsonDeserializationError of RequestResult.T
         /// If the result could not be interpreted.
         | Unknown of RequestResult.T
         /// This endpoint requires the document id to be set.
@@ -61,11 +62,11 @@ module Put =
                         | Some 201 ->
                             match deserializeJsonWith [] result.content with
                             | Ok response -> Created response
-                            | Error e -> JsonDeserialisationError e
+                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 201, result.headers)
                         | Some 202 ->
                             match deserializeJsonWith [] result.content with
                             | Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError e
+                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 202, result.headers)
                         | Some 400 -> BadRequest result
                         | Some 401 -> Unauthorized result
                         | Some 404 -> NotFound result

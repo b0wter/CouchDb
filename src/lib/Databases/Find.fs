@@ -30,7 +30,7 @@ module Find =
         | InvalidRequest of RequestResult.T
         | NotAuthorized of RequestResult.T
         | QueryExecutionError of RequestResult.T
-        | JsonError of JsonDeserialisationError
+        | JsonError of JsonDeserializationError.T
         | Failure of RequestResult.T
 
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =

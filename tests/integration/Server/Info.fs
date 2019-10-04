@@ -23,7 +23,7 @@ module Info =
                     response.git_sha |> should not' <| be NullOrEmptyString
                     response.features |> should not' <| be Empty
                 | Server.Info.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed, json: %s | reason: %s" e.json e.reason
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
                 | Server.Info.Result.Unknown x ->
                     failwith x.content
             }

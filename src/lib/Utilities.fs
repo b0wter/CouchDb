@@ -2,7 +2,6 @@ namespace b0wter.CouchDb.Lib
 
 module Utilities =
 
-    open System
     
     module Json = 
         open Newtonsoft.Json
@@ -25,3 +24,4 @@ module Utilities =
                                                    Converters = converters,
                                                    Formatting = Newtonsoft.Json.Formatting.Indented,
                                                    NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
+            

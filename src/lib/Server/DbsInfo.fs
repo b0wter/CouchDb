@@ -65,7 +65,7 @@ namespace b0wter.CouchDb.Lib.Server
             /// </summary>
             | KeyError of RequestResult.T
             /// Returned if the local deserialization of the response failed.
-            | JsonDeserialisationError of JsonDeserialisationError
+            | JsonDeserialisationError of RequestResult.T
             /// <summary>
             /// Generic error case. Refer to the status code and reason for more details.
             /// </summary>
@@ -86,7 +86,7 @@ namespace b0wter.CouchDb.Lib.Server
                     return match result.statusCode with
                             | Some 200 -> match deserializeJson result.content with
                                           | Ok r -> Success r
-                                          | Error e -> JsonDeserialisationError e
+                                          | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
                             | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
                             | _   -> Unknown <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
             }

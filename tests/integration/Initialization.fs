@@ -135,7 +135,7 @@ module Initialization =
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
             | Server.AllDbs.Result.JsonDeserialisationError f ->
-                return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed, json: %s | reason: %s" f.json f.reason
+                return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed: %s%s" System.Environment.NewLine f.content
             | Server.AllDbs.Result.Unknown f ->
                 return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.content
                 

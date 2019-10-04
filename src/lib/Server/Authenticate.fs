@@ -7,6 +7,7 @@ namespace b0wter.CouchDb.Lib.Server
     open Newtonsoft.Json
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib
+    open b0wter.CouchDb.Lib
 
     module Authenticate =
         type Vendor = {
@@ -29,7 +30,7 @@ namespace b0wter.CouchDb.Lib.Server
             /// Username or password wasn’t recognized (401)
             | Unauthorized
             /// Deserialization of the recieved response failed.
-            | JsonDeserialisationError of JsonDeserialisationError
+            | JsonDeserialisationError of RequestResult.T
             /// Response could not be interpreted.
             | Unknown of RequestResult.T
             
@@ -47,7 +48,7 @@ namespace b0wter.CouchDb.Lib.Server
                         | Some 200 | Some 302->
                             match deserializeJson<Response> result.content with
                             | Ok r -> Success r
-                            | Error e -> JsonDeserialisationError e
+                            | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
                         | Some 401 -> Unauthorized
                         | _ -> Unknown result
             }
