@@ -26,7 +26,7 @@ module Head =
     }
     
     type Tests() =
-        inherit Utilities.PrefilledDatabaseTests("test-db")
+        inherit Utilities.PrefilledSingleDatabaseTests("test-db")
         let dbName = "test-db"
         
         [<Fact>]

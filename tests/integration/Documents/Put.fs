@@ -29,7 +29,7 @@ module Put =
     let getTestDocumentRev (doc: TestDocument) = doc._rev
 
     type Tests() =
-        inherit Utilities.PrefilledDatabaseTests("test-db")
+        inherit Utilities.PrefilledSingleDatabaseTests("test-db")
         let dbName = "test-db"
 
         [<Fact>]

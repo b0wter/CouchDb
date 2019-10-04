@@ -9,7 +9,7 @@ module Delete =
     open b0wter.CouchDb.Tests.Integration
     
     type Tests() =
-        inherit Utilities.PrefilledDatabaseTests()
+        inherit Utilities.PrefilledMultiDatabaseTests()
 
         [<Fact>]
         member this.``Deleting an existing database results in deletion`` () =

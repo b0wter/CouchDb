@@ -50,6 +50,7 @@
     <Compile Include="Documents\Head.fs" />
     <Compile Include="Documents\Put.fs" />
     <Compile Include="Documents\Delete.fs" />
+    <Compile Include="Documents\Copy.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

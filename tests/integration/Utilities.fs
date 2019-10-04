@@ -16,6 +16,10 @@ module Utilities =
            else
             failwith <| sprintf "The database preparation failed (authenticated: %b; cleaned: %b)!" authenticated cleaned 
     
+    [<AbstractClass>]
+    type PrefilledDatabaseTests() =
+        inherit CleanDatabaseTests()
+    
     /// <summary>
     /// Cleans the database and prefills with databases prior
     /// to running a query against it.
@@ -25,22 +29,20 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type PrefilledDatabaseTests(dbNames: string list) =
-        inherit CleanDatabaseTests ()
+    type PrefilledMultiDatabaseTests(dbNames: string list) =
+        inherit PrefilledDatabaseTests ()
         do Initialization.createDatabases dbNames
            |> Async.RunSynchronously
            |> (fun x -> if x then printfn "Prefilled database is ok."
                         else failwith "Could not create the required databases.")
+           
+        /// Returns the database names that were supplied as constructor parameters.
+        member this.DbNames = dbNames
         
         /// <summary>
         /// Instatiate without creating databases.
         /// </summary>
-        new() = PrefilledDatabaseTests([])
-        
-        /// <summary>
-        /// Instantiates with a single database.
-        /// </summary>
-        new(dbName: string) = PrefilledDatabaseTests([dbName])
+        new() = PrefilledMultiDatabaseTests([])
         
         /// <summary>
         /// Will run create queries for each supplied database name
@@ -53,3 +55,37 @@ module Utilities =
                 | false -> return failwith "The database preparation failed!"
             } |> Async.RunSynchronously
             
+    /// <summary>
+    /// Cleans the database and prefills with databases prior
+    /// to running a query against it.
+    /// </summary>
+    /// <remarks>
+    /// Uses a special method to run the tests since not all tests
+    /// may require the same databases.
+    /// </remarks>
+    [<AbstractClass>]
+    type PrefilledSingleDatabaseTests(dbName: string) =
+        inherit PrefilledDatabaseTests ()
+        do Initialization.createDatabases [ dbName ]
+           |> Async.RunSynchronously
+           |> (fun x -> if x then printfn "Prefilled database is ok."
+                        else failwith "Could not create the required databases.")
+           
+        /// Returns the database names that were supplied as constructor parameters.
+        member this.DbName = dbName
+        
+        /// <summary>
+        /// Instatiate without creating databases.
+        /// </summary>
+        new() = PrefilledSingleDatabaseTests()
+        
+        /// <summary>
+        /// Will run create queries for each supplied database name
+        /// and the `toRun` afterwards.
+        /// </summary>
+        member this.RunWithDatabase dbName (toRun: unit -> Async<unit>) =
+            async {
+                match! Initialization.createDatabases [dbName] with
+                | true -> return! toRun ()
+                | false -> return failwith "The database preparation failed!"
+            } |> Async.RunSynchronously
