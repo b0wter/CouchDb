@@ -88,6 +88,8 @@ steps:
       docker run --name couchdb_tests -e NUGET_ORG_KEY=$NUGET_ORG_KEY couchdb-lib:latest nuget
       docker cp couchdb_tests:/output/couchdb.nupkg $(Build.ArtifactStagingDirectory)
       docker rm couchdb_tests
+      echo "Contents of the ArtifactStagingDirectory:"
+      ls $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
   inputs:
