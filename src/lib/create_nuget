@@ -12,6 +12,7 @@ else
 fi
 
 GIT_TAG=$(git describe --tags --abbrev=0)
+GIT_TAG=$(echo "${GIT_TAG//v}")
 GIT_MESSAGE=$(sed 's/ /\\ /g' <<< $(git log -1 --pretty=%B | tr '\n' ' '))
 echo "Latest tag: $GIT_TAG; Latest commit: $GIT_MESSAGE"
 echo "Creating temporary nuspec file from template."
