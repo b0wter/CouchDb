@@ -66,4 +66,6 @@ module AllDocuments =
         | Success x -> Ok x
         | NotFound e | JsonDeserialisationError e | Unauthorized e | BadRequest e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
-
+    let queryAllAsResult props dbName = queryAll props dbName |> Async.map asResult
+    
+    let querySelectedAsResult props dbName keys = querySelected props dbName keys |> Async.map asResult

@@ -7,7 +7,7 @@ namespace b0wter.CouchDb.Lib.Database
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
-open b0wter.FSharp.Operators
+open b0wter.FSharp
 
 module Exists =
 
@@ -34,3 +34,5 @@ module Exists =
         | Exists -> Ok true
         | DoesNotExist -> Ok false
         | DbNameMissing e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+        
+    let queryAsResult props name = query props name |> Async.map asResult

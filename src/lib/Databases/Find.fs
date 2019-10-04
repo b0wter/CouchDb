@@ -68,3 +68,5 @@ module Find =
         | Success x -> Ok x
         | BadRequest e | Unauthorized e | QueryExecutionError e | JsonDeserializationError e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult<'a> props dbName expression = query<'a> props dbName expression |> Async.map asResult<'a>

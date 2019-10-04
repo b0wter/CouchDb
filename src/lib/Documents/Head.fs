@@ -10,6 +10,7 @@ open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 
 module Head =
+    
     type Response = {
         ETag: string
         Length: int
@@ -78,3 +79,5 @@ module Head =
         | DocumentExists x | NotModified x -> Ok x
         | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult props name id = query props name id |> Async.map asResult

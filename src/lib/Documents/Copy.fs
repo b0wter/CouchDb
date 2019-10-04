@@ -5,9 +5,9 @@ namespace b0wter.CouchDb.Lib.Documents
 //
 
 open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
+open b0wter.FSharp
 
 module Copy =
     
@@ -82,3 +82,5 @@ module Copy =
         | Created x | Accepted x -> Ok x
         | BadRequest e | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Conflict e | Unknown e | DestinationIdMissing e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult<'a> props dbName docId destinationId destinationRev docRev = query<'a> props dbName docId destinationId destinationRev docRev |> Async.map asResult

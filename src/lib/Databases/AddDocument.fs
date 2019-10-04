@@ -6,6 +6,7 @@ namespace b0wter.CouchDb.Lib.Database
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.FSharp
 
 module AddDocument =
     type Response = {
@@ -46,3 +47,5 @@ module AddDocument =
         | Created x | Accepted x -> Ok x
         | InvalidDbName e | Unauthorized e | DbDoesNotExist e | DocumentIdConflict e | JsonDeserializationError e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult props dbName obj = query props dbName obj |> Async.map asResult

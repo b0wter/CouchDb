@@ -4,8 +4,6 @@ namespace b0wter.CouchDb.Lib.Documents
 // Queries: /{db}/{docid} [DELETE]
 //
 
-open Newtonsoft.Json
-open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib.QueryParameters
@@ -78,3 +76,5 @@ module Delete =
         | Ok x | Accepted x -> FSharp.Core.Result.Ok x
         | BadRequest e | NotFound e | Unauthorized e | Conflict e | DocumentIdEmpty e | DocumentRevEmpty e | JsonDeserialisationError e | Unknown e ->
             FSharp.Core.Result.Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult<'a> props dbName docId docRev = query<'a> props dbName docId docRev |> Async.map asResult

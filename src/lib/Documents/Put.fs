@@ -79,3 +79,5 @@ module Put =
         | Created x | Accepted x -> Ok x
         | BadRequest e | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Conflict e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
+            
+    let queryAsResult<'a> props dbName docId docRev document = query<'a> props dbName docId docRev document |> Async.map asResult
