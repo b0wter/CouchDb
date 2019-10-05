@@ -9,7 +9,7 @@ module AllDocuments =
     open CustomMatchers
     
     type Tests() =
-        inherit Utilities.PrefilledSingleDatabaseTests("test-db")
+        inherit Utilities.EmptySingleDatabaseTests("test-db")
         let dbName = "test-db"
         
         [<Fact>]

@@ -1,6 +1,11 @@
 namespace b0wter.CouchDb.Tests.Integration
+open FsUnit
 
 module Utilities =
+    
+    open CustomMatchers
+    open b0wter.CouchDb.Lib
+    open FsUnit.Xunit
     
     /// <summary>
     /// Is used as a base class to contain tests.
@@ -16,8 +21,9 @@ module Utilities =
            else
             failwith <| sprintf "The database preparation failed (authenticated: %b; cleaned: %b)!" authenticated cleaned 
     
+    /// Base class for all tests that require the existence of one or more databases.
     [<AbstractClass>]
-    type PrefilledDatabaseTests() =
+    type DatabaseTests() =
         inherit CleanDatabaseTests()
     
     /// <summary>
@@ -29,8 +35,8 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type PrefilledMultiDatabaseTests(dbNames: string list) =
-        inherit PrefilledDatabaseTests ()
+    type EmptyMultiDatabaseTests(dbNames: string list) =
+        inherit DatabaseTests ()
         do Initialization.createDatabases dbNames
            |> Async.RunSynchronously
            |> (fun x -> if x then printfn "Prefilled database is ok."
@@ -42,7 +48,7 @@ module Utilities =
         /// <summary>
         /// Instatiate without creating databases.
         /// </summary>
-        new() = PrefilledMultiDatabaseTests([])
+        new() = EmptyMultiDatabaseTests([])
         
         /// <summary>
         /// Will run create queries for each supplied database name
@@ -64,8 +70,8 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type PrefilledSingleDatabaseTests(dbName: string) =
-        inherit PrefilledDatabaseTests ()
+    type EmptySingleDatabaseTests(dbName: string) =
+        inherit DatabaseTests ()
         do Initialization.createDatabases [ dbName ]
            |> Async.RunSynchronously
            |> (fun x -> if x then printfn "Prefilled database is ok."
@@ -77,7 +83,7 @@ module Utilities =
         /// <summary>
         /// Instatiate without creating databases.
         /// </summary>
-        new() = PrefilledSingleDatabaseTests()
+        new() = EmptySingleDatabaseTests()
         
         /// <summary>
         /// Will run create queries for each supplied database name
@@ -89,3 +95,12 @@ module Utilities =
                 | true -> return! toRun ()
                 | false -> return failwith "The database preparation failed!"
             } |> Async.RunSynchronously
+            
+    [<AbstractClass>]
+    type PrefilledSingleDatabaseTests(dbName: string, documents: obj list) =
+        inherit EmptySingleDatabaseTests (dbName)
+        let addDocument obj = Database.AddDocument.query Initialization.defaultDbProperties dbName obj |> Async.RunSynchronously
+        let result = documents |> List.map addDocument
+        do result |> List.iter (should be (ofCase <@ Database.AddDocument.Result.Created @>))
+        
+        member this.DbName = dbName
