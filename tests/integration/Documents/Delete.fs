@@ -5,40 +5,24 @@ module Delete =
     open FsUnit.Xunit
     open Xunit
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp.Operators
     open b0wter.CouchDb.Tests.Integration.CustomMatchers
     open b0wter.CouchDb.Tests.Integration
+    open b0wter.CouchDb.Tests.Integration.TestModels
     
-    type TestDocument = {
-        _id: System.Guid
-        _rev: string option
-        myInt: int
-        myFirstString: string
-        mySecondString: string
-    }
-    
-    let testDocumentWithId = {
-        _id = System.Guid.Parse("c8cb91dc-1121-43de-a858-0742327ff158")
-        _rev = None
-        myInt = 42
-        myFirstString = "foo"
-        mySecondString = "bar"
-    }
-
-    let getTestDocumentId (doc: TestDocument) = doc._id
-    let getTestDocumentRev (doc: TestDocument) = doc._rev
+    let getTestDocumentId (doc: Default.T) = doc._id
+    let getTestDocumentRev (doc: Default.T) = doc._rev
 
     type Tests() =
-        inherit Utilities.PrefilledSingleDatabaseTests("test-db")
+        inherit Utilities.EmptySingleDatabaseTests("test-db")
         let dbName = "test-db"
 
         [<Fact>]
         member this.``Deleting an existing document returns Ok result`` () =
             async {
-                let! addResult = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev testDocumentWithId
+                let! addResult = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev Default.defaultInstance
                 match addResult with
                 | Documents.Put.Result.Created x ->
-                    let! removeResult = Documents.Delete.query Initialization.defaultDbProperties dbName testDocumentWithId._id x.rev
+                    let! removeResult = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.rev
                     removeResult |> should be (ofCase <@ Documents.Delete.Result.Ok @>)
                     
                 | _ -> failwith "Adding the initial document failed."
@@ -48,7 +32,7 @@ module Delete =
         member this.``Deleting a non-existing document returns NotFound result`` () =
             async {
                 let bogusRev = "ThisIsABogusRev"
-                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName testDocumentWithId._id bogusRev
+                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id bogusRev
                 result |> should be (ofCase<@ Documents.Delete.Result.NotFound @>)
             }
             
@@ -56,7 +40,7 @@ module Delete =
         member this.``Deleting with an non-existing database returns NotFound result`` () =
             async {
                 let bogusRev = "ThisIsABogusRev"
-                let! result = Documents.Delete.query Initialization.defaultDbProperties "non-existing-db" testDocumentWithId._id bogusRev
+                let! result = Documents.Delete.query Initialization.defaultDbProperties "non-existing-db" Default.defaultInstance._id bogusRev
                 result |> should be (ofCase<@ Documents.Delete.Result.NotFound @>)
             }
             
@@ -71,7 +55,7 @@ module Delete =
         [<Fact>]
         member this.``Deleting a document with an empty rev returns DocumentRevEmpty result`` () =
             async {
-                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName testDocumentWithId._id ""
+                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id ""
                 result |> should be (ofCase<@ Documents.Delete.Result.DocumentRevEmpty @>)
             }
             
@@ -81,21 +65,21 @@ module Delete =
                 
                 // Add the document.
                 //
-                let! addResult = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev testDocumentWithId
+                let! addResult = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev Default.defaultInstance
                 match addResult with
                 | Documents.Put.Result.Created x ->
                     
                     // Set the revision and update the contents of the document.
                     // Then update it again. This will result in a new revision that we don't care about.
                     //
-                    let updatedDocument = { testDocumentWithId with _rev = Some x.rev; myInt = 1337 }
+                    let updatedDocument = { Default.defaultInstance with _rev = Some x.rev; myInt = 1337 }
                     let! update = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev updatedDocument
                     match update with
                     | Documents.Put.Result.Created y ->
                         
                         // Delete using the old revision (from when the document was initially added, not updated).
                         //
-                        let! delete = Documents.Delete.query Initialization.defaultDbProperties dbName testDocumentWithId._id x.rev
+                        let! delete = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.rev
                         delete |> should be (ofCase <@ Documents.Delete.Result.Conflict @>)
                         
                     | _ -> failwith "Updating the initial document failed!"
