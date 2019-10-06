@@ -35,7 +35,7 @@ module Mango =
         = Bool of bool
         | Integer of int
         | Float of float
-        | String of string
+        | Text of string
         | Date of System.DateTime
         | Id of System.Guid
 

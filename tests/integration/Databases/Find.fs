@@ -24,7 +24,7 @@ module Find =
         member this.``Find using Equal String returns matching documents`` () =
             async {
                 
-                let selector = condition "type" <| Equal (DataType.String "Default")
+                let selector = condition "type" <| Equal (Text "Default")
                 let expression = createExpression selector
                 let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with

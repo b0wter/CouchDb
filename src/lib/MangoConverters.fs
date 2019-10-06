@@ -15,7 +15,7 @@ module MangoConverters =
         | Bool b            -> JProperty(operation, b)
         | Integer i             -> JProperty(operation, i)
         | Float f           -> JProperty(operation, f)
-        | DataType.String s -> JProperty(operation, s)
+        | Text s -> JProperty(operation, s)
         | Date d            -> JProperty(operation, d.ToString("yyyy-mm-DD"))
         | Id i              -> JProperty(operation, i.ToString())
 
@@ -36,7 +36,7 @@ module MangoConverters =
                                                     | Bool b -> JValue(b)
                                                     | Integer i  -> JValue(i)
                                                     | Float f -> JValue(f)
-                                                    | DataType.String s -> JValue(s)
+                                                    | Text s -> JValue(s)
                                                     | Date d -> JValue(d.ToString("yyyy-mm-DD"))
                                                     | Id i -> JValue(i.ToString()))
         let jArray = JArray(asJValues)
