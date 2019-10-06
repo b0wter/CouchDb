@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Database
+namespace b0wter.CouchDb.Lib.Databases
 
 //
 // Queries: /{db} [PUT]

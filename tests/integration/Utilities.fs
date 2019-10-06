@@ -99,8 +99,8 @@ module Utilities =
     [<AbstractClass>]
     type PrefilledSingleDatabaseTests(dbName: string, documents: obj list) =
         inherit EmptySingleDatabaseTests (dbName)
-        let addDocument obj = Database.AddDocument.query Initialization.defaultDbProperties dbName obj |> Async.RunSynchronously
+        let addDocument obj = Databases.AddDocument.query Initialization.defaultDbProperties dbName obj |> Async.RunSynchronously
         let result = documents |> List.map addDocument
-        do result |> List.iter (should be (ofCase <@ Database.AddDocument.Result.Created @>))
+        do result |> List.iter (should be (ofCase <@ Databases.AddDocument.Result.Created @>))
         
         member this.DbName = dbName

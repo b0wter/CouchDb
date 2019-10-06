@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Tests.Integration.Database
+namespace b0wter.CouchDb.Tests.Integration.Databases
 
 module Find =
     
@@ -48,9 +48,9 @@ module Find =
             async {
                 let selector = condition "myInt" <| Equal (Integer 1)
                 let expression = createExpression selector
-                let! result = Database.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
-                | Database.Find.Result.Success testModels ->
+                | Databases.Find.Result.Success testModels ->
                     do testModels.docs |> should haveLength 1
                     do testModels.docs.Head |> TestModels.Default.compareWithoutRev model1
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
@@ -63,9 +63,9 @@ module Find =
             async {
                 let selector = condition "myFloat" <| Equal (Float 3.14)
                 let expression = createExpression selector
-                let! result = Database.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
-                | Database.Find.Result.Success testModels ->
+                | Databases.Find.Result.Success testModels ->
                     do testModels.docs |> should haveLength 1
                     do testModels.docs.Head |> TestModels.Default.compareWithoutRev model3
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
@@ -81,9 +81,9 @@ module Find =
                 let myIntEquals2 = condition "myInt" (Equal <| Integer 2)
                 let myInt1Or2 = myIntEquals1 |> ``or`` myIntEquals2
                 let expression = createExpression myInt1Or2
-                let! result = Database.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
-                | Database.Find.Result.Success testModels ->
+                | Databases.Find.Result.Success testModels ->
                     testModels.docs |> should haveLength 2
                     let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
                     let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 

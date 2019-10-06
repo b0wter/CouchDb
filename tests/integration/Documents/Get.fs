@@ -16,8 +16,8 @@ module Get =
         [<Fact>]
         member this.``Retrieving a newly-added document returns DocumentExists result`` () =
             async {
-                match! Database.AddDocument.query Initialization.defaultDbProperties dbName Default.defaultInstance with
-                | Database.AddDocument.Result.Created x ->
+                match! Databases.AddDocument.query Initialization.defaultDbProperties dbName Default.defaultInstance with
+                | Databases.AddDocument.Result.Created x ->
                     do x.ok |> should be True
                     do x.id |> should equal (Default.defaultInstance._id.ToString())
                     do x.rev |> should not' (be EmptyString)

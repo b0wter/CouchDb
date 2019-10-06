@@ -124,13 +124,13 @@ module Initialization =
                 if dbNames.IsEmpty then return true else
                 let deleteResult = dbNames |> List.map (fun name ->
                     async {
-                        match! Database.Delete.query defaultDbProperties name with
-                        | Database.Delete.Result.Deleted deleted -> return deleted.ok
-                        | Database.Delete.Result.Accepted deleted -> return deleted.ok
-                        | Database.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.content
-                        | Database.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.content
-                        | Database.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.content
-                        | Database.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.content
+                        match! Databases.Delete.query defaultDbProperties name with
+                        | Databases.Delete.Result.Deleted deleted -> return deleted.ok
+                        | Databases.Delete.Result.Accepted deleted -> return deleted.ok
+                        | Databases.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.content
+                        | Databases.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.content
+                        | Databases.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.content
+                        | Databases.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.content
                     })
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
@@ -148,13 +148,13 @@ module Initialization =
         async {
             let queries = names |> List.map (fun name ->
                 async {
-                    match! Database.Create.query defaultDbProperties name [] with
-                    | Database.Create.Result.Unauthorized _ -> return false
-                    | Database.Create.Result.AlreadyExists _ -> return false
-                    | Database.Create.Result.InvalidDbName _ -> return false
-                    | Database.Create.Result.Unknown _ -> return false
-                    | Database.Create.Result.Accepted _ -> return true
-                    | Database.Create.Result.Created _ -> return true
+                    match! Databases.Create.query defaultDbProperties name [] with
+                    | Databases.Create.Result.Unauthorized _ -> return false
+                    | Databases.Create.Result.AlreadyExists _ -> return false
+                    | Databases.Create.Result.InvalidDbName _ -> return false
+                    | Databases.Create.Result.Unknown _ -> return false
+                    | Databases.Create.Result.Accepted _ -> return true
+                    | Databases.Create.Result.Created _ -> return true
                 })
             let! queryResults = Async.Parallel queries
             return queryResults |> Array.forall ((=) true)

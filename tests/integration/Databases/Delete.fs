@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Tests.Integration.Database
+namespace b0wter.CouchDb.Tests.Integration.Databases
 
 module Delete =
     
@@ -16,8 +16,8 @@ module Delete =
             let dbName = "database-delete-test-1" 
             let toRun = fun () ->
                 async {
-                    let! result = Database.Delete.query Initialization.defaultDbProperties dbName
-                    result |> should be (ofCase <@ Database.Delete.Result.Deleted @>)
+                    let! result = Databases.Delete.query Initialization.defaultDbProperties dbName
+                    result |> should be (ofCase <@ Databases.Delete.Result.Deleted @>)
                 }
             this.RunWithDatabases [ dbName ] toRun
             
@@ -27,8 +27,8 @@ module Delete =
             let dbNameDeletion = "database-delete-test-2-non-existing" 
             let toRun = fun () ->
                 async {
-                    let! result = Database.Delete.query Initialization.defaultDbProperties dbNameDeletion
-                    result |> should be (ofCase<@ Database.Delete.Result.NotFound @>)
+                    let! result = Databases.Delete.query Initialization.defaultDbProperties dbNameDeletion
+                    result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>)
                 }
             this.RunWithDatabases [ dbNameCreation ] toRun
             
@@ -36,6 +36,6 @@ module Delete =
         member this.``Deleting an database with invalid name results a NotFound-result`` () =
             let dbName = "00-this-[is]-{an}-inv@lid-name"
             async {
-                let! result = Database.Delete.query Initialization.defaultDbProperties dbName
-                result |> should be (ofCase<@ Database.Delete.Result.NotFound @>) 
+                let! result = Databases.Delete.query Initialization.defaultDbProperties dbName
+                result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>) 
             }

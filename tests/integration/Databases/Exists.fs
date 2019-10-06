@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Tests.Integration.Database
+namespace b0wter.CouchDb.Tests.Integration.Databases
 
 module Exists =
     
@@ -17,8 +17,8 @@ module Exists =
                let dbNames = [ "exists-test-db-1"; "exists-test-db-2" ]
                match! Initialization.createDatabases dbNames with
                | true ->
-                   let! result = Database.Exists.query Initialization.defaultDbProperties dbNames.Head
-                   result |> should be (ofCase<@ Database.Exists.Result.Exists @>)
+                   let! result = Databases.Exists.query Initialization.defaultDbProperties dbNames.Head
+                   result |> should be (ofCase<@ Databases.Exists.Result.Exists @>)
                | false ->
                    return failwith "The database creation (preparation) failed."
             }
@@ -27,14 +27,14 @@ module Exists =
         member this.``Querying for a non-existing database returns DoesNotExist-result`` () =
             async {
                let dbName = "non-existing-db-1"
-               let! result = Database.Exists.query Initialization.defaultDbProperties dbName
-               result |> should be (ofCase <@ Database.Exists.DoesNotExist @>)
+               let! result = Databases.Exists.query Initialization.defaultDbProperties dbName
+               result |> should be (ofCase <@ Databases.Exists.DoesNotExist @>)
             }
 
         [<Fact>]
         member this.``Querying with an empty database name returns RequestError-result`` () =
             async {
                let dbName = ""
-               let! result = Database.Exists.query Initialization.defaultDbProperties dbName
-               result |> should be (ofCase <@ Database.Exists.DbNameMissing @>)
+               let! result = Databases.Exists.query Initialization.defaultDbProperties dbName
+               result |> should be (ofCase <@ Databases.Exists.DbNameMissing @>)
             }
