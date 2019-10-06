@@ -7,7 +7,6 @@ module Utilities =
         match FSharpValue.GetUnionFields(x, typeof<'a>) with
         | case, _ -> case.Name  
     
-    
     module Json = 
         open Newtonsoft.Json
 

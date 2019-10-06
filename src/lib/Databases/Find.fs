@@ -11,6 +11,9 @@ open Newtonsoft.Json
 open b0wter.CouchDb.Lib
 
 module Find =
+    
+    // TODO: Think about having two query methods: `query` and `queryWithExecutionStats`. This would remove the option.
+    
     type ExecutionStats = {
         total_keys_examined: int
         total_docs_examined: int
