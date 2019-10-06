@@ -33,7 +33,7 @@ module Mango =
     /// </summary>
     type DataType
         = Bool of bool
-        | Int of int
+        | Integer of int
         | Float of float
         | String of string
         | Date of System.DateTime
@@ -206,4 +206,17 @@ module Mango =
             update = None
             stable = None
             execution_stats = None
-        }   
+        }
+        
+    let condition field operation =
+        Conditional {
+            ConditionalOperator.name = field;
+            ConditionalOperator.parents = [];
+            ConditionalOperator.operation = operation
+        }
+        
+    let ``or`` (a: Operator) (b: Operator) =
+        Combinator <| Or [a; b]
+        
+    let ``and`` (a: Operator) (b: Operator) =
+        Combinator <| And [a; b]

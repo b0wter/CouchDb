@@ -13,7 +13,7 @@ module MangoConverters =
     let private dataTypeAndNameToJProperty (d: DataType) (operation: string) =
         match d with
         | Bool b            -> JProperty(operation, b)
-        | Int i             -> JProperty(operation, i)
+        | Integer i             -> JProperty(operation, i)
         | Float f           -> JProperty(operation, f)
         | DataType.String s -> JProperty(operation, s)
         | Date d            -> JProperty(operation, d.ToString("yyyy-mm-DD"))
@@ -34,7 +34,7 @@ module MangoConverters =
     let dataTypesToJProperty (propertyName: string) (types: DataType list) =
         let asJValues = types |> List.map (fun x -> match x with
                                                     | Bool b -> JValue(b)
-                                                    | Int i  -> JValue(i)
+                                                    | Integer i  -> JValue(i)
                                                     | Float f -> JValue(f)
                                                     | DataType.String s -> JValue(s)
                                                     | Date d -> JValue(d.ToString("yyyy-mm-DD"))

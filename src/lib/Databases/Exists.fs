@@ -5,7 +5,6 @@ namespace b0wter.CouchDb.Lib.Database
 //
 
 open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 
