@@ -23,13 +23,12 @@ module Find =
         [<Fact>]
         member this.``Find using Equal String returns matching documents`` () =
             async {
-                let operator = Conditional { ConditionalOperator.name = "type";
-                                             ConditionalOperator.parents = [];
-                                             ConditionalOperator.operation = Condition.Equal (DataType.String "Default") }
-                let expression = createExpression operator
-                let! result = Database.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                
+                let selector = condition "type" <| Equal (DataType.String "Default")
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
-                | Database.Find.Result.Success testModels ->
+                | Databases.Find.Result.Success testModels ->
                     let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
                     let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 
                     let m3 = testModels.docs |> List.find (fun x -> x._id = id3)
