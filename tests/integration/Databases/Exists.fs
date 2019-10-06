@@ -16,11 +16,11 @@ module Exists =
             async {
                let dbNames = [ "exists-test-db-1"; "exists-test-db-2" ]
                match! Initialization.createDatabases dbNames with
-               | true ->
+               | Ok _ ->
                    let! result = Databases.Exists.query Initialization.defaultDbProperties dbNames.Head
                    result |> should be (ofCase<@ Databases.Exists.Result.Exists @>)
-               | false ->
-                   return failwith "The database creation (preparation) failed."
+               | Error e ->
+                   return failwith e
             }
             
         [<Fact>]

@@ -144,18 +144,24 @@ module Initialization =
     /// <summary>
     /// Creates a database using the default db properties.
     /// </summary>
-    let createDatabases (names: string list) =
+    let createDatabases (names: string list) : Async<Result<bool, string>> =
         async {
             let queries = names |> List.map (fun name ->
                 async {
                     match! Databases.Create.query defaultDbProperties name [] with
-                    | Databases.Create.Result.Unauthorized _ -> return false
-                    | Databases.Create.Result.AlreadyExists _ -> return false
-                    | Databases.Create.Result.InvalidDbName _ -> return false
-                    | Databases.Create.Result.Unknown _ -> return false
-                    | Databases.Create.Result.Accepted _ -> return true
-                    | Databases.Create.Result.Created _ -> return true
+                    | Databases.Create.Result.Unauthorized x ->  return Error (sprintf "[%s] %s: %s" name "unauthorized" x.content)
+                    | Databases.Create.Result.AlreadyExists x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
+                    | Databases.Create.Result.InvalidDbName x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
+                    | Databases.Create.Result.Unknown x ->       return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
+                    | Databases.Create.Result.Accepted _ ->      return Ok true
+                    | Databases.Create.Result.Created _ ->       return Ok true
                 })
             let! queryResults = Async.Parallel queries
-            return queryResults |> Array.forall ((=) true)
+            
+            let resultAccumulator (isSuccess, errorMessage) (r: Result<bool, string>) = match r with
+                                                                                        | Ok s    -> (s && isSuccess, errorMessage)
+                                                                                        | Error e -> (false, sprintf "%s; %s" errorMessage e)
+            let (success, errors) = queryResults |> Array.fold resultAccumulator (true, sprintf "Initialization.createDatabases failed because:%s" System.Environment.NewLine)
+            
+            return if success then Ok true else Error errors 
         }

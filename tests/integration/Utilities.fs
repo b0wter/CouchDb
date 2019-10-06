@@ -39,8 +39,9 @@ module Utilities =
         inherit DatabaseTests ()
         do Initialization.createDatabases dbNames
            |> Async.RunSynchronously
-           |> (fun x -> if x then printfn "Prefilled database is ok."
-                        else failwith "Could not create the required databases.")
+           |> (fun x -> match x with
+                        | Ok _ -> printfn "Prefilled database is ok."
+                        | Error e -> failwith e)
            
         /// Returns the database names that were supplied as constructor parameters.
         member this.DbNames = dbNames
@@ -57,8 +58,8 @@ module Utilities =
         member this.RunWithDatabases dbNames (toRun: unit -> Async<unit>) =
             async {
                 match! Initialization.createDatabases dbNames with
-                | true -> return! toRun ()
-                | false -> return failwith "The database preparation failed!"
+                | Ok _ -> return! toRun ()
+                | Error e -> return failwith e
             } |> Async.RunSynchronously
             
     /// <summary>
@@ -74,8 +75,9 @@ module Utilities =
         inherit DatabaseTests ()
         do Initialization.createDatabases [ dbName ]
            |> Async.RunSynchronously
-           |> (fun x -> if x then printfn "Prefilled database is ok."
-                        else failwith "Could not create the required databases.")
+           |> (fun x -> match x with
+                        | Ok _ -> printfn "Prefilled database is ok."
+                        | Error e -> failwith e)
            
         /// Returns the database names that were supplied as constructor parameters.
         member this.DbName = dbName
@@ -92,8 +94,8 @@ module Utilities =
         member this.RunWithDatabase dbName (toRun: unit -> Async<unit>) =
             async {
                 match! Initialization.createDatabases [dbName] with
-                | true -> return! toRun ()
-                | false -> return failwith "The database preparation failed!"
+                | Ok _ -> return! toRun ()
+                | Error e -> return failwith e
             } |> Async.RunSynchronously
             
     [<AbstractClass>]

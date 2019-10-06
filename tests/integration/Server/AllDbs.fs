@@ -16,7 +16,7 @@ module AllDbs =
             async {
                 let dbNames = [ "test-db-1"; "test-db-2"; "test-db-3" ]
                 match! Initialization.createDatabases dbNames with
-                | true ->
+                | Ok _ ->
                     let! result = Server.AllDbs.query Initialization.defaultDbProperties
                     match result with
                     | Server.AllDbs.Result.Success s ->
@@ -26,8 +26,8 @@ module AllDbs =
                         failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
                     | Server.AllDbs.Result.Unknown e ->
                         failwith <| sprintf "Request returned an error (status code: %i): %s" (e.statusCode |?| -1) e.content
-                | false ->
-                   return failwith "The database creation (preparation) failed."
+                | Error e ->
+                   return failwith e
             }
 
         [<Fact>]
