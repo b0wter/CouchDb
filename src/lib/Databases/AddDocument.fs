@@ -16,17 +16,26 @@ module AddDocument =
     }
 
     type Result
+        /// Document created and stored on disk
         = Created of Response
+        /// Document data accepted, but not yet stored on disk
         | Accepted of Response
-        | InvalidDbName of RequestResult.T
+        /// Write privileges required
         | Unauthorized of RequestResult.T
+        /// Database doesn’t exist
         | DbDoesNotExist of RequestResult.T
+        /// A Conflicting Document with same ID already exists
         | DocumentIdConflict of RequestResult.T
+        /// A local json deserialization error occured.
         | JsonDeserializationError of RequestResult.T
+        /// `obj` is null
+        | DocumentIsNull of RequestResult.T
+        /// Returned if the response could not be interpreted.
         | Unknown of RequestResult.T
 
     let query (props: DbProperties.T) (dbName: string) (obj: obj) =
         async {
+            if obj |> isNull then return DocumentIsNull <| RequestResult.create(None, "The document you supplied is null. No query has been sent to the server.") else
             let request = createJsonPost props dbName obj []
             let! result = sendRequest request 
             match result.statusCode with
@@ -34,7 +43,6 @@ module AddDocument =
                 return match deserializeJson<Response> result.content with
                         | Ok o -> Created o
                         | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
-            | Some 400 -> return InvalidDbName result
             | Some 401 -> return Unauthorized result
             | Some 404 -> return DbDoesNotExist result
             | Some 409 -> return DocumentIdConflict result
@@ -45,7 +53,8 @@ module AddDocument =
     let asResult (r: Result) =
         match r with
         | Created x | Accepted x -> Ok x
-        | InvalidDbName e | Unauthorized e | DbDoesNotExist e | DocumentIdConflict e | JsonDeserializationError e | Unknown e ->
+        | Unauthorized e | DbDoesNotExist e | DocumentIdConflict e | JsonDeserializationError e | DocumentIsNull e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+    /// Runs query followed by asResult.
     let queryAsResult props dbName obj = query props dbName obj |> Async.map asResult
