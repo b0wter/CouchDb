@@ -53,4 +53,5 @@ module Delete =
         | Deleted x | Accepted x -> Ok x
         | NotFound e | Unauthorized e | BadRequest e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
+    /// Runs query followed by asResult.
     let queryAsResult props name = query props name |> Async.map asResult

@@ -58,5 +58,6 @@ module Authenticate =
         | Success response | Found response -> Ok response
         | Unauthorized e | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
         
+    /// Runs query followed by asResult.
     let queryAsResult = query >> Async.map asResult
     

@@ -59,4 +59,5 @@ module Create =
         | Created x | Accepted x -> Ok x
         | InvalidDbName e | Unauthorized e | AlreadyExists e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
     
+    /// Runs query followed by asResult.
     let queryAsResult props name parameters = query props name parameters |> Async.map asResult

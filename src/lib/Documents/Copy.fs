@@ -83,4 +83,5 @@ module Copy =
         | BadRequest e | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Conflict e | Unknown e | DestinationIdMissing e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+    /// Runs query followed by asResult.
     let queryAsResult<'a> props dbName docId destinationId destinationRev docRev = query<'a> props dbName docId destinationId destinationRev docRev |> Async.map asResult

@@ -80,4 +80,5 @@ module Head =
         | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+    /// Runs query followed by asResult.
     let queryAsResult props name id = query props name id |> Async.map asResult

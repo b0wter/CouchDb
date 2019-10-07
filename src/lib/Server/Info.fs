@@ -44,4 +44,5 @@ module Info =
         | Success response -> Ok response
         | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
+    /// Runs query followed by asResult.
     let queryAsResult = query >> Async.map asResult

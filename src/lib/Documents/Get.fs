@@ -126,4 +126,5 @@ module Get =
         | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | JsonDeserializationError e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+    /// Runs query followed by asResult.
     let queryAsResult<'a> props name id queryParameters = query<'a> props name id queryParameters |> Async.map asResult<'a>

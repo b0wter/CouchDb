@@ -77,4 +77,5 @@ module Delete =
         | BadRequest e | NotFound e | Unauthorized e | Conflict e | DocumentIdEmpty e | DocumentRevEmpty e | JsonDeserialisationError e | Unknown e ->
             FSharp.Core.Result.Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+    /// Runs query followed by asResult.
     let queryAsResult<'a> props dbName docId docRev = query<'a> props dbName docId docRev |> Async.map asResult

@@ -34,4 +34,5 @@ module Exists =
         | DoesNotExist -> Ok false
         | DbNameMissing e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
         
+    /// Runs query followed by asResult.
     let queryAsResult props name = query props name |> Async.map asResult

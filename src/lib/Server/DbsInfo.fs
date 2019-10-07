@@ -93,4 +93,5 @@ module DbsInfo =
         | Success response -> Ok response
         | KeyError e | JsonDeserialisationError e | Unknown e -> Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
         
+    /// Runs query followed by asResult.
     let queryAsResult props names = query props names |> Async.map asResult
