@@ -9,33 +9,27 @@ module Delete =
     open b0wter.CouchDb.Tests.Integration
     
     type Tests() =
-        inherit Utilities.EmptyMultiDatabaseTests()
+        inherit Utilities.EmptySingleDatabaseTests("database-delete-test")
 
         [<Fact>]
-        member this.``Deleting an existing database results in deletion`` () =
-            let dbName = "database-delete-test-1" 
-            let toRun = fun () ->
-                async {
-                    let! result = Databases.Delete.query Initialization.defaultDbProperties dbName
-                    result |> should be (ofCase <@ Databases.Delete.Result.Deleted @>)
-                }
-            this.RunWithDatabases [ dbName ] toRun
+        member this.``Deleting an existing database results in Deleted`` () =
+            async {
+                let! result = Databases.Delete.query Initialization.defaultDbProperties this.DbName
+                result |> should be (ofCase <@ Databases.Delete.Result.Deleted @>)
+            }
             
         [<Fact>]
-        member this.``Deleting an non-existing database results in deletion`` () =
-            let dbNameCreation = "database-delete-test-2" 
-            let dbNameDeletion = "database-delete-test-2-non-existing" 
-            let toRun = fun () ->
-                async {
-                    let! result = Databases.Delete.query Initialization.defaultDbProperties dbNameDeletion
-                    result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>)
-                }
-            this.RunWithDatabases [ dbNameCreation ] toRun
+        member this.``Deleting an non-existing database results in NotFound`` () =
+            let dbNameDeletion = this.DbName + "_non-existing-suffix"
+            async {
+                let! result = Databases.Delete.query Initialization.defaultDbProperties dbNameDeletion
+                result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>)
+            }
             
         [<Fact>]
         member this.``Deleting an database with invalid name results a NotFound-result`` () =
-            let dbName = "00-this-[is]-{an}-inv@lid-name"
+            let dbNameInvalid = "00-this-[is]-{an}-inv@lid-name"
             async {
-                let! result = Databases.Delete.query Initialization.defaultDbProperties dbName
-                result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>) 
+                let! result = Databases.Delete.query Initialization.defaultDbProperties dbNameInvalid
+                result |> should be (ofCase<@ Databases.Delete.Result.NotFound @>)
             }
