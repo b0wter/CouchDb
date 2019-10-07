@@ -10,13 +10,12 @@ module AllDocuments =
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("test-db")
-        let dbName = "test-db"
         
         [<Fact>]
         member this.``Retrieving all documents for an empty but existing db returns empty result`` () =
             async {
                 //TODO: Add documents :D
-                let! result = Databases.AllDocuments.queryAll Initialization.defaultDbProperties dbName
+                let! result = Databases.AllDocuments.queryAll Initialization.defaultDbProperties this.DbName
                 match result with
                 | Databases.AllDocuments.Success s ->
                     s.total_rows |> should equal 0
