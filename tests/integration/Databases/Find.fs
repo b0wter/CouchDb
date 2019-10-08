@@ -8,6 +8,7 @@ module Find =
     open b0wter.CouchDb.Tests.Integration
     open b0wter.CouchDb.Lib.Mango
     open b0wter.FSharp.Collections
+    open FsUnit.CustomMatchers
     
     let id1 = System.Guid.Parse("39346820-3700-4d09-b86c-e68653c98ca7")
     let id2 = System.Guid.Parse("c51b3eae-73a5-4e18-9c29-701645cfb91e")
@@ -38,8 +39,6 @@ module Find =
                     do (m3 |> TestModels.Default.compareWithoutRev model3)
                     
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
-                
-                return 0
             }
             
         [<Fact>]
@@ -53,8 +52,6 @@ module Find =
                     do testModels.docs |> should haveLength 1
                     do testModels.docs.Head |> TestModels.Default.compareWithoutRev model1
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
-                
-                return 0
             }
             
         [<Fact>]
@@ -68,8 +65,6 @@ module Find =
                     do testModels.docs |> should haveLength 1
                     do testModels.docs.Head |> TestModels.Default.compareWithoutRev model3
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
-                
-                return 0
             }
             
         [<Fact>]
@@ -91,6 +86,14 @@ module Find =
                     do (m2 |> TestModels.Default.compareWithoutRev model2)
                                        
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
-                
-                return 0
+            }
+            
+        [<Fact>]
+        member this.``Find using an invalid db name returns InvalidDbName`` () =
+            async {
+                let nonExistingDbName = this.DbName + "_non-existing"
+                let selector = condition "myInt" <| Equal (Integer 1)
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties nonExistingDbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.NotFound @>)
             }

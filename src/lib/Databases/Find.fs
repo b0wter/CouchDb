@@ -38,6 +38,8 @@ module Find =
         | Unauthorized of RequestResult.T
         /// Query execution error
         | QueryExecutionError of RequestResult.T
+        /// The database with the given name could not be found.
+        | NotFound of RequestResult.T
         /// If the local deserialization of the servers response failed.
         | JsonDeserializationError of RequestResult.T
         /// If the response from the server could not be interpreted.
@@ -58,6 +60,7 @@ module Find =
                         | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
                     | Some 400 -> BadRequest result
                     | Some 401 -> Unauthorized result
+                    | Some 404 -> NotFound result
                     | Some 500 -> QueryExecutionError result
                     | _ ->
                         Unknown result
@@ -69,7 +72,7 @@ module Find =
     let asResult<'a> (r: Result<'a>) =
         match r with
         | Success x -> Ok x
-        | BadRequest e | Unauthorized e | QueryExecutionError e | JsonDeserializationError e | Unknown e ->
+        | BadRequest e | Unauthorized e | QueryExecutionError e | JsonDeserializationError e | NotFound e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
     /// Runs query followed by asResult.
