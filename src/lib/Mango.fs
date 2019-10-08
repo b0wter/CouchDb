@@ -220,3 +220,9 @@ module Mango =
         
     let ``and`` (a: Operator) (b: Operator) =
         Combinator <| And [a; b]
+
+    let nor (a: Operator) (b: Operator) =
+        Combinator <| Nor [a; b]
+        
+    let all ([<System.ParamArray>] operators: Operator array) =
+        Combinator (All <| (operators |> List.ofArray))
