@@ -30,3 +30,11 @@ module AllDocuments =
                 let! result = Databases.AllDocuments.queryAll Initialization.defaultDbProperties nonExistingDbName
                 result |> should be (ofCase <@ Databases.AllDocuments.NotFound @>)
             }
+            
+        [<Fact>]
+        member this.``Retrieving selected documents for non-existing db returns NotFound`` () =
+            async {
+                let nonExistingDbName = "this-does-not-exist"
+                let! result = Databases.AllDocuments.querySelected Initialization.defaultDbProperties nonExistingDbName [ "a"; "b"; "b" ]
+                result |> should be (ofCase <@ Databases.AllDocuments.NotFound @>)
+            }
