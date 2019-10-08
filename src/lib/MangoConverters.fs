@@ -127,11 +127,13 @@ module MangoConverters =
 
     type OperatorJsonConverter() =
         inherit Newtonsoft.Json.JsonConverter()
+        
+        override this.CanRead = false
 
         override this.CanConvert(t) =
             typeof<Operator>.IsAssignableFrom(t)
 
-        override this.ReadJson(reader, objectType, existingValue, serializer) =
+        override this.ReadJson(_, _, _, _) =
             failwith "Reading this type (ConditionalOperator) is not supported."
 
         override this.WriteJson(writer, value, _) =
