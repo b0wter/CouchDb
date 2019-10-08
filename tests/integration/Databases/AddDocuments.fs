@@ -39,3 +39,13 @@ module AddDocument =
                 let! result = Databases.AddDocument.query Initialization.defaultDbProperties "00-this-[is]-{an}-inv@lid-name" TestModels.Default.defaultInstance
                 result |> should be (ofCase <@ Databases.AddDocument.Result.DbDoesNotExist @>)
             }
+            
+        [<Fact>]
+        member this.``Adding a document with an id that is in use returns Conflict`` () =
+            async {
+                let! firstInsert = Databases.AddDocument.query Initialization.defaultDbProperties this.DbName TestModels.Default.defaultInstance
+                firstInsert |> should be (ofCase <@ Databases.AddDocument.Result.Created @>)
+                let! secondInsert = Databases.AddDocument.query Initialization.defaultDbProperties this.DbName TestModels.Default.defaultInstance
+                secondInsert |> should be (ofCase <@ Databases.AddDocument.Result.DocumentIdConflict @>)
+            }
+            
