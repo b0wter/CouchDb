@@ -3,14 +3,6 @@
 rm b0wter.couchdb.nuspec
 set -e
 
-if [ -z "$NUGET_ORG_KEY" ]
-then
-	echo "\$NUGET_ORG_KEY is empty. Cannot continue."
-	exit 1
-else
-	echo "\$NUGET_ORG_KEY is set, no need to do anything"
-fi
-
 GIT_TAG=$(git describe --tags --abbrev=0)
 GIT_TAG=$(echo "${GIT_TAG//v}")
 GIT_MESSAGE=$(sed 's/ /\\ /g' <<< $(git log -1 --pretty=%B | tr '\n' ' '))
