@@ -21,7 +21,7 @@ If you are in doubt please submit an issue!
 
 
 Features
-=======
+========
 Note that (optional) query parameter are currently *not supported*! Even for endpoints that are marked as working. Query parameters that are required (like the `rev` parameter for `/db/docid/` `[PUT]`) are supported.
 
 | Authentication | Status |
@@ -103,6 +103,8 @@ There is a submodule for _database_ and _server_ endpoints. A _documents_ endoin
 	* a `query` method (sometimes there are multiple methods)
 	* a `Response` that contains the results of a successful response from the CouchDb Server
 	* a `Result` type that contains all error cases (matching the ones listed in the official documentation) and a `Success` type that contains the `Response`
+	* a 'asResult' wraps the query-specific `Result` as a `FSharp.Core.Result<Response, ErrorRequestResult.T>`. This allows you to easily bind it
+	* a 'queryAsResult' runs `query` followed by `asResult`
 
 Connection Details
 ------------------
@@ -131,26 +133,46 @@ let doesTestDbExist () =
 All other requests work in the same way. Here is another example using the `_find`-endpoint:
 
 ```
+open b0wter.CouchDb.Lib.Mango
+
 let findWithMultipleSelectors () =
 	async {
-		let nameFindSelector = Find.TypedSelector("name", "myName", id)
-		let typefindSelector = Find.TypedSelector("type", "myType", id)
-		let multiSelector = Find.MultiSelector([nameFindSelector; typeFindSelector])
-		let findParams = Find.createExpression multiSelector
-		let! result = Database.Find.query<MyDocumentType> p "test-db" findParams
+		let nameFindSelector = condition "name" <| Equal (Text "myName")
+		let typefindSelector = condition "type" <| Equal (Text "myType")
+		let intSelector = condition "age" <| LessOrEqual (Integer 100)
+		let multiSelector = And [ nameFindSelector; typefindSelector; intSelector ]
+		let expression = createExpression multiSelector
+		let! result = Database.Find.query<MyDocumentType> p "test-db" expression
 		do printfn "%A" result
 	}
 ```
 
-If you need more control over the search expression you can create the `b0wter.CouchDb.Lib.Find.Expression` yourself instead of using the premade `Find.createExpression`. 
+If you need more control over the search expression you can create the `b0wter.CouchDb.Lib.Find.Expression` yourself instead of using the premade `<Mango.createExpression`. There are a couple of helper functions that allow you to handle special cases like two conditions:
+
+```
+open b0wter.CouchDb.Lib.Mango
+
+let findWithMultipleSelectors () =
+	async {
+		let nameFindSelector = condition "name" <| Equal (Text "myName")
+		let typefindSelector = condition "type" <| Equal (Text "myType")
+		let multiSelector = nameFindSelector |> ``and`` typefindSelector
+		let expression = createExpression multiSelector
+		let! result = Database.Find.query<MyDocumentType> p "test-db" expression
+		do printfn "%A" result
+	}
+```
+Other examples are: `''or''`, `nor` and `all`.
 
 In case you only require a single selector the previous example boils down to this:
 
 ```
+open b0wter.CouchDb.Lib.Mango
+
 let findWithSingleSelectors () =
 	async {
-		let nameFindSelector = Find.TypedSelector("name", "myName", id)
-		let findParams = Find.createExpression nameFindSelector
+		let nameFindSelector = condition "name" <| Equal (Text "myName")
+		let findParams = createExpression nameFindSelector
 		let! result = Database.Find.query<MyDocumentType> p "test-db" findParams
 		do printfn "%A" result
 	}
