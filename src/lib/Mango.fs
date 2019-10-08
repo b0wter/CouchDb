@@ -208,12 +208,15 @@ module Mango =
             execution_stats = None
         }
         
-    let condition field operation =
+    let conditionWithParents parents field operation =
         Conditional {
             ConditionalOperator.name = field;
-            ConditionalOperator.parents = [];
+            ConditionalOperator.parents = parents;
             ConditionalOperator.operation = operation
         }
+        
+    let condition =
+        conditionWithParents []
         
     let ``or`` (a: Operator) (b: Operator) =
         Combinator <| Or [a; b]
