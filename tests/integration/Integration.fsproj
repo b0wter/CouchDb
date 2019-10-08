@@ -11,7 +11,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="README.md" />
-    <Compile Include="CustomMatchers.fs" />
     <Compile Include="Configuration.fs" />
     <Compile Include="Initialization.fs" />
     <Compile Include="Utilities.fs" />
@@ -19,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="b0wter.FSharp" Version="3.2.0" />
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
-    <PackageReference Include="FsUnit.xUnit" Version="3.4.1" />
+    <PackageReference Include="FsUnit.xUnit" Version="3.5.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
@@ -49,6 +48,7 @@
     <Compile Include="Databases\AllDocuments.fs" />
     <Compile Include="Databases\AddDocuments.fs" />
     <Compile Include="Databases\Find.fs" />
+    <Compile Include="Databases\BulkAdd.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Documents\Get.fs" />

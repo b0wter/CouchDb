@@ -6,7 +6,7 @@ module Get =
     open FsUnit.Xunit
     open Xunit
     open b0wter.CouchDb.Lib
-    open b0wter.CouchDb.Tests.Integration.CustomMatchers
+    open FsUnit.CustomMatchers
     open b0wter.CouchDb.Tests.Integration.TestModels
     
     type Tests() =

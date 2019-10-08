@@ -6,7 +6,7 @@ module AddDocument =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
-    open CustomMatchers
+    open FsUnit.CustomMatchers
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("test-db")
@@ -15,7 +15,7 @@ module AddDocument =
         member this.``Adding a document to an existing database returns Created`` () =
             async {
                 let! result = Databases.AddDocument.query Initialization.defaultDbProperties this.DbName TestModels.Default.defaultInstance
-                result |> should be (ofCase <@ Databases.AddDocument.Result.Created @>)
+                result |> should be (ofCase <@ Databases.AddDocument.Result.Created @>) 
             }
             
         [<Fact>]

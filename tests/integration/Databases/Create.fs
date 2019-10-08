@@ -6,7 +6,7 @@ module Create =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
-    open CustomMatchers
+    open FsUnit.CustomMatchers
     
     type Tests() =
         inherit Utilities.CleanDatabaseTests()

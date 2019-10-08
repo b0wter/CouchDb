@@ -3,9 +3,9 @@ namespace b0wter.CouchDb.Tests.Integration.Databases
 module Delete =
     
     open FsUnit.Xunit
+    open FsUnit.CustomMatchers
     open Xunit
     open b0wter.CouchDb.Lib
-    open b0wter.CouchDb.Tests.Integration.CustomMatchers
     open b0wter.CouchDb.Tests.Integration
     
     type Tests() =
