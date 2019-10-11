@@ -10,8 +10,8 @@ module Json =
 
     let converters = defaultConverters |> converterListToIList
 
-    
-    let settings () = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+    /// Creates a new instance of the default settings.
+    let settings = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
                                                               Converters = converters,
                                                               Formatting = Newtonsoft.Json.Formatting.Indented,
                                                               NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
@@ -20,10 +20,36 @@ module Json =
     let mutable postProcessing = fun (serialized: string) -> serialized
     
     /// Returns `settings` but adds the converters specified as argument.
-    let settingsWithCustomConverter (customs: JsonConverter list) = 
+    let settingsWithCustomConverter (customs: JsonConverter list) =
+        // TODO: make this nice ^^
         let converters = (customs @ defaultConverters) |> converterListToIList
-        let settings = settings ()
-        do settings.Converters <- converters
-        settings
-        
-
+        let s = Newtonsoft.Json.JsonSerializerSettings()
+        do s.Context <- settings.Context
+        do s.Culture <- settings.Culture
+        do s.ContractResolver <- settings.ContractResolver
+        do s.ConstructorHandling <- settings.ConstructorHandling
+        do s.CheckAdditionalContent <- settings.CheckAdditionalContent
+        do s.DateFormatHandling <- settings.DateFormatHandling
+        do s.DateFormatString <- settings.DateFormatString
+        do s.DateParseHandling <- settings.DateParseHandling
+        do s.DateTimeZoneHandling <- settings.DateTimeZoneHandling
+        do s.DefaultValueHandling <- settings.DefaultValueHandling
+        do s.EqualityComparer <- settings.EqualityComparer
+        do s.FloatFormatHandling <- settings.FloatFormatHandling
+        do s.Formatting <- settings.Formatting
+        do s.FloatParseHandling <- settings.FloatParseHandling
+        do s.MaxDepth <- settings.MaxDepth
+        do s.MetadataPropertyHandling <- settings.MetadataPropertyHandling
+        do s.MissingMemberHandling <- settings.MissingMemberHandling
+        do s.NullValueHandling <- settings.NullValueHandling
+        do s.ObjectCreationHandling <- settings.ObjectCreationHandling
+        do s.PreserveReferencesHandling <- settings.PreserveReferencesHandling
+        do s.ReferenceResolverProvider <- settings.ReferenceResolverProvider
+        do s.ReferenceLoopHandling <- settings.ReferenceLoopHandling
+        do s.StringEscapeHandling <- settings.StringEscapeHandling
+        do s.TraceWriter <- settings.TraceWriter
+        do s.TypeNameHandling <- settings.TypeNameHandling
+        do s.SerializationBinder <- settings.SerializationBinder
+        do s.TypeNameAssemblyFormatHandling <- settings.TypeNameAssemblyFormatHandling
+        do s.Converters <- converters
+        s

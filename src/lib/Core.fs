@@ -89,7 +89,7 @@ module Core =
         try
             let result = Ok <| match customConverters with
                                | [] ->
-                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Json.settings())
+                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Json.settings)
                                | converters ->
                                  Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, converters |> Json.settingsWithCustomConverter)
             do printfn "Deserialization successful."
@@ -121,7 +121,7 @@ module Core =
     /// Allows the user to define additional `JsonConverter`.
     let private serializeAsBinaryJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: obj) =
         let json = match customConverters with
-                    | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Json.settings ())
+                    | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Json.settings)
                     | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Json.settingsWithCustomConverter)
                     |> Json.postProcessing
         (json, System.Text.Encoding.UTF8.GetBytes(json))
