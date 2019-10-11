@@ -116,7 +116,7 @@ module MangoConverters =
         override this.CanConvert(t) =
             typeof<CombinationOperator>.IsAssignableFrom(t)
 
-        override this.ReadJson(reader, objectType, existingValue, serializer) =
+        override this.ReadJson(_, _, _, _) =
             failwith "Reading this type (ConditionalOperator) is not supported."
 
         override this.WriteJson(writer, value, _) =
@@ -142,14 +142,14 @@ module MangoConverters =
             | Operator.Conditional conditional -> 
                 // TODO: this is a nasty hack that needs to be addressed
                 let converter = ConditionalJsonConverter () :> Newtonsoft.Json.JsonConverter
-                let settings = Utilities.Json.jsonSettingsWithCustomConverter [ converter ]
+                let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(conditional, settings)
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)
             | Operator.Combinator combinator -> 
                 // TODO: this is a nasty hack that needs to be addressed
                 let converter = CombinationJsonConverter () :> Newtonsoft.Json.JsonConverter
-                let settings = Utilities.Json.jsonSettingsWithCustomConverter [ converter ]
+                let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(combinator, settings)
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)

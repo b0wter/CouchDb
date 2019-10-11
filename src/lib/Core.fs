@@ -89,9 +89,9 @@ module Core =
         try
             let result = Ok <| match customConverters with
                                | [] ->
-                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Utilities.Json.jsonSettings)
+                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Json.settings())
                                | converters ->
-                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
+                                 Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, converters |> Json.settingsWithCustomConverter)
             do printfn "Deserialization successful."
             result
         with
@@ -121,8 +121,8 @@ module Core =
     /// Allows the user to define additional `JsonConverter`.
     let private serializeAsBinaryJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: obj) =
         let json = match customConverters with
-                    | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
-                    | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
+                    | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Json.settings ())
+                    | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Json.settingsWithCustomConverter)
                     |> Json.postProcessing
         (json, System.Text.Encoding.UTF8.GetBytes(json))
 
@@ -181,6 +181,8 @@ module Core =
             let queryParameters = queryParameters |> formatQueryParameters
             let url = combineUrls (p |> DbProperties.baseEndpoint) path
             let json, binary = serializeAsBinaryJson customConverters content
+            do printfn "Serialized object:"
+            do printfn "%s" json
             Http.AsyncRequest(url,
                               httpMethod = "PUT",
                               body = BinaryUpload binary,
