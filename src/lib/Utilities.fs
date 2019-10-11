@@ -17,11 +17,15 @@ module Utilities =
 
         let jsonConverters = defaultConverters |> converterListToIList
 
+        
         let jsonSettings = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
                                                                   Converters = jsonConverters,
                                                                   Formatting = Newtonsoft.Json.Formatting.Indented,
                                                                   NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
-
+        
+        /// This function is run after an object has been serialized. You can use it to tweak the output.
+        let mutable postProcessing = fun (serialized: string) -> serialized
+        
         let jsonSettingsWithCustomConverter (customs: JsonConverter list) = 
             let converters = (customs @ defaultConverters) |> converterListToIList
             Newtonsoft.Json.JsonSerializerSettings(ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),

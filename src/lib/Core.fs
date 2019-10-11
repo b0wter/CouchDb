@@ -123,6 +123,7 @@ module Core =
         let json = match customConverters with
                     | [] -> Newtonsoft.Json.JsonConvert.SerializeObject(content, Utilities.Json.jsonSettings)
                     | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Utilities.Json.jsonSettingsWithCustomConverter)
+                    |> Json.postProcessing
         (json, System.Text.Encoding.UTF8.GetBytes(json))
 
     /// <summary>
