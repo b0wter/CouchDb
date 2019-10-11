@@ -201,6 +201,21 @@ In case you miss these attributes CouchDb will assign these values on its own. B
 
 Why use this approach? I could define interfaces are make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
 
+Custom json settings
+--------------------
+This library makes use of [NewtonSoft.Json](https://www.newtonsoft.com/). In order to better serialize some F# specific objects, like union cases and options we use a port of [Fifteenbelow](https://github.com/kolektiv/FifteenBelow.Json) to [dotnet core](https://github.com/b0wter/FifteenBelow.Json). The default settings are:
+```
+ContractResolver = Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+Converters = [ FifteenBelow.Json.OptionConverter () ]
+Formatting = Newtonsoft.Json.Formatting.Indented,
+NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
+```
+This may be outdated in the future, check [this file](https://github.com/b0wter/CouchDb/blob/master/src/lib/Json.fs). Since the settings are stored in a `NewtonSoft.Json.JsonSettings` instance its properties are mutable. Use this to change the settings as you like. E.g.:
+```
+Json.settings.Formatting <- Newtonsoft.Json.Formatting.None
+```
+You have the option to set a `string -> string` as postprocessing for the serialized object before it is sent to the db server. Simple replace `Json.postProcessing` with a function of your choice.
+
 Tests
 =====
 
