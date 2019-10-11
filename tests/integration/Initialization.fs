@@ -7,11 +7,6 @@ open b0wter.FSharp.Operators
 open Microsoft.Extensions.Configuration
 
 module Initialization =
-
-    /// <summary>
-    /// Default CouchDb credentials.
-    /// </summary>
-    let defaultCredentials = Credentials.create("admin", "password")
     
     /// <summary>
     /// Default db properties (localhost and default port).
