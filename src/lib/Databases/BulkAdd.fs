@@ -1,8 +1,7 @@
 namespace b0wter.CouchDb.Lib.Databases
 open Newtonsoft.Json
 open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
+open b0wter.CouchDb.Lib.Json
 
 module BulkAdd =
     
@@ -43,6 +42,7 @@ module BulkAdd =
         /// Occurs if response could not be interpreted.
         | Unknown of RequestResult.T
         
+    [<RemoveTypeName>]
     type DocumentContainer<'a> = {
         docs: 'a list
     }
