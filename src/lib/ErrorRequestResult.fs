@@ -27,3 +27,7 @@ module ErrorRequestResult =
     let fromRequestResultAndCase<'a>(r: RequestResult.T, case: 'a) =
         let caseName = case |> getUnionCaseName 
         fromRequestResult(r, caseName)
+        
+    /// Returns a string in the format: "[$CASE] $CONTENT"
+    let asString e =
+        sprintf "[%s] %s" e.case e.content
