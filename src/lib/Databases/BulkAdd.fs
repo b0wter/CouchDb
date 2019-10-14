@@ -42,7 +42,6 @@ module BulkAdd =
         /// Occurs if response could not be interpreted.
         | Unknown of RequestResult.T
         
-    [<RemoveTypeName>]
     type DocumentContainer<'a> = {
         docs: 'a list
     }
