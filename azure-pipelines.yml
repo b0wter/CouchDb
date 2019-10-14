@@ -58,7 +58,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      scripts/up-test.sh localhost 5984
+      scripts/up-test.sh localhost 5985
 
 - task: Bash@3
   displayName: "Run tests in container"
