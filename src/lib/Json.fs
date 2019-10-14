@@ -4,11 +4,14 @@ open Newtonsoft.Json.Serialization
 module Json = 
     open Newtonsoft.Json
     
+    /// List of default converters.
     let defaultConverters = [ FifteenBelow.Json.OptionConverter () :> Newtonsoft.Json.JsonConverter ]
 
+    /// Takes a list of converters and turns them into an `IList<JsonConverter>`.
     let private converterListToIList (converters: JsonConverter list) =
         System.Collections.Generic.List<Newtonsoft.Json.JsonConverter> (converters |> Seq.ofList)
 
+    /// Default `IList` of json converters.
     let converters = defaultConverters |> converterListToIList
 
     /// Creates a new instance of the default settings.
