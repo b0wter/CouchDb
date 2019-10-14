@@ -68,6 +68,7 @@ module Find =
         // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
         // this is currently not in use.
         
+        
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
     let asResult<'a> (r: Result<'a>) =
         match r with
@@ -77,3 +78,11 @@ module Find =
             
     /// Runs query followed by asResult.
     let queryAsResult<'a> props dbName expression = query<'a> props dbName expression |> Async.map asResult<'a>
+    
+    /// Retrieves the first element of a successful query or an error message.
+    /// Useful if you know that your query will return a single element.
+    let getFirst (r: Result<'a>) : Result<'a, string> =
+        r
+        |> asResult
+        |> Result.map (fun x -> x.docs.Head)
+        |> Result.mapError (fun x -> sprintf "[%s] %s" x.case x.content)

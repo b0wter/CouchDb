@@ -1,4 +1,5 @@
 namespace b0wter.CouchDb.Tests.Integration.Databases
+open b0wter.CouchDb.Tests.Integration.TestModels
 
 module Find =
     
@@ -96,4 +97,17 @@ module Find =
                 let expression = createExpression selector
                 let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties nonExistingDbName expression
                 do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.NotFound @>)
+            }
+
+        [<Fact>]
+        member this.``getFirst on a successful query returns the first element of a query`` () =
+            async {
+                let selector = condition "_id" <| Equal (Id id1)
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.Success @>)
+                
+                match result |> Databases.Find.getFirst with
+                | Ok o -> o |> Default.compareWithoutRev model1
+                | Error e -> failwith e
             }
