@@ -70,7 +70,7 @@ module MangoConverters =
         override this.CanConvert(t) =
             typeof<ConditionalOperator>.IsAssignableFrom(t)
 
-        override this.ReadJson(reader, objectType, existingValue, serializer) =
+        override this.ReadJson(_, _, _, _) =
             failwith "Reading this type (ConditionalOperator) is not supported."
 
         override this.WriteJson(writer, value, _) =
@@ -95,14 +95,25 @@ module MangoConverters =
         let operatorsToJObjects (os: Operator list) =
             os |> List.map matchOperator
 
+        let combinationToJObject (operator: Operator) (combinatorName: string) : JObject =
+             let operatorObject = operator |> matchOperator
+             let property = JProperty(combinatorName, operatorObject)
+             let subObject = JObject()
+             do subObject.Add(property)
+             subObject
+        
         let property =  match combinator with
                         | And x -> JProperty("$and", x |> operatorsToJObjects)
                         | Or x -> JProperty("$or", x |> operatorsToJObjects)
                         | Not x -> JProperty("$not", x |> matchOperator)
                         | Nor x -> JProperty("$nor", x |> operatorsToJObjects)
                         | All x -> JProperty("$all", x |> operatorsToJObjects)
-                        | ElementMatch x -> JProperty("$elemMatch", x |> matchOperator) // TODO: is this correct? should not only be conditionals here?
-                        | AllMatch x -> JProperty("$allMatch", x |> matchOperator)
+                        | ElementMatch (operator, key) ->
+                             let subObject = combinationToJObject operator "$elemMatch"
+                             JProperty(key, subObject)
+                        | AllMatch (operator, key) ->
+                             let subObject = combinationToJObject operator "$allMatch"
+                             JProperty(key, subObject)
         
         let jObject = JObject()
         do jObject.Add(property)
@@ -144,6 +155,8 @@ module MangoConverters =
                 let converter = ConditionalJsonConverter () :> Newtonsoft.Json.JsonConverter
                 let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(conditional, settings)
+                do printfn "Serialized a condition to:"
+                do printfn "%s" serialized
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)
             | Operator.Combinator combinator -> 
@@ -151,5 +164,7 @@ module MangoConverters =
                 let converter = CombinationJsonConverter () :> Newtonsoft.Json.JsonConverter
                 let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(combinator, settings)
+                do printfn "Serialized a combinator to:"
+                do printfn "%s" serialized
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)

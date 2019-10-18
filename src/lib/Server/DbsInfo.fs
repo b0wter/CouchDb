@@ -69,7 +69,7 @@ module DbsInfo =
 
     /// <summary>
     /// Returns detailed information for all databases (`names` parameter).
-    /// <summary>
+    /// </summary>
     let query (props: DbProperties.T) (names: string list) : Async<Result> =
         async {
             do printfn "Querying db information for keys: %A" names

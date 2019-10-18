@@ -64,6 +64,7 @@ module Get =
         | NotModified of Response<'a>
         /// <summary>
         /// Read privilege required
+        /// </summary>
         | Unauthorized of RequestResult.T
         /// <summary>
         /// Document not found>

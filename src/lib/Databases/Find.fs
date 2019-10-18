@@ -81,8 +81,12 @@ module Find =
     
     /// Retrieves the first element of a successful query or an error message.
     /// Useful if you know that your query will return a single element.
+    /// Also returns an error if the query is successful but did not return any documents.
     let getFirst (r: Result<'a>) : Result<'a, string> =
         r
         |> asResult
-        |> Result.map (fun x -> x.docs.Head)
-        |> Result.mapError (fun x -> sprintf "[%s] %s" x.case x.content)
+        |> Result.mapBoth (fun ok -> ok.docs |> List.tryHead)  (fun error -> sprintf "[%s] %s" error.case error.content)
+        |> function
+           | Ok (Some o) -> Ok o
+           | Ok None -> Error "The query was successful but did not return any documents."
+           | Error e -> Error e

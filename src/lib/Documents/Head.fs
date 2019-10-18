@@ -27,6 +27,7 @@ module Head =
         | NotModified of Response
         /// <summary>
         /// Read privilege required
+        /// </summary>
         | Unauthorized of RequestResult.T
         /// <summary>
         /// Document not found>

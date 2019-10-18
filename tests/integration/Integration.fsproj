@@ -16,7 +16,6 @@
     <Compile Include="Utilities.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="b0wter.FSharp" Version="3.2.0" />
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
     <PackageReference Include="FsUnit.xUnit" Version="3.5.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
@@ -35,6 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestModels\Default.fs" />
+    <Compile Include="TestModels\Hierarchical.fs" />
+    <Compile Include="TestModels\HierarchicalArray.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />
@@ -59,5 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="b0wter.FSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\fsharp_base\src\base\lib\Debug\netstandard2.0\b0wter.FSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

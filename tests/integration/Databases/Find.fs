@@ -19,7 +19,38 @@ module Find =
     let model2 = TestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
     let model3 = TestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
     
-    type Tests() =
+    let sub1_1 = TestModels.HierarchicalArray.createSubField (101, "substring", -3.14)
+    let sub1_2 = TestModels.HierarchicalArray.createSubField (102, "substring", -6.28)
+    let sub2_1 = TestModels.HierarchicalArray.createSubField (201, "substring", -9.42)
+    let sub2_2 = TestModels.HierarchicalArray.createSubField (202, "substring", -9.42)
+    let sub3_1 = TestModels.HierarchicalArray.createSubField (301, "substring", -9.42)
+    let sub3_2 = TestModels.HierarchicalArray.createSubField (302, "substring", -12.56)
+    
+    let hAModel1 = TestModels.HierarchicalArray.create(id1, 42, "one",   11.1, [ sub1_1; sub1_2 ])
+    let hAModel2 = TestModels.HierarchicalArray.create(id2, 42, "two",   22.2, [ sub2_1; sub2_2 ])
+    let hAModel3 = TestModels.HierarchicalArray.create(id3, 42, "three", 33.3, [ sub3_1; sub3_2 ])
+    
+    let hModel1 = TestModels.Hierarchical.create (id1, 42, "one",   11.1, "sub-one", -21, -11.1)
+    let hModel2 = TestModels.Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
+    let hModel3 = TestModels.Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
+    
+    type GenericTests() =
+        inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ model1; model2; model3 ])
+        
+        [<Fact>]
+        member this.``getFirst on a successful query returns the first element of a query`` () =
+            async {
+                let selector = condition "_id" <| Equal (Id id1)
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.Success @>)
+                
+                match result |> Databases.Find.getFirst with
+                | Ok o -> o |> Default.compareWithoutRev model1
+                | Error e -> failwith e
+            }
+    
+    type EqualsTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ model1; model2; model3 ])
 
         [<Fact>]
@@ -99,15 +130,48 @@ module Find =
                 do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.NotFound @>)
             }
 
+    type ElemMatchTests() =
+        inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hAModel1; hAModel2; hAModel3 ])
+
         [<Fact>]
-        member this.``getFirst on a successful query returns the first element of a query`` () =
+        member this.``Find using an ElementMatch on a valid db returns Success result`` () =
             async {
-                let selector = condition "_id" <| Equal (Id id1)
+                let elementSelector = condition "subFloat" (Equal <| Float -9.42)
+                let selector = combination <| ElementMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.Success @>)
+                let! result = Databases.Find.query<TestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalArray.T>.Success @>)
                 
-                match result |> Databases.Find.getFirst with
-                | Ok o -> o |> Default.compareWithoutRev model1
-                | Error e -> failwith e
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 2
+                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
+                    let s3 = s.docs |> List.find (fun x -> x._id = id3)
+                    
+                    do (s2 |> TestModels.HierarchicalArray.compareWithoutRev hAModel2)
+                    do (s3 |> TestModels.HierarchicalArray.compareWithoutRev hAModel3)
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
+            
+    type AllMatchTests() =
+        inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hAModel1; hAModel2; hAModel3 ])
+
+        [<Fact>]
+        member this.``Find using an ElementMatch on a valid db returns Success result`` () =
+            async {
+                let elementSelector = condition "subFloat" (Equal <| Float -9.42)
+                let selector = combination <| AllMatch (elementSelector, "mySubs")
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalArray.T>.Success @>)
+                
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 1
+                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
+                    
+                    do (s2 |> TestModels.HierarchicalArray.compareWithoutRev hAModel2)
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
+            }
+            
+        

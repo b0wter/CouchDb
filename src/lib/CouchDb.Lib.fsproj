@@ -4,6 +4,7 @@
     <RootNamespace>b0wter.CouchDb.Lib</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>b0wter.couchdb.nuspec</NuspecFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Utilities.fs" />
@@ -24,7 +25,6 @@
     <PackageReference Include="FSharp.Data.GraphQL.Client" Version="1.0.1" />
     <PackageReference Include="FSharpx.Async" Version="1.14.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="b0wter.FSharp" Version="3.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />
@@ -48,5 +48,10 @@
     <Compile Include="Documents\Put.fs" />
     <Compile Include="Documents\Delete.fs" />
     <Compile Include="Documents\Copy.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="b0wter.FSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\fsharp_base\src\base\lib\Debug\netstandard2.0\b0wter.FSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
