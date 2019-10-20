@@ -1,12 +1,16 @@
 namespace b0wter.CouchDb.Lib.Databases
-open b0wter.CouchDb.Lib
 
-module BulkUpdate =
+module BulkDelete =
     
+    open b0wter.CouchDb.Lib
     open b0wter.FSharp
     
     type Result
-        /// Document(s) have been created or updated (201)
+        /// Document(s) have been created or updated (201). *Beware*, CouchDb returns created
+        /// even if the deletion of some documents failed. You need to check the InsertResult.
+        /// Because delete means that documents are
+        /// updated with `_deleted=true` this case is still named `Created` in accordance with
+        /// BulkAdd and BulkUpdate.
         = Created of BulkAdd.Response
         /// The request provided invalid JSON data (400)
         | BadRequest of RequestResult.T
@@ -25,16 +29,24 @@ module BulkUpdate =
         /// Requested database does not exist
         | NotFound of RequestResult.T
     
+    type DeleteUpdate<'a, 'b>(id: 'a, rev: 'b) = 
+        member this._id = id
+        member this._rev = rev
+        member this._deleted = true
+        
     /// This query wraps `BulkAdd.query` but requires that each doc passes the given idSetCheck and revSetCheck.
     /// This makes sure that the documents are updates not insertions.
-    let query (props: DbProperties.T) (dbName: string) (idSetCheck: 'a -> bool) (revSetCheck: 'a -> bool) (docs: 'a list) =
+    let query (props: DbProperties.T) (dbName: string) (isIdValid: 'a -> bool) (isRevValid: 'b -> bool) (idsAndRevs: ('a * 'b) list) =
         async {
-            if docs |> List.forall idSetCheck |> not then
-                return IdCheckFailed <| RequestResult.create (None, "The idSetCheck failed for at least one document. No request has been sent to the server.")
-            else if docs |> List.forall revSetCheck |> not then
-                return RevCheckFailed <| RequestResult.create (None, "The revSetCheck failed for at least one document. No request has been sent to the server.")
+            let ids = idsAndRevs |> List.map fst
+            let revs = idsAndRevs |> List.map snd
+            if ids |> List.exists (not << isIdValid) then
+                return IdCheckFailed <| RequestResult.create (None, "At least one document id equals System.Guid.Empty. No request has been sent to the server.")
+            else if revs |> List.exists (not << isRevValid) then
+                return RevCheckFailed <| RequestResult.create (None, "At least one document rev is empty. No request has been sent to the server.")
             else
-                let! result = BulkAdd.query props dbName docs
+                let deleteUpdates = idsAndRevs |> List.map DeleteUpdate
+                let! result = BulkAdd.query props dbName deleteUpdates
                 return match result with
                         | BulkAdd.Result.Created x -> Created x
                         | BulkAdd.Result.BadRequest x -> BadRequest x
@@ -45,6 +57,10 @@ module BulkUpdate =
                         | BulkAdd.Result.Unknown x -> Unknown x
         }
         
+    /// Works like `query` but uses full documents instead of a `(id * rev) list`.
+    let queryWithDocs props dbName isIdValid isRevValid (getId: 'a ->'b) (getRev: 'a -> 'c) (docs: 'a list) =
+        query props dbName isIdValid isRevValid (docs |> List.map (fun d -> (d |> getId, d |> getRev)))
+        
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
     let asResult (r: Result) =
         match r with
@@ -52,4 +68,8 @@ module BulkUpdate =
         | BadRequest e | ExpectationFailed e | JsonDeserializationError e | DbNameMissing e | Unknown e | IdCheckFailed e | RevCheckFailed e | NotFound e -> Error <| ErrorRequestResult.fromRequestResultAndCase (e, r)
         
     /// Runs query followed by asResult.
-    let queryAsResult props dbName idSetCheck revSetCheck docs = query props dbName idSetCheck revSetCheck docs |> Async.map asResult
+    let queryAsResult props dbName isIdValid isRefValid idsAndRevs = query props dbName isIdValid isRefValid idsAndRevs |> Async.map asResult
+    
+    /// Runs queryWithChheck followed by asResult.
+    let queryWithDocsAsResult props dbName getid getRev isValidId isValidRef docs = queryWithDocs props dbName getid getRev isValidId isValidRef docs |> Async.map asResult
+

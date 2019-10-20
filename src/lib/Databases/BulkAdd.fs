@@ -11,20 +11,28 @@ module BulkAdd =
     type Success = {
         ok: bool
         id: System.Guid
-        rev: string option
+        rev: string 
     }
     
     type Failure = {
-        id: System.Guid option
+        id: System.Guid 
         error: string
         reason: string
     }
+
+    let failureAsString (f: Failure) =
+        sprintf "%s - %s" f.error f.reason
     
     type InsertResult
         = Success of Success
         | Failure of Failure
     
+    let insertResultId ir = match ir with | Success s -> s.id | Failure f -> f.id
+    
     type Response = InsertResult list
+    
+    /// Checks if a `Response` contains one or more `InsertResult.Failure`.
+    let allSuccessful (r: Response) = r |> List.exists (fun x -> match x with Success s -> s.ok = false | Failure _ -> true)
     
     type Result
         /// Document(s) have been created or updated (201)

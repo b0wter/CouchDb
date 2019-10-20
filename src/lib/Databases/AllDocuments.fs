@@ -21,7 +21,7 @@ module AllDocuments =
     }
     type Response = {
         offset: int option
-        rows: ResponseRow []
+        rows: ResponseRow list
         total_rows: int
     }
 

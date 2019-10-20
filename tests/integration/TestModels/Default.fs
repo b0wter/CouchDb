@@ -14,10 +14,10 @@ module Default =
         myDate: System.DateTime
     }
     
-    let create (id, myInt, myFirstString, mySecondString, myFloat, myDate) =
+    let createWithRev (id, rev, myInt, myFirstString, mySecondString, myFloat, myDate) =
         {
             _id = id
-            _rev = None
+            _rev = rev
             ``type`` = "Default"
             myInt = myInt
             myFirstString = myFirstString
@@ -25,6 +25,9 @@ module Default =
             myFloat = myFloat
             myDate = myDate
         }
+        
+    let create(id, myInt, myFirstString, mySecondString, myFloat, myDate) =
+        createWithRev(id, None, myInt, myFirstString, mySecondString, myFloat, myDate)
     
     let defaultInstance = create (System.Guid.Parse("c8cb91dc-1121-43de-a858-0742327ff158"), 42, "foo", "bar", 1.38064852, System.DateTime(2000, 8, 1, 12, 0, 0))
     
