@@ -28,7 +28,7 @@ module BulkDelete =
                     do o.rows |> should haveLength 3
                     let idsAndRevs = [id1; id2; id3] |> List.map (fun id -> (id, (o.rows |> List.find (fun row -> row.id = id)).value.Value.rev))
                     
-                    let! deleteMany = Databases.BulkDelete.query Initialization.defaultDbProperties this.DbName ((=) System.Guid.Empty) (System.String.IsNullOrWhiteSpace >> not) idsAndRevs
+                    let! deleteMany = Databases.BulkDelete.query Initialization.defaultDbProperties this.DbName ((<>) System.Guid.Empty) (System.String.IsNullOrWhiteSpace >> not) idsAndRevs
                     do deleteMany |> should be (ofCase <@ Databases.BulkDelete.Result.Created @>)
                     
                     let! documentCountCheck = Server.DbsInfo.queryAsResult Initialization.defaultDbProperties [this.DbName]
