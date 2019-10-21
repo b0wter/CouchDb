@@ -11,11 +11,7 @@ open b0wter.FSharp
 
 module Delete =
 
-    type Response = {
-        id: System.Guid
-        ok: bool
-        rev: string
-    }
+    type Response = Databases.BulkAdd.Success
     
     type Result
         /// Document successfully removed (200)
