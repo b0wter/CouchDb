@@ -37,6 +37,7 @@
     <Compile Include="TestModels\Default.fs" />
     <Compile Include="TestModels\Hierarchical.fs" />
     <Compile Include="TestModels\HierarchicalArray.fs" />
+    <Compile Include="TestModels\HierarchicalSimpel.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />

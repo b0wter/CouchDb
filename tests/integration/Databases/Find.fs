@@ -34,6 +34,10 @@ module Find =
     let hModel2 = TestModels.Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
     let hModel3 = TestModels.Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
     
+    let hSModel1 = TestModels.HierarchicalSimpel.create (id1, 42, "one", 11.1, [1;2;3;4])
+    let hSModel2 = TestModels.HierarchicalSimpel.create (id2, 43, "one", 22.2, [1;2;7;9])
+    let hSModel3 = TestModels.HierarchicalSimpel.create (id3, 44, "one", 33.3, [1;5;6;9])
+    
     type GenericTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ model1; model2; model3 ])
         
@@ -130,7 +134,7 @@ module Find =
                 do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.NotFound @>)
             }
 
-    type ElemMatchTests() =
+    type ElemComplexMatchTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hAModel1; hAModel2; hAModel3 ])
 
         [<Fact>]
@@ -153,11 +157,34 @@ module Find =
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
+    type ElemSimpleMatchTests() =
+        inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hSModel1; hSModel2; hSModel3 ])
+
+        [<Fact>]
+        member this.``Find using an ElementMatch on a valid db returns Success result`` () =
+            async {
+                let elementSelector = condition "" (Equal <| Integer 9)
+                let selector = combination <| ElementMatch (elementSelector, "mySubs")
+                let expression = createExpression selector
+                let! result = Databases.Find.query<TestModels.HierarchicalSimpel.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalSimpel.T>.Success @>)
+                
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 2
+                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
+                    let s3 = s.docs |> List.find (fun x -> x._id = id3)
+                    
+                    do (s2 |> TestModels.HierarchicalSimpel.compareWithoutRev hSModel2)
+                    do (s3 |> TestModels.HierarchicalSimpel.compareWithoutRev hSModel3)
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
+            }
+            
     type AllMatchTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hAModel1; hAModel2; hAModel3 ])
 
         [<Fact>]
-        member this.``Find using an ElementMatch on a valid db returns Success result`` () =
+        member this.``Find using an AllMatch on a valid db returns Success result`` () =
             async {
                 let elementSelector = condition "subFloat" (Equal <| Float -9.42)
                 let selector = combination <| AllMatch (elementSelector, "mySubs")

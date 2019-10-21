@@ -88,9 +88,12 @@ module MangoConverters =
             | Combinator combinator -> combinator |> combinationToJObject
             | Conditional conditional -> let elementSelector = conditional |> conditionalOperatorToJObject
                                          let name = if conditional.parents.IsEmpty then conditional.name else System.String.Join(".", conditional.parents |> Seq.ofList) + "." + conditional.name
-                                         let parent = JObject()
-                                         do parent.Add(name, elementSelector)
-                                         parent
+                                         if System.String.IsNullOrWhiteSpace(name) then
+                                             elementSelector
+                                         else
+                                             let parent = JObject()
+                                             do parent.Add(name, elementSelector)
+                                             parent
 
         let operatorsToJObjects (os: Operator list) =
             os |> List.map matchOperator

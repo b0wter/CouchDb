@@ -52,121 +52,76 @@ module Mango =
         | Object
 
     type Condition
-        /// <summary>
         /// The field is less than the argument.
-        /// </summary>
         = Less of DataType
-        /// <summary>
         /// The field is less than or equal to the argument.
-        /// </summary>
         | LessOrEqual of DataType
-        /// <summary>
         /// The field is equal to the argument
-        /// </summary>
         | Equal of DataType
-        /// <summary>
         /// The field is not equal to the argument.
-        /// </summary>
         | NotEqual of DataType
-        /// <summary>
         /// The field is greater than or equal to the argument.
-        /// </summary>
         | GreaterOrEqual of DataType
-        /// <summary>
         /// The field is greater than the to the argument.
-        /// </summary>
         | Greater of DataType
-        /// <summary>
         /// Check whether the field exists or not, regardless of its value. The bool sets wether to check for existance or non-existance.
-        /// </summary>
         | Exists of bool
-        /// <summary>
         /// Check the document field’s type. See <see cref="TypeField"/> for possible field types.
-        /// </summary>
         | Type of TypeField
-        /// <summary>
         /// The document field must exist in the list provided.
-        /// </summary>
         | In of DataType list
-        /// <summary>
         /// The document field not must exist in the list provided.
-        /// </summary>
         | NotIn of DataType list
-        /// <summary>
         /// Special condition to match the length of an array field in a document. Non-array fields cannot match this condition.
-        /// </summary>
         | Size of int
-        /// <summary>
         /// Divisor and Remainder are both positive or negative integers. 
         /// Matches documents where field % Divisor == Remainder is true, and only when the document field is an integer.
-        /// </summary>
         | Mod of (int * int)
-        /// <summary>
         /// A regular expression pattern to match against the document field.
         /// Only matches when the field is a string value and matches the supplied regular expression.
         /// The matching algorithms are based on the Perl Compatible Regular Expression (PCRE) library.
         /// For more information about what is implemented, see the see the Erlang Regular Expression
-        /// </summary>
         | Regex of System.Text.RegularExpressions.Regex
 
         
-    /// <summary>
     /// A single condition to check. Contains the name of the key to check, the parameter to use for comparison and the operation.
-    /// </summary>
     type ConditionalOperator = {
-        /// <summary>
         /// Name of the property to run condition on.
-        /// </summary>
         name: string
-        /// <summary>
         /// Name of the parents. This is translated into a subfield query.
         /// 
         /// See: https://docs.couchdb.org/en/stable/api/database/find.html#subfields
-        /// </summary>
         parents: string list
-        /// <summary>
         /// Contains the operation and the parameter to perform the actual comoparison.
-        /// </summary>
         operation: Condition
     }
-    /// <summary>
     /// Combination operators are used to combine selectors. 
     /// In addition to the common boolean operators found in most programming languages, 
     /// there are three combination operators ($all, $elemMatch, and $allMatch) that help you work with JSON arrays.
     /// A combination operator takes a single argument. The argument is either another selector, or an array of selectors.
     /// 
     /// _Source_: https://docs.couchdb.org/en/stable/api/database/find.html#combination-operators
-    /// </summary>
     and CombinationOperator
-        /// <summary>
         /// Matches if all the selectors in the array match.
-        /// </summary>
         = And of Operator list
-        /// <summary>
         /// Matches if any of the selectors in the array match. All selectors must use the same index.
-        /// </summary>
         | Or of Operator list
-        /// <summary>
         /// Matches if the given selector does not match.
-        /// </summary>
         | Not of Operator
-        /// <summary>
         /// Matches if none of the selectors in the array match.
-        /// </summary>
         | Nor of Operator list
-        /// <summary>
         /// Matches an array value if it contains all the elements of the argument array.
-        /// </summary>
         | All of Operator list
-        /// <summary>
         /// Matches and returns all documents that contain an array field with at least one element that matches all the specified query criteria.
+        /// The complex version is used to match properties on subdocuments (don't use this on something like `[ 123, 456, 789]`).
         /// The second parameter is the name of the field that the element match query will be run on.
-        /// </summary>
         | ElementMatch of (Operator * string)
-        /// <summary>
         /// Matches and returns all documents that contain an array field with all its elements matching all the specified query criteria.
-        /// </summary>
+        /// If you want to match a subfield in an object in the array you need to supply a non-empty string for the enclosed operator.
+        /// If you dont supply a name the complete name element will be dropped and allow you to match an array of simple data types (e.g. int).
+        /// The second parameter is the name of the field that the element match query will be run on.
         | AllMatch of (Operator * string)
+        
     /// <summary>
     /// An operator represents a single operation that is performed. This may be a `Combinator` that contains multiple `Contidionals`.
     /// </summary>
