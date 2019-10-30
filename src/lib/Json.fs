@@ -15,7 +15,7 @@ module Json =
     let converters = defaultConverters |> converterListToIList
 
     /// Creates a new instance of the default settings.
-    let settings = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = CamelCasePropertyNamesContractResolver(),
+    let settings () = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = CamelCasePropertyNamesContractResolver(),
                                                               Converters = converters,
                                                               Formatting = Newtonsoft.Json.Formatting.Indented,
                                                               NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
@@ -27,6 +27,7 @@ module Json =
     let settingsWithCustomConverter (customs: JsonConverter list) =
         // TODO: make this nice ^^
         let converters = (customs @ defaultConverters) |> converterListToIList
+        let settings = settings ()
         let s = Newtonsoft.Json.JsonSerializerSettings()
         do s.Context <- settings.Context
         do s.Culture <- settings.Culture
