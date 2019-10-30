@@ -75,6 +75,8 @@ module Head =
         }
         
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
+    /// `DocumentExists` and `NotModified` are mapped to `true`, the other
+    /// results are mapped to `false`.
     let asResult (r: Result) =
         match r with
         | DocumentExists x | NotModified x -> Ok x
