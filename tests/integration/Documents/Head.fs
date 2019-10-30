@@ -41,7 +41,7 @@ module Head =
         [<Fact>]
         member this.``Retrieving a document without specifying an id returns DocumentIdMissing`` () =
             async {
-                let! result = Documents.Head.query Initialization.defaultDbProperties this.DbName null
+                let! result = Documents.Head.query Initialization.defaultDbProperties this.DbName System.Guid.Empty
                 result |> should be (ofCase<@ Documents.Head.Result.DocumentIdMissing @>)
             }
                 
