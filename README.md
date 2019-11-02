@@ -91,6 +91,9 @@ Documents endpoint
 
 How-to
 ======
+
+**If you're stuck using this library open a new issue and add the label 'howto'!**
+
 Usage of this library is simple.
 Start by opening the library.
 
@@ -98,7 +101,7 @@ Start by opening the library.
 open b0wter.CouchDb.Lib
 ```
 
-There is a submodule for _database_ and _server_ endpoints. A _documents_ endoint will follow soon. Each type of query has its own submodule containing:
+There is a submodule for the _database_, _server_ and _documents_ endpoints. Each type of query has its own submodule containing:
 
 	* a `query` method (sometimes there are multiple methods)
 	* a `Response` that contains the results of a successful response from the CouchDb Server
