@@ -32,7 +32,6 @@ module Core =
                 let! response = request ()
                 let status = response.StatusCode
                 do printfn "Received HTTP response with status code: %i" status
-                
                 return match response.Body with
                        | Binary _ ->
                            {
@@ -58,7 +57,6 @@ module Core =
                 if ex.Status = WebExceptionStatus.ProtocolError then
                     try
                         let response = ex.Response :?> HttpWebResponse
-                        //let headers = [0..response.Headers.Count - 1] |> List.collect ()
                         let headers = seq { for i in [0..response.Headers.Count - 1] do yield (response.Headers.Keys.[i], response.Headers.Get(i)) } |> Map.ofSeq
                         do printfn "WebException contained a HttpWebResponse with status code %i. Will continue evaluation." (response.StatusCode |> int)
                         let! content = b0wter.FSharp.Streams.readToEndAsync (System.Text.Encoding.UTF8) (response.GetResponseStream()) 
