@@ -52,6 +52,3 @@ module Head =
                 let! result = Documents.Head.query Initialization.defaultDbProperties "" id
                 result |> should be (ofCase<@ Documents.Head.Result.DbNameMissing @>)
             }
-    
-    
-

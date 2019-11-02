@@ -11,9 +11,12 @@ open b0wter.FSharp
 
 module Head =
     
+    /// Should also contain the content-lenght but System.Net.Http.HttpClient hides
+    /// the header until after it finished processing the stream!
+    /// See: https://social.msdn.microsoft.com/Forums/windowsapps/en-US/cb7417b5-ca3e-44f6-a272-9e2f8fc5d9b8 \
+    ///            /portable-httpclient-hides-contentlength-and-contentencoding-headers-with-gzip-encoding?forum=wpdevelop
     type Response = {
         ETag: string
-        Length: int
     }
     
     type Result
@@ -66,9 +69,26 @@ module Head =
                 let request = createHead props (sprintf "%s/%s" name (id |> string)) []
                 let! result = sendRequest request
                 let trimETag (tag: string) = tag.TrimStart([|'"'|]).TrimEnd([|'"'|])
+
+                do printfn "HEADERS: %A" result.headers
+
                 return match result.statusCode with
-                       | Some 200 -> DocumentExists { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
-                       | Some 304 -> NotModified { ETag = result.headers.["ETag"] |> trimETag; Length = result.headers.["Content-Length"] |> int }
+                       | Some 200 -> 
+                            if result.headers.ContainsKey("ETag") then
+                                DocumentExists { ETag = result.headers.["ETag"] |> trimETag }
+                            else
+                                do printfn "Documents.Head.query was successful but the response is missing the ETag header."
+                                do printfn "Here is a list of the headers:"
+                                do printfn "%A" result.headers
+                                Unknown result
+                       | Some 304 -> 
+                            if result.headers.ContainsKey("ETag") && result.headers.ContainsKey("Content-Length") then
+                                NotModified { ETag = result.headers.["ETag"] |> trimETag }
+                            else
+                                do printfn "Documents.Head.query was successful but the response is missing the ETag header."
+                                do printfn "Here is a list of the headers:"
+                                do printfn "%A" result.headers
+                                Unknown result
                        | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result
                        | _        -> Unknown result
