@@ -1,5 +1,5 @@
 namespace b0wter.CouchDb.Tests.Integration
-open Docker.DotNet.Models
+
 open System.Collections.Generic
 open b0wter.CouchDb.Lib
 open b0wter.FSharp
@@ -19,16 +19,11 @@ module Initialization =
         let password = configurationRoot.GetValue<string>("couchdb_password")
         let credentials = Credentials.create(user, password)
         do printfn "Created default connection: %s:%i" host port
-        //match DbProperties.create ("localhost", 5984, defaultCredentials, DbProperties.ConnectionType.Http) with
         match DbProperties.create (host, port, credentials, DbProperties.ConnectionType.Http) with
         | DbProperties.DbPropertiesCreateResult.Valid properties -> properties
         | DbProperties.DbPropertiesCreateResult.HostIsEmpty -> failwith "Host name is emty."
         | DbProperties.DbPropertiesCreateResult.PortIsInvalid -> failwith "Invalid port"
         
-    /// <summary>
-    /// Docker client using the default settings (local machine).
-    /// </summary>
-    let dockerClient = (new Docker.DotNet.DockerClientConfiguration(System.Uri("unix:///var/run/docker.sock"))).CreateClient()
     
     /// <summary>
     /// Runs a login query using the default db properties and the default credentials.
@@ -42,70 +37,6 @@ module Initialization =
             | Server.Authenticate.Result.Unauthorized _ -> return failwith "Unknown username/password"
             | Server.Authenticate.Result.JsonDeserialisationError _ -> return failwith "JsonDeserialization of the servers response failed."
             | Server.Authenticate.Result.Unknown x -> return failwith <| sprintf "Unkown error occured: %s" x.content
-        }
-    
-    /// <summary>
-    /// Default port mapping to expose the default CouchDb port.
-    /// </summary>
-    let private defaultPortMapping =
-        let binding = PortBinding()
-        do binding.HostPort <- "5984"
-        System.Collections.Generic.List<PortBinding>([binding])
-        
-    /// <summary>
-    /// Collection wrapping the defaultPortMapping.
-    /// </summary>
-    let private defaultPortMappings : IDictionary<string, IList<PortBinding>> =
-        let dict = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IList<PortBinding>>()
-        do dict.Add("5984/tcp", defaultPortMapping)
-        dict :> IDictionary<string, IList<PortBinding>>
-    
-    /// <summary>
-    /// Returns image creation parameters using the given imageName and tag.
-    /// </summary>
-    let private defaultImageCreationParameters (imageName: string, tag: string) =
-        let imageCreationParameters = Docker.DotNet.Models.ImagesCreateParameters()
-        do imageCreationParameters.Repo <- imageName
-        do imageCreationParameters.Tag <- tag
-        imageCreationParameters
-    
-    /// <summary>
-    /// Default host configuration with the default port mapping.
-    /// </summary>
-    let private defaultHostConfiguration =
-        let hostConfiguration = Docker.DotNet.Models.HostConfig()
-        do hostConfiguration.PortBindings <- defaultPortMappings //<- defaultPortMapping
-        hostConfiguration
-    
-    /// <summary>
-    /// Returns the default container creation parameters for the given image, container name and host configuration.
-    /// Uses the 'latest' tag.
-    /// </summary>
-    let private defaultContainerCreationParameters (imageName: string, tag: string) (containerName: string) hostConfiguration = 
-        let containerCreationParameters = Docker.DotNet.Models.CreateContainerParameters()
-        do containerCreationParameters.Image <- sprintf "%s:%s" imageName tag
-        do containerCreationParameters.Name <- containerName
-        do containerCreationParameters.HostConfig <- hostConfiguration
-        containerCreationParameters
-        
-    /// <summary>
-    /// Default parameters to start containers.
-    /// </summary>
-    let private defaultStartParameters =
-        ContainerStartParameters()
-        
-    /// <summary>
-    /// Runs a docker image as a container using the default parameters.
-    /// </summary>
-    let runDockerImage (client: Docker.DotNet.DockerClient) (imageName: string) (containerName: string) (tag: string option) =
-        async {
-            let containerCreationParameters = defaultContainerCreationParameters (imageName, tag |?| "latest") containerName defaultHostConfiguration
-            let exposedPorts = new Dictionary<string, Docker.DotNet.Models.EmptyStruct>()
-            do exposedPorts.Add("5984/tcp", EmptyStruct())
-            do containerCreationParameters.ExposedPorts <- exposedPorts
-            
-            let! creationResult = client.Containers.CreateContainerAsync(containerCreationParameters) |> Async.AwaitTask
-            return! client.Containers.StartContainerAsync(creationResult.ID, defaultStartParameters) |> Async.AwaitTask
         }
         
     /// <summary>
@@ -133,7 +64,6 @@ module Initialization =
                 return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed: %s%s" System.Environment.NewLine f.content
             | Server.AllDbs.Result.Unknown f ->
                 return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.content
-                
         }
         
     /// <summary>
