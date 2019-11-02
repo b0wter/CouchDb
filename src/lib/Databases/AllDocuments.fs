@@ -37,7 +37,7 @@ module AllDocuments =
         keys: string list
     }
 
-    let private query (request: unit -> Async<FSharp.Data.HttpResponse>) =
+    let private query (request: Async<System.Net.Http.HttpResponseMessage>) =
         async {
             let! result = (sendRequest request)
             return match result.statusCode with

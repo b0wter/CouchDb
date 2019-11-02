@@ -1,9 +1,11 @@
 namespace b0wter.CouchDb.Lib
 
 module Credentials =
+    open Newtonsoft.Json
 
     /// Credentials for the CouchDb login.
     type T = {
+        [<JsonProperty("name")>]
         username: string
         password: string
     }
