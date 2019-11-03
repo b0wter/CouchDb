@@ -119,6 +119,19 @@ module Core =
         | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Json.settingsWithCustomConverter)
         |> Json.postProcessing
 
+    /// Creates a POST request with a form encoded payload. Allows the usage of additional `JsonConverter`s.
+    let createCustomFormPost (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
+        let data = formData |> Map.toSeq |> Seq.map (fun (key, value) -> Collections.Generic.KeyValuePair<string, string>(key, value |> string))
+        let queryParameters = queryParameters |> formatQueryParameters 
+        let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
+        let request = new HttpRequestMessage(HttpMethod.Post, url)
+        do request.Content <- new FormUrlEncodedContent(data)
+        DefaultClient.SendAsync(request) |> Async.AwaitTask
+
+    /// Creates a POST request with a form encoded payload.
+    let createFormPost (p: DbProperties.T) (path: HttpPath) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
+        createCustomFormPost p path [] formData queryParameters
+
     /// Creates a POST request containing a json serialized payload. Allows to define additional `JsonConverter`.
     let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters 
