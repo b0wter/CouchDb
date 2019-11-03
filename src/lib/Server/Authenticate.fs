@@ -40,7 +40,8 @@ module Authenticate =
     /// </summary>
     let query (props: DbProperties.T) =
         async {
-            let request = createJsonPost props "_session" props.credentials [] 
+            let formData = [("name", props.credentials.username :> obj); ("password", props.credentials.password :> obj)] |> Map.ofList
+            let request = createFormPost props "_session" formData []
             let! result = sendRequest request 
             return match result.statusCode with
                     | Some 200 | Some 302->
