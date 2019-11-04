@@ -40,28 +40,18 @@ module Core =
                     headers = headers
                 }
             with
-            | :? System.NullReferenceException as ex ->
-                do printfn "Encountered a NullReferenceException! %s" ex.Message
-                return RequestResult.create(None, ex.Message)
-            | :? Http.HttpRequestException as ex ->
+            | :? AggregateException as ex when  ex.InnerException.GetType () = typeof<Sockets.SocketException> ->
+                do printfn "A low-level socket error occured: %s" ex.InnerException.Message
+                let message = sprintf "[AggregateException] %s%s[Net.Sockets.SocketException] %s" ex.Message Environment.NewLine ex.InnerException.Message
+                return RequestResult.create(None, message)
+            | :? HttpRequestException as ex ->
                 do printfn "Encountered a HttpRequestException! %s" ex.Message
-                return RequestResult.create(None, ex.Message)
-            | :? WebException as ex ->
-                do printfn "Encountered a WebException! %s" ex.Message
-                if ex.Status = WebExceptionStatus.ProtocolError then
-                    try
-                        let response = ex.Response :?> HttpWebResponse
-                        let headers = seq { for i in [0..response.Headers.Count - 1] do yield (response.Headers.Keys.[i], response.Headers.Get(i)) } |> Map.ofSeq
-                        do printfn "WebException contained a HttpWebResponse with status code %i. Will continue evaluation." (response.StatusCode |> int)
-                        let! content = b0wter.FSharp.Streams.readToEndAsync (System.Text.Encoding.UTF8) (response.GetResponseStream()) 
-                        return RequestResult.createWithHeaders (response.StatusCode |> int |> Some, content, headers)
-                    with
-                    | :? InvalidCastException as e ->
-                        do printfn "WebException could not be cast into a HttpWebResponse. Details: %s | Parent: %s" e.Message ex.Message
-                        return RequestResult.create(None, sprintf "Internal error with casting WebException. Details: %s | Parent: %s" e.Message ex.Message)
-                else
-                    do printfn "Exception indicates a non-protocol error (e.g. connection refused). Continue evaluation with status code 0!"
-                    return RequestResult.create (None, ex.Message)
+                let message = sprintf "[HttpRequestException] %s" ex.Message
+                return RequestResult.create(None, message)
+            | :? InvalidOperationException as ex ->
+                do printfn "Encountered an InvalidOperationException! %s" ex.Message
+                let message = sprintf "[InvalidOperationException] %s" ex.Message
+                return RequestResult.create(None, message)
         }
 
     /// <summary>
