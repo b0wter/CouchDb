@@ -204,6 +204,21 @@ In case you miss these attributes CouchDb will assign these values on its own. B
 
 Why use this approach? I could define interfaces are make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
 
+Hint: In most cases it's pretty handy to add a "constant property" to all records that specifies the type. This helps you to restrict queries to certain types of entities. Since records are compiled to classes the following adds a readonly property to `MyRecord` that does not need to be specified when creating a new instance:
+```
+type MyRecord = 
+	{
+	[<JsonProperty("_id")>]
+	myId: System.Guid
+	[<JsonProperty("_rev")>]
+	myRevision: string
+	myA: int
+	myB: float }
+	}
+	member this.``type`` = "MyRecord"
+```
+Correct indentation is **absolutely necessary** to make this compile!
+
 Custom json settings
 --------------------
 This library makes use of [NewtonSoft.Json](https://www.newtonsoft.com/). In order to better serialize some F# specific objects, like union cases and options we use a port of [Fifteenbelow](https://github.com/kolektiv/FifteenBelow.Json) to [dotnet core](https://github.com/b0wter/FifteenBelow.Json). The default settings are:
