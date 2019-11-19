@@ -21,7 +21,7 @@ while [ "$STATUSCODE" -ne 200 ]
 do
 	printf '%s' "."
 	sleep 10
-	STATUSCODE=$(curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://localhost:5984/_up)
+	STATUSCODE=$(curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://$PORT:$PORT/_up)
 done
 
 echo "CouchDb is now available!"
