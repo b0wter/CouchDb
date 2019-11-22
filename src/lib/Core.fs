@@ -103,7 +103,7 @@ module Core =
     
     /// Serializes an object and returns a string representation as well as a binary (UTF8) representation.
     /// Allows the user to define additional `JsonConverter`.
-    let private serializeAsJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) =
+    let serializeAsJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) =
         match customConverters with
         | [] ->         Newtonsoft.Json.JsonConvert.SerializeObject(content, Json.settings ())
         | converters -> Newtonsoft.Json.JsonConvert.SerializeObject(content, converters |> Json.settingsWithCustomConverter)
