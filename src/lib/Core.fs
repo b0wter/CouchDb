@@ -40,17 +40,9 @@ module Core =
                     headers = headers
                 }
             with
-            | :? AggregateException as ex when  ex.InnerException.GetType () = typeof<Sockets.SocketException> ->
-                do printfn "A low-level socket error occured: %s" ex.InnerException.Message
-                let message = sprintf "[AggregateException] %s%s[Net.Sockets.SocketException] %s" ex.Message Environment.NewLine ex.InnerException.Message
-                return RequestResult.create(None, message)
-            | :? HttpRequestException as ex ->
-                do printfn "Encountered a HttpRequestException! %s" ex.Message
-                let message = sprintf "[HttpRequestException] %s" ex.Message
-                return RequestResult.create(None, message)
-            | :? InvalidOperationException as ex ->
-                do printfn "Encountered an InvalidOperationException! %s" ex.Message
-                let message = sprintf "[InvalidOperationException] %s" ex.Message
+            | ex ->
+                let message = ex |> Exception.foldMessages
+                do printfn "%s" message
                 return RequestResult.create(None, message)
         }
 

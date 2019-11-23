@@ -7,6 +7,7 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Exception.fs" />
     <Compile Include="Utilities.fs" />
     <Compile Include="Json.fs" />
     <Compile Include="Credentials.fs" />
@@ -22,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="FifteenBelow.Json.Core" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="*" />
-    <PackageReference Include="b0wter.FSharp" Version="*" />
+    <PackageReference Include="b0wter.FSharp" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />

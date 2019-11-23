@@ -7,4 +7,3 @@ module Utilities =
     let getUnionCaseName (x:'a) = 
         match FSharpValue.GetUnionFields(x, typeof<'a>) with
         | case, _ -> case.Name  
-    
