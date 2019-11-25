@@ -45,9 +45,9 @@ module Find =
         /// If the response from the server could not be interpreted.
         | Unknown of RequestResult.T
 
-    let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+    let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
-            let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ MangoConverters.OperatorJsonConverter () :> JsonConverter ] expression []
+            let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
             let! result = sendRequest request
             let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
 
@@ -63,9 +63,15 @@ module Find =
                     | _ ->
                         Unknown result
         }
-        // CouchDb contains a syntax to define the fields to return but since we are using Json-deserialization
-        // this is currently not in use.
-        
+    
+    /// Works like query but prints the serialized Find-Operators to stdout.
+    let queryWithOutput<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+        queryWith true props dbName expression
+
+    /// Queries the database using a custom-build mango expression. 
+    /// If you want to print the serialized operator use `queryWithOutput` instead.
+    let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+        queryWith false props dbName expression
         
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
     let asResult<'a> (r: Result<'a>) =
