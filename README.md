@@ -257,7 +257,7 @@ There is a `docker-compose.yml` in `tests/integration`. Simply change into that 
 #### Using docker run
 The following command is the same as running the `docker-compose.yml`. It will automatically destroy the container on exit.
 ```
-$ docker run --rm -it -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password
+$ docker run --rm -it -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password couchdb:latest
 ``` 
 
 ### Running the tests
