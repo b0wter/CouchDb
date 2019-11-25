@@ -66,12 +66,12 @@ module Find =
     
     /// Works like query but prints the serialized Find-Operators to stdout.
     let queryWithOutput<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
-        queryWith true props dbName expression
+        queryWith<'a> true props dbName expression
 
     /// Queries the database using a custom-build mango expression. 
     /// If you want to print the serialized operator use `queryWithOutput` instead.
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
-        queryWith false props dbName expression
+        queryWith<'a> false props dbName expression
         
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
     let asResult<'a> (r: Result<'a>) =
@@ -83,6 +83,9 @@ module Find =
     /// Runs query followed by asResult.
     let queryAsResult<'a> props dbName expression = query<'a> props dbName expression |> Async.map asResult<'a>
     
+    /// Runs queryWithOutput followed by asResult
+    let queryAsResultWithOutput<'a> props dbName expression = queryWithOutput<'a> props dbName expression |> Async.map asResult<'a>
+
     /// Retrieves the first element of a successful query or an error message.
     /// Useful if you know that your query will return a single element.
     /// Also returns an error if the query is successful but did not return any documents.

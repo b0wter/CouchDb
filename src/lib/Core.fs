@@ -115,8 +115,6 @@ module Core =
         let queryParameters = queryParameters |> formatQueryParameters 
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let serialized = serializeAsJson customConverters content
-        do printfn "Serialized object:"
-        do printfn "%s" serialized
         let request = new HttpRequestMessage(HttpMethod.Post, url)
         do request.Content <- new StringContent(serialized, Text.Encoding.UTF8, "application/json")
         DefaultClient.SendAsync(request) |> Async.AwaitTask
@@ -150,8 +148,6 @@ module Core =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let json = serializeAsJson customConverters content
-        do printfn "Serialized object:"
-        do printfn "%s" json
         let request = new HttpRequestMessage(HttpMethod.Put, url)
         do request.Content <- new StringContent(json, Text.Encoding.UTF8, "application/json")
         DefaultClient.SendAsync(request) |> Async.AwaitTask
