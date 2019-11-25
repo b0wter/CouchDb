@@ -42,7 +42,6 @@ module Core =
             with
             | ex ->
                 let message = ex |> Exception.foldMessages
-                do printfn "%s" message
                 return RequestResult.create(None, message)
         }
 
@@ -59,18 +58,15 @@ module Core =
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
     let deserializeJsonWith<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserializationError.T> =
-        do printfn "Deserializing to type: %s" typeof<'TResult>.FullName
         try
             let result = Ok <| match customConverters with
                                | [] ->
                                  Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, Json.settings ())
                                | converters ->
                                  Newtonsoft.Json.JsonConvert.DeserializeObject<'TResult>(content, converters |> Json.settingsWithCustomConverter)
-            do printfn "Deserialization successful."
             result
         with
         | :? Newtonsoft.Json.JsonException as ex ->
-            do printfn "Deserialization failed."
             Error { json = content; reason = ex.Message }
 
     /// <summary>

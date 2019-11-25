@@ -51,8 +51,6 @@ module Find =
             let! result = sendRequest request
             let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
 
-            do printfn "Response content:%s%s" System.Environment.NewLine queryResult.content
-
             return match queryResult.statusCode with
                     | Some 200 ->
                         match deserializeJsonWith<Response<'a>> [] queryResult.content with

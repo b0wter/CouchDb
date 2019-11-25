@@ -72,7 +72,6 @@ module DbsInfo =
     /// </summary>
     let query (props: DbProperties.T) (names: string list) : Async<Result> =
         async {
-            do printfn "Querying db information for keys: %A" names
             if names.IsEmpty then
                 return KeyError <| RequestResult.create (None, "You have not supplied database names. No query was sent to the server.")
             else
