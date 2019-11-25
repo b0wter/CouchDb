@@ -139,8 +139,10 @@ module MangoConverters =
             jObject.WriteTo(writer)
 
 
-    type OperatorJsonConverter() =
+    type OperatorJsonConverter(printSerializedOperators: bool) =
         inherit Newtonsoft.Json.JsonConverter()
+
+        let printSerializedOperators = printSerializedOperators
         
         override this.CanRead = false
 
@@ -158,8 +160,10 @@ module MangoConverters =
                 let converter = ConditionalJsonConverter () :> Newtonsoft.Json.JsonConverter
                 let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(conditional, settings)
-                do printfn "Serialized a condition to:"
-                do printfn "%s" serialized
+                if printSerializedOperators then 
+                    do printfn "Serialized a condition to:"
+                    do printfn "%s" serialized
+                else ()
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)
             | Operator.Combinator combinator -> 
@@ -167,7 +171,9 @@ module MangoConverters =
                 let converter = CombinationJsonConverter () :> Newtonsoft.Json.JsonConverter
                 let settings = Json.settingsWithCustomConverter [ converter ]
                 let serialized = Newtonsoft.Json.JsonConvert.SerializeObject(combinator, settings)
-                do printfn "Serialized a combinator to:"
-                do printfn "%s" serialized
+                if printSerializedOperators then
+                    do printfn "Serialized a combinator to:"
+                    do printfn "%s" serialized
+                else ()
                 let jObject = JObject.Parse(serialized)
                 do jObject.WriteTo(writer)

@@ -70,24 +70,16 @@ module Head =
                 let! result = sendRequest request
                 let trimETag (tag: string) = tag.TrimStart([|'"'|]).TrimEnd([|'"'|])
 
-                do printfn "HEADERS: %A" result.headers
-
                 return match result.statusCode with
                        | Some 200 -> 
                             if result.headers.ContainsKey("ETag") then
                                 DocumentExists { ETag = result.headers.["ETag"] |> trimETag }
                             else
-                                do printfn "Documents.Head.query was successful but the response is missing the ETag header."
-                                do printfn "Here is a list of the headers:"
-                                do printfn "%A" result.headers
                                 Unknown result
                        | Some 304 -> 
                             if result.headers.ContainsKey("ETag") && result.headers.ContainsKey("Content-Length") then
                                 NotModified { ETag = result.headers.["ETag"] |> trimETag }
                             else
-                                do printfn "Documents.Head.query was successful but the response is missing the ETag header."
-                                do printfn "Here is a list of the headers:"
-                                do printfn "%A" result.headers
                                 Unknown result
                        | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result
