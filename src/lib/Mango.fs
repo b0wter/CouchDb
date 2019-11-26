@@ -149,9 +149,7 @@ module Mango =
         *)
     }
 
-    /// <summary>
     /// Creates an <see cref="Expression"/> with default settings for all fields but the selector.
-    /// </summary>
     let createExpression (operator: Operator) =
         {
             selector = operator
@@ -165,6 +163,10 @@ module Mango =
             stable = None
             execution_stats = None
         }
+
+    let createExpressionWithLimit (operator: Operator) (limit: int) =
+        { selector = operator; limit = Some limit; skip = None; sort = None; use_index = None; 
+          r = 1; bookmark = None ; update = None; stable = None; execution_stats = None }
         
     let conditionWithParents parents field operation =
         Conditional {
