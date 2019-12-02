@@ -45,6 +45,7 @@
     <Compile Include="Server\ActiveTasks.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Databases\Infos.fs" />
     <Compile Include="Databases\Exists.fs" />
     <Compile Include="Databases\Create.fs" />
     <Compile Include="Databases\Delete.fs" />
