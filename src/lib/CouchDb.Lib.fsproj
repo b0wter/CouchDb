@@ -30,6 +30,7 @@
     <Compile Include="Server\Info.fs" />
     <Compile Include="Server\DbsInfo.fs" />
     <Compile Include="Server\Authenticate.fs" />
+    <Compile Include="Server\ActiveTasks.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Databases\Exists.fs" />

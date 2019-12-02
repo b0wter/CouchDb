@@ -42,6 +42,7 @@
     <Compile Include="Server\AllDbs.fs" />
     <Compile Include="Server\Info.fs" />
     <Compile Include="Server\DbsInfo.fs" />
+    <Compile Include="Server\ActiveTasks.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Databases\Exists.fs" />

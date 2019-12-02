@@ -30,6 +30,8 @@ Note that (optional) query parameter are currently *not supported*! Even for end
 | Basic  | ❌      |
 | Proxy  | ❌      |
 
+There are currently no plans to support the other two authentication methods. If you feeld you need them please open an issue or (better) open a pull request.
+
 
 Databases endpoint
 ------------------
@@ -64,7 +66,7 @@ Server endpoint
 | Endpoint                    | HEAD | GET | POST | PUT | DELETE |
 |-----------------------------|------|-----|------|-----|--------|
 | /                           |      | ✔️   |      |     |        |
-| /_active_tasks              |      | ❌   |      |     |        |
+| /_active_tasks              |      | ✔️   |      |     |        |
 | /_all_dbs                   |      | ✔️   |      |     |        |
 | /_dbs_info                  |      |     | ✔️    |     |        |
 | /_cluster_setup             |      | ❌   | ❌    |     |        |
