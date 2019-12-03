@@ -3,13 +3,13 @@ Current Status
 
 [![Build Status](https://b0wter.visualstudio.com/b0wter.CouchDb/_apis/build/status/b0wter.CouchDb?branchName=master)](https://b0wter.visualstudio.com/b0wter.CouchDb/_build/latest?definitionId=28&branchName=master)
 
-This project is currently in development and by no means production ready! Please consult the tables below to see which features are supported. The endpoints refer to the endpoints listed in the official CouchDb documentation.
+This project is currently in development. Please consult the tables below to see which features are supported. The endpoints refer to the endpoints listed in the official CouchDb documentation. There are integration tests for all implemented endpoints.
 
 You can get the library from [nuget](https://www.nuget.org/packages/b0wter.CouchDb/).
 
 Contributing
 ------------
-Contributions (bug fixes, features, ...) are welcome! Please submit a pull request. I will merge the PR if it satisfies the following requirements:
+Contributions (bug fixes, features, ...) are very welcome! Please submit a pull request. I will merge the PR if it satisfies the following requirements:
 
  * The integration tests succeed.
  * You have added tests (if it's a new feature) or
