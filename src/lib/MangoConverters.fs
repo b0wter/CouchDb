@@ -18,7 +18,7 @@ module MangoConverters =
         | Integer i             -> JProperty(operation, i)
         | Float f           -> JProperty(operation, f)
         | Text s -> JProperty(operation, s)
-        | Date d            -> JProperty(operation, d.ToString("yyyy-mm-DD"))
+        | Date d            -> JProperty(operation, d.ToString(dateTimeFormat))
         | Id i              -> JProperty(operation, i.ToString())
 
     let private typeFieldToString (t: TypeField) =
@@ -39,7 +39,7 @@ module MangoConverters =
                                                     | Integer i  -> JValue(i)
                                                     | Float f -> JValue(f)
                                                     | Text s -> JValue(s)
-                                                    | Date d -> JValue(d.ToString("yyyy-mm-DD"))
+                                                    | Date d -> JValue(d.ToString(dateTimeFormat))
                                                     | Id i -> JValue(i.ToString()))
         let jArray = JArray(asJValues)
         JProperty(propertyName, jArray)
