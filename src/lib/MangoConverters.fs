@@ -5,7 +5,7 @@ module MangoConverters =
     open Newtonsoft.Json.Linq
     open Mango
 
-    let dateTimeFormat = "yyyy-MM-ddTHH:MM:ss"
+    let dateTimeFormat = "yyyy-MM-ddTHH:mm:ss"
 
     /// <summary>
     /// Builds a 
