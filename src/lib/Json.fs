@@ -77,9 +77,16 @@ module Json =
             if j.ContainsKey propertyName then Ok (j.Property propertyName)
             else Error "JObject does not contain given key."
 
-        let toObjects<'a>(docs: JArray) =
+        let toObjects<'a>(docs: JObject list) =
             let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
             try
-                Ok (seq { for doc in docs do yield (doc :?> Newtonsoft.Json.Linq.JObject).ToObject<'a>(serializer) } |> List.ofSeq)
+                Ok (docs |> List.map (fun doc -> doc.ToObject<'a>(serializer)))
+                //Ok (seq { for doc in docs do yield (doc :?> Newtonsoft.Json.Linq.JObject).ToObject<'a>(serializer) } |> List.ofSeq)
+            with
+            | ex -> Error ex.Message
+
+        let jArrayAsJObjects (a: JArray) : Result<JObject list, string> =
+            try
+                Ok [ for item in a do yield (item :?> JObject) ]
             with
             | ex -> Error ex.Message
