@@ -13,7 +13,7 @@ Contributions (bug fixes, features, ...) are very welcome! Please submit a pull 
 
  * The integration tests succeed.
  * You have added tests (if it's a new feature) or
- * You have fixed tests (it it's a bugfix)
+ * You have fixed tests (if it's a bugfix)
  * The new methods/member have XML documentation tags
  * I am convinced it will not break anything :)
 
@@ -30,7 +30,7 @@ Note that (optional) query parameter are currently *not supported*! Even for end
 | Basic  | ❌      |
 | Proxy  | ❌      |
 
-There are currently no plans to support the other two authentication methods. If you feeld you need them please open an issue or (better) open a pull request.
+There are currently no plans to support the other two authentication methods. If you feel like you need them please open an issue or (better) open a pull request.
 
 
 Databases endpoint
@@ -134,6 +134,7 @@ let doesTestDbExist () =
         | Database.Exists.Result.RequestError e -> printf "Encountered a request error: %s" e.reason
 	}
 ```
+**Note:** If you only care about success or failure you can use `queryAsResult` instead of `query`. That will return a `Result<true, ErrorRequestResult.T>>`. An `ErrorRequestResult.T` contains a status code, an error message and the response headers.
 
 All other requests work in the same way. Here is another example using the `_find`-endpoint:
 
