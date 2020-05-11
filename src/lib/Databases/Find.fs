@@ -130,7 +130,7 @@ module Find =
     /// Is build on top of `jObjectsQuery` and maps the result into a `Database.Find.Result<JObject>`.
     let private queryJObjectsWith (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) : Async<Result<Linq.JObject>> =
         async {
-            let! result = jObjectsQuery true props dbName expression
+            let! result = jObjectsQuery printSerializedOperators props dbName expression
             return match result with
                     | Ok r -> Success r
                     | Error e -> mapError e
