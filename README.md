@@ -14,7 +14,7 @@ Contributions (bug fixes, features, ...) are very welcome! Please submit a pull 
  * The integration tests succeed.
  * You have added tests (if it's a new feature) or
  * You have fixed tests (if it's a bugfix)
- * The new methods/member have XML documentation tags
+ * The new methods/members have XML documentation tags
  * I am convinced it will not break anything :)
 
 If you are in doubt please submit an issue!
