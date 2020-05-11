@@ -201,4 +201,44 @@ module Find =
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
+    type JObjectTests() =
+        inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ hModel1; hModel2; hModel3 ])
+
+        [<Fact>]
+        member this.``Running a selector matching all elements return three JObjects.`` () =
+            async {
+                let selector = condition "myInt" (Equal <| Integer 42)
+                let expression = createExpression selector
+                let! result = Databases.Find.queryObjects Initialization.defaultDbProperties this.DbName expression
+                
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 3
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
+            }
+
+        [<Fact>]
+        member this.``Running a selector matching two elements returns two JOjects`` () =
+            async {
+                let selector = condition "myString" (Equal <| Text "one")
+                let expression = createExpression selector
+                let! result = Databases.Find.queryObjects Initialization.defaultDbProperties this.DbName expression
+                
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 2
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
+            }
         
+        [<Fact>]
+        member this.``Running a selector matching a single element returns a single JObject``() =
+            async {
+                let selector = condition "_id" (Equal <| Id id1)
+                let expression = createExpression selector
+                let! result = Databases.Find.queryObjects Initialization.defaultDbProperties this.DbName expression
+                
+                match result with
+                | Databases.Find.Result.Success s ->
+                    do s.docs |> should haveLength 1
+                | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
+            }
