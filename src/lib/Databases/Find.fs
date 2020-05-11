@@ -22,12 +22,26 @@ module Find =
         execution_time_ms: float
     }
 
-    type Response<'a> = {
-        docs: 'a list
+    type BaseResponse<'a> = { 
+        docs: 'a 
         warning: string option
         execution_stats: ExecutionStats option
         bookmarks: string option
     }
+
+    type MetaData = {
+        warning: string option
+        execution_stats: ExecutionStats option
+        bookmarks: string option
+    }
+
+    /// The documents of this response have already been parsed
+    /// and converted into class/record instances.
+    type Response<'a> = BaseResponse<'a list>
+
+    /// The documents of this response have been parsed as a JObject
+    /// to allow the users of the library to work with dynamic documents.
+    type JResponse = BaseResponse<Newtonsoft.Json.Linq.JObject>
 
     type Result<'a>
         /// Request completed successfully
@@ -45,34 +59,80 @@ module Find =
         /// If the response from the server could not be interpreted.
         | Unknown of RequestResult.T
 
-    let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+
+    /// Turns a `RequestResult.T` into an actual `Result<'a>`.
+    /// It will never return `Success` because that takes a `Response<'a>` as parameter.
+    let private mapError (r: RequestResult.T) =
+        match r.statusCode with
+        | Some 400 -> BadRequest r
+        | Some 401 -> Unauthorized r
+        | Some 404 -> NotFound r
+        | Some 500 -> QueryExecutionError r
+        | _ ->
+            Unknown r
+
+
+    /// Queries the server and does some basic parsing.
+    /// The documents are not deserialized to objects but kept in a JArray.
+    /// This allows the user to perform dynamic operations.
+    let private jArrayQuery (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
             let! result = sendRequest request
-            let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
+            //let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
+            if result.statusCode.IsSome && result.statusCode.Value = 200 then
+                let array = result.content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty "docs") |> Result.bind Json.JObject.getJArray
+                let metadata = deserializeJson<MetaData> result.content
 
-            return match queryResult.statusCode with
-                    | Some 200 ->
-                        match deserializeJsonWith<Response<'a>> [] queryResult.content with
-                        | Ok o -> Success o
-                        | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
-                    | Some 400 -> BadRequest result
-                    | Some 401 -> Unauthorized result
-                    | Some 404 -> NotFound result
-                    | Some 500 -> QueryExecutionError result
-                    | _ ->
-                        Unknown result
+                return match array, metadata with
+                        | Ok a, Ok m -> Ok { JResponse.docs = a; JResponse.bookmarks = m.bookmarks; JResponse.execution_stats = m.execution_stats; JResponse.warning = m.warning }
+                        | Error e, _ -> 
+                            let jsonError = JsonDeserializationError.create(result.content, e)
+                            let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
+                            Error <| requestResult
+                        | _, Error e ->
+                            let requestResult = RequestResult.createForJson(e, result.statusCode, result.headers)
+                            Error <| requestResult
+            else
+                return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
         }
-    
+
+    /// Is build on top of `jArrayQuery` and uses `Json.JObject.toObjects` to deserialize the `JArray` into a list of actual objects.
+    let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) : Async<Result<'a>> =
+        async {
+            match! jArrayQuery printSerializedOperators props dbName expression with
+            | Ok o -> 
+                match o.docs |> Json.JObject.toObjects with
+                | Ok docs -> 
+                    return Success ({ Response.docs = docs; Response.bookmarks = o.bookmarks; Response.execution_stats = o.execution_stats; Response.warning = o.warning })
+                | Error e -> 
+                    let error = JsonDeserializationError.create(o.docs.ToString(), e)
+                    return JsonDeserializationError (RequestResult.createForJson(error, None, Map.empty))
+            | Error e -> return (mapError e)
+        }
+
+
     /// Works like query but prints the serialized Find-Operators to stdout.
     let queryWithOutput<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         queryWith<'a> true props dbName expression
 
-    /// Queries the database using a custom-build mango expression. 
+
+    /// Queries the database using a custom-built mango expression. 
     /// If you want to print the serialized operator use `queryWithOutput` instead.
     let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         queryWith<'a> false props dbName expression
+
+
+    /// Queries the database using a custom-built mange expression.
+    /// This version does not deserialize the documents but returns a JArray instead.
+    let queryJObjectsWithOutput = jArrayQuery true//(props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+
+
+    /// Queries the database using a custom-built mange expression.
+    /// This version does not deserialize the documents but returns a JArray instead.
+    let queryJObjects = jArrayQuery false
         
+
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
     let asResult<'a> (r: Result<'a>) =
         match r with
@@ -80,11 +140,14 @@ module Find =
         | BadRequest e | Unauthorized e | QueryExecutionError e | JsonDeserializationError e | NotFound e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
+
     /// Runs query followed by asResult.
     let queryAsResult<'a> props dbName expression = query<'a> props dbName expression |> Async.map asResult<'a>
     
+
     /// Runs queryWithOutput followed by asResult
     let queryAsResultWithOutput<'a> props dbName expression = queryWithOutput<'a> props dbName expression |> Async.map asResult<'a>
+
 
     /// Retrieves the first element of a successful query or an error message.
     /// Useful if you know that your query will return a single element.

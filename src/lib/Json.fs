@@ -58,3 +58,28 @@ module Json =
         do s.TypeNameAssemblyFormatHandling <- settings.TypeNameAssemblyFormatHandling
         do s.Converters <- converters
         s
+
+    module JObject =
+        open Newtonsoft.Json.Linq
+
+        let asJObject s : Result<JObject, string> =
+            try
+                Ok (Newtonsoft.Json.Linq.JObject.Parse(s))
+            with
+                | :? Newtonsoft.Json.JsonException as ex -> Error ex.Message
+
+        let getJArray (p: JProperty) =
+            match p.Value.Type with
+            | JTokenType.Array -> Ok (p.Value :?> JArray)
+            | _ -> Error <| sprintf "Is of type %s." (p.Value.Type.ToString())
+
+        let getProperty propertyName (j: JObject) =
+            if j.ContainsKey propertyName then Ok (j.Property propertyName)
+            else Error "JObject does not contain given key."
+
+        let toObjects<'a>(docs: JArray) =
+            let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
+            try
+                Ok (seq { for doc in docs do yield (doc :?> Newtonsoft.Json.Linq.JObject).ToObject<'a>(serializer) } |> List.ofSeq)
+            with
+            | ex -> Error ex.Message
