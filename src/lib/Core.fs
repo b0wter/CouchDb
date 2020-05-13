@@ -89,7 +89,7 @@ module Core =
                    |> List.fold (fun acc (key, value) -> sprintf "%s%s=%s" (if String.IsNullOrWhiteSpace(acc) then "?" else "&") key value) ""
                    |> Uri.EscapeUriString
     
-    /// Serializes an object and returns a string representation as well as a binary (UTF8) representation.
+    /// Serializes an object.
     /// Allows the user to define additional `JsonConverter`.
     let serializeAsJson (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) =
         match customConverters with
