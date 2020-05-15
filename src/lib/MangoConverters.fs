@@ -65,6 +65,10 @@ module MangoConverters =
         do object.Add(jProperty)
         object
 
+    // DO NOT DELETE THIS CONVERTER!
+    // Although it is marked obsolete it is still used by the `OperatorJsonConverter`.
+    // The direct use of this converter is heavily discouraged.
+    //
     [<System.Obsolete("Everything moved to the OperatorJsonConverter.")>]
     type ConditionalJsonConverter() =
         inherit Newtonsoft.Json.JsonConverter()
@@ -125,6 +129,10 @@ module MangoConverters =
         jObject
 
 
+    // DO NOT DELETE THIS CONVERTER!
+    // Although it is marked obsolete it is still used by the `OperatorJsonConverter`.
+    // The direct use of this converter is heavily discouraged.
+    //
     [<System.Obsolete("Everything moved to the OperatorJsonConverter.")>]
     type CombinationJsonConverter() =
         inherit Newtonsoft.Json.JsonConverter()
