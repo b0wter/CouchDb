@@ -78,17 +78,17 @@ module Find =
     /// Queries the server and does some basic parsing.
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
+    /// The `JOject` has a single property named `docs` that contains a list of `JObjects`.
     let private jObjectsQuery (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
             let! result = sendRequest request
-            //let queryResult = { QueryResult.content = result.content; QueryResult.statusCode = result.statusCode }
             if result.statusCode.IsSome && result.statusCode.Value = 200 then
                 let objects = result.content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty "docs") |> Result.bind Json.JObject.getJArray |> Result.bind Json.JObject.jArrayAsJObjects
                 let metadata = deserializeJson<MetaData> result.content
 
                 return match objects, metadata with
-                        | Ok a, Ok m -> Ok { Response.docs = a; Response.bookmarks = m.bookmarks; Response.execution_stats = m.execution_stats; Response.warning = m.warning }
+                        | Ok a, Ok m -> Ok ({ Response.docs = a; Response.bookmarks = m.bookmarks; Response.execution_stats = m.execution_stats; Response.warning = m.warning }, result.statusCode, result.headers)
                         | Error e, _ -> 
                             let jsonError = JsonDeserializationError.create(result.content, e)
                             let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
@@ -105,13 +105,13 @@ module Find =
     let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) : Async<Result<'a>> =
         async {
             match! jObjectsQuery printSerializedOperators props dbName expression with
-            | Ok o -> 
+            | Ok (o, statusCode, headers) -> 
                 match o.docs |> Json.JObject.toObjects with
                 | Ok docs -> 
                     return Success ({ Response.docs = docs; Response.bookmarks = o.bookmarks; Response.execution_stats = o.execution_stats; Response.warning = o.warning })
                 | Error e -> 
                     let error = JsonDeserializationError.create(o.docs.ToString(), e)
-                    return JsonDeserializationError (RequestResult.createForJson(error, None, Map.empty))
+                    return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
             | Error e -> return (mapError e)
         }
 
@@ -132,7 +132,7 @@ module Find =
         async {
             let! result = jObjectsQuery printSerializedOperators props dbName expression
             return match result with
-                    | Ok r -> Success r
+                    | Ok (r, _, _) -> Success r
                     | Error e -> mapError e
         }
 
