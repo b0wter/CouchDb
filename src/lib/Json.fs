@@ -81,7 +81,6 @@ module Json =
             let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
             try
                 Ok (docs |> List.map (fun doc -> doc.ToObject<'a>(serializer)))
-                //Ok (seq { for doc in docs do yield (doc :?> Newtonsoft.Json.Linq.JObject).ToObject<'a>(serializer) } |> List.ofSeq)
             with
             | ex -> Error ex.Message
 
