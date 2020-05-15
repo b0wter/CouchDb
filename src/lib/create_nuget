@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm b0wter.couchdb.nuspec
+rm -f b0wter.couchdb.nuspec
 set -e
 
 GIT_TAG=$(git describe --tags --abbrev=0)
