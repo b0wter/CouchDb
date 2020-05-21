@@ -63,6 +63,7 @@ module Find =
         | Some 401 -> Unauthorized r
         | Some 404 -> NotFound r
         | Some 500 -> QueryExecutionError r
+        | Some 200 -> JsonDeserializationError r
         | _ ->
             Unknown r
 
@@ -90,11 +91,11 @@ module Find =
                 return match objects, metadata with
                         | Ok a, Ok m -> Ok ({ Response.docs = a; Response.bookmarks = m.bookmarks; Response.execution_stats = m.execution_stats; Response.warning = m.warning }, result.statusCode, result.headers)
                         | Error e, _ -> 
-                            let jsonError = JsonDeserializationError.create(result.content, e)
+                            let jsonError = JsonDeserializationError.create(result.content, sprintf "Error occured while deserializing the `docs` property and transforming its contents into `JObject`s: %s" e)
                             let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
                             Error <| requestResult
                         | _, Error e ->
-                            let requestResult = RequestResult.createForJson(e, result.statusCode, result.headers)
+                            let requestResult = RequestResult.createForJson({e with reason = sprintf "Error occured while deserializing the meta data: %s" e.reason }, result.statusCode, result.headers)
                             Error <| requestResult
             else
                 return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
@@ -106,11 +107,11 @@ module Find =
         async {
             match! jObjectsQuery printSerializedOperators props dbName expression with
             | Ok (o, statusCode, headers) -> 
-                match o.docs |> Json.JObject.toObjects with
+                match o.docs |> Json.JObject.toObjects<'a> with
                 | Ok docs -> 
                     return Success ({ Response.docs = docs; Response.bookmarks = o.bookmarks; Response.execution_stats = o.execution_stats; Response.warning = o.warning })
                 | Error e -> 
-                    let error = JsonDeserializationError.create(o.docs.ToString(), e)
+                    let error = JsonDeserializationError.create(o.docs.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
                     return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
             | Error e -> return (mapError e)
         }

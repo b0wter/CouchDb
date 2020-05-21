@@ -80,7 +80,8 @@ module Json =
         let toObjects<'a>(docs: JObject list) =
             let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
             try
-                Ok (docs |> List.map (fun doc -> doc.ToObject<'a>(serializer)))
+                Ok (docs |> List.map (fun doc -> 
+                    doc.ToObject<'a>(serializer)))
             with
             | ex -> Error ex.Message
 
