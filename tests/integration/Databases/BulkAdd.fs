@@ -14,9 +14,9 @@ module BulkAdd =
     let id2 = System.Guid.Parse("c51b3eae-73a5-4e18-9c29-701645cfb91e")
     let id3 = System.Guid.Parse("94429f08-0b16-4076-be3e-bc47d4deea21")
     
-    let model1 = TestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
-    let model2 = TestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
-    let model3 = TestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
+    let model1 = DocumentTestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
+    let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
+    let model3 = DocumentTestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("database-find-tests")

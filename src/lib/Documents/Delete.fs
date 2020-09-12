@@ -17,4 +17,3 @@ module Delete =
         }
 
     let queryAsResult dbProps dbName (docId: System.Guid) (docRev: string) = query dbProps dbName docId docRev |> Async.map HttpVerbs.Delete.asResult
-

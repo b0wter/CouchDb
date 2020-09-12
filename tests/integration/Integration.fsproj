@@ -33,10 +33,10 @@
     <PackageReference Include="XunitXml.TestLogger" Version="2.1.26" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestModels\Default.fs" />
-    <Compile Include="TestModels\Hierarchical.fs" />
-    <Compile Include="TestModels\HierarchicalArray.fs" />
-    <Compile Include="TestModels\HierarchicalSimpel.fs" />
+    <Compile Include="DocumentTestModels\Default.fs" />
+    <Compile Include="DocumentTestModels\Hierarchical.fs" />
+    <Compile Include="DocumentTestModels\HierarchicalArray.fs" />
+    <Compile Include="DocumentTestModels\HierarchicalSimpel.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />
@@ -52,7 +52,6 @@
     <Compile Include="Databases\AllDocuments.fs" />
     <Compile Include="Databases\AddDocuments.fs" />
     <Compile Include="Databases\Find.fs" />
-    <Compile Include="Databases\Views.fs" />
     <Compile Include="Databases\BulkAdd.fs" />
     <Compile Include="Databases\BulkDelete.fs" />
   </ItemGroup>
@@ -62,6 +61,13 @@
     <Compile Include="Documents\Put.fs" />
     <Compile Include="Documents\Delete.fs" />
     <Compile Include="Documents\Copy.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DesignDocuments\Get.fs" />
+    <Compile Include="DesignDocuments\Head.fs" />
+    <Compile Include="DesignDocuments\Put.fs" />
+    <Compile Include="DesignDocuments\Delete.fs" />
+    <Compile Include="DesignDocuments\Copy.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

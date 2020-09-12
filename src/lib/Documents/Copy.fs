@@ -17,5 +17,3 @@ module Copy =
         }
 
     let queryAsResult dbProps dbName (docId: System.Guid) docRev destinationId destinationRev = query dbProps dbName docId docRev destinationId destinationRev |> Async.map HttpVerbs.Copy.asResult
-
-

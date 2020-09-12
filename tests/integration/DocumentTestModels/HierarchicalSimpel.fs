@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Tests.Integration.TestModels
+namespace b0wter.CouchDb.Tests.Integration.DocumentTestModels
 
 module HierarchicalSimpel =
     open FsUnit.Xunit   

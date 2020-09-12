@@ -7,7 +7,7 @@ module Put =
     open b0wter.CouchDb.Lib
     open FsUnit.CustomMatchers
     open b0wter.CouchDb.Tests.Integration
-    open b0wter.CouchDb.Tests.Integration.TestModels
+    open b0wter.CouchDb.Tests.Integration.DocumentTestModels
     
     let getTestDocumentId (doc: Default.T) = doc._id
     let getTestDocumentRev (doc: Default.T) = doc._rev

@@ -1,5 +1,5 @@
 namespace b0wter.CouchDb.Tests.Integration.Databases
-open b0wter.CouchDb.Tests.Integration.TestModels
+open b0wter.CouchDb.Tests.Integration.DocumentTestModels
 
 module Find =
     
@@ -15,28 +15,28 @@ module Find =
     let id2 = System.Guid.Parse("c51b3eae-73a5-4e18-9c29-701645cfb91e")
     let id3 = System.Guid.Parse("94429f08-0b16-4076-be3e-bc47d4deea21")
     
-    let model1 = TestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
-    let model2 = TestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
-    let model3 = TestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
+    let model1 = DocumentTestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
+    let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
+    let model3 = DocumentTestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
     
-    let sub1_1 = TestModels.HierarchicalArray.createSubField (101, "substring", -3.14)
-    let sub1_2 = TestModels.HierarchicalArray.createSubField (102, "substring", -6.28)
-    let sub2_1 = TestModels.HierarchicalArray.createSubField (201, "substring", -9.42)
-    let sub2_2 = TestModels.HierarchicalArray.createSubField (202, "substring", -9.42)
-    let sub3_1 = TestModels.HierarchicalArray.createSubField (301, "substring", -9.42)
-    let sub3_2 = TestModels.HierarchicalArray.createSubField (302, "substring", -12.56)
+    let sub1_1 = DocumentTestModels.HierarchicalArray.createSubField (101, "substring", -3.14)
+    let sub1_2 = DocumentTestModels.HierarchicalArray.createSubField (102, "substring", -6.28)
+    let sub2_1 = DocumentTestModels.HierarchicalArray.createSubField (201, "substring", -9.42)
+    let sub2_2 = DocumentTestModels.HierarchicalArray.createSubField (202, "substring", -9.42)
+    let sub3_1 = DocumentTestModels.HierarchicalArray.createSubField (301, "substring", -9.42)
+    let sub3_2 = DocumentTestModels.HierarchicalArray.createSubField (302, "substring", -12.56)
     
-    let hAModel1 = TestModels.HierarchicalArray.create(id1, 42, "one",   11.1, [ sub1_1; sub1_2 ])
-    let hAModel2 = TestModels.HierarchicalArray.create(id2, 42, "two",   22.2, [ sub2_1; sub2_2 ])
-    let hAModel3 = TestModels.HierarchicalArray.create(id3, 42, "three", 33.3, [ sub3_1; sub3_2 ])
+    let hAModel1 = DocumentTestModels.HierarchicalArray.create(id1, 42, "one",   11.1, [ sub1_1; sub1_2 ])
+    let hAModel2 = DocumentTestModels.HierarchicalArray.create(id2, 42, "two",   22.2, [ sub2_1; sub2_2 ])
+    let hAModel3 = DocumentTestModels.HierarchicalArray.create(id3, 42, "three", 33.3, [ sub3_1; sub3_2 ])
     
-    let hModel1 = TestModels.Hierarchical.create (id1, 42, "one",   11.1, "sub-one", -21, -11.1)
-    let hModel2 = TestModels.Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
-    let hModel3 = TestModels.Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
+    let hModel1 = DocumentTestModels.Hierarchical.create (id1, 42, "one",   11.1, "sub-one", -21, -11.1)
+    let hModel2 = DocumentTestModels.Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
+    let hModel3 = DocumentTestModels.Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
     
-    let hSModel1 = TestModels.HierarchicalSimpel.create (id1, 42, "one", 11.1, [1;2;3;4])
-    let hSModel2 = TestModels.HierarchicalSimpel.create (id2, 43, "one", 22.2, [1;2;7;9])
-    let hSModel3 = TestModels.HierarchicalSimpel.create (id3, 44, "one", 33.3, [1;5;6;9])
+    let hSModel1 = DocumentTestModels.HierarchicalSimpel.create (id1, 42, "one", 11.1, [1;2;3;4])
+    let hSModel2 = DocumentTestModels.HierarchicalSimpel.create (id2, 43, "one", 22.2, [1;2;7;9])
+    let hSModel3 = DocumentTestModels.HierarchicalSimpel.create (id3, 44, "one", 33.3, [1;5;6;9])
     
     type GenericTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ model1; model2; model3 ])
@@ -46,8 +46,8 @@ module Find =
             async {
                 let selector = condition "_id" <| Equal (Id id1)
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.Success @>)
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.Default.T>.Success @>)
                 
                 match result |> Databases.Find.getFirst with
                 | Ok o -> o |> Default.compareWithoutRev model1
@@ -63,16 +63,16 @@ module Find =
                 
                 let selector = condition "type" <| Equal (Text "Default")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
                     let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
                     let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 
                     let m3 = testModels.docs |> List.find (fun x -> x._id = id3)
                     
-                    do (m1 |> TestModels.Default.compareWithoutRev model1)
-                    do (m2 |> TestModels.Default.compareWithoutRev model2) 
-                    do (m3 |> TestModels.Default.compareWithoutRev model3)
+                    do (m1 |> DocumentTestModels.Default.compareWithoutRev model1)
+                    do (m2 |> DocumentTestModels.Default.compareWithoutRev model2) 
+                    do (m3 |> DocumentTestModels.Default.compareWithoutRev model3)
                     
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
@@ -82,11 +82,11 @@ module Find =
             async {
                 let selector = condition "myInt" <| Equal (Integer 1)
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
                     do testModels.docs |> should haveLength 1
-                    do testModels.docs.Head |> TestModels.Default.compareWithoutRev model1
+                    do testModels.docs.Head |> DocumentTestModels.Default.compareWithoutRev model1
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
             
@@ -95,11 +95,11 @@ module Find =
             async {
                 let selector = condition "myFloat" <| Equal (Float 3.14)
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
                     do testModels.docs |> should haveLength 1
-                    do testModels.docs.Head |> TestModels.Default.compareWithoutRev model3
+                    do testModels.docs.Head |> DocumentTestModels.Default.compareWithoutRev model3
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
             
@@ -111,15 +111,15 @@ module Find =
                 let myIntEquals2 = condition "myInt" (Equal <| Integer 2)
                 let myInt1Or2 = myIntEquals1 |> ``or`` myIntEquals2
                 let expression = createExpression myInt1Or2
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
                     testModels.docs |> should haveLength 2
                     let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
                     let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 
                     
-                    do (m1 |> TestModels.Default.compareWithoutRev model1)
-                    do (m2 |> TestModels.Default.compareWithoutRev model2)
+                    do (m1 |> DocumentTestModels.Default.compareWithoutRev model1)
+                    do (m2 |> DocumentTestModels.Default.compareWithoutRev model2)
                                        
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
@@ -130,8 +130,8 @@ module Find =
                 let nonExistingDbName = this.DbName + "_non-existing"
                 let selector = condition "myInt" <| Equal (Integer 1)
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.Default.T> Initialization.defaultDbProperties nonExistingDbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.Default.T>.NotFound @>)
+                let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties nonExistingDbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.Default.T>.NotFound @>)
             }
 
     type ElemComplexMatchTests() =
@@ -143,8 +143,8 @@ module Find =
                 let elementSelector = condition "subFloat" (Equal <| Float -9.42)
                 let selector = combination <| ElementMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalArray.T>.Success @>)
+                let! result = Databases.Find.query<DocumentTestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalArray.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
@@ -152,8 +152,8 @@ module Find =
                     let s2 = s.docs |> List.find (fun x -> x._id = id2)
                     let s3 = s.docs |> List.find (fun x -> x._id = id3)
                     
-                    do (s2 |> TestModels.HierarchicalArray.compareWithoutRev hAModel2)
-                    do (s3 |> TestModels.HierarchicalArray.compareWithoutRev hAModel3)
+                    do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
+                    do (s3 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel3)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
@@ -166,8 +166,8 @@ module Find =
                 let elementSelector = condition "" (Equal <| Integer 9)
                 let selector = combination <| ElementMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.HierarchicalSimpel.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalSimpel.T>.Success @>)
+                let! result = Databases.Find.query<DocumentTestModels.HierarchicalSimpel.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalSimpel.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
@@ -175,8 +175,8 @@ module Find =
                     let s2 = s.docs |> List.find (fun x -> x._id = id2)
                     let s3 = s.docs |> List.find (fun x -> x._id = id3)
                     
-                    do (s2 |> TestModels.HierarchicalSimpel.compareWithoutRev hSModel2)
-                    do (s3 |> TestModels.HierarchicalSimpel.compareWithoutRev hSModel3)
+                    do (s2 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel2)
+                    do (s3 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel3)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
@@ -189,15 +189,15 @@ module Find =
                 let elementSelector = condition "subFloat" (Equal <| Float -9.42)
                 let selector = combination <| AllMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<TestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<TestModels.HierarchicalArray.T>.Success @>)
+                let! result = Databases.Find.query<DocumentTestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalArray.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
                     do s.docs |> should haveLength 1
                     let s2 = s.docs |> List.find (fun x -> x._id = id2)
                     
-                    do (s2 |> TestModels.HierarchicalArray.compareWithoutRev hAModel2)
+                    do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             

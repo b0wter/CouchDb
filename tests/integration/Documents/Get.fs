@@ -7,7 +7,7 @@ module Get =
     open Xunit
     open b0wter.CouchDb.Lib
     open FsUnit.CustomMatchers
-    open b0wter.CouchDb.Tests.Integration.TestModels
+    open b0wter.CouchDb.Tests.Integration.DocumentTestModels
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("test-db")
