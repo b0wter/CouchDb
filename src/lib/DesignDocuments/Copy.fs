@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Documents
+namespace b0wter.CouchDb.Lib.DesignDoc
 
 module Copy =
 
@@ -12,10 +12,8 @@ module Copy =
             if System.String.IsNullOrWhiteSpace(dbName) then 
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
-                let url = sprintf "%s/%s" dbName (docId |> string)
+                let url = sprintf "%s/_design/%s" dbName (docId |> string)
                 return! HttpVerbs.Copy.query<'a> props url docId docRev destinationId destinationRev
         }
 
     let queryAsResult dbProps dbName (docId: System.Guid) docRev destinationId destinationRev = query dbProps dbName docId docRev destinationId destinationRev |> Async.map HttpVerbs.Copy.asResult
-
-

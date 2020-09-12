@@ -1,9 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>b0wter.CouchDb</AssemblyName>
     <RootNamespace>b0wter.CouchDb.Lib</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <NuspecFile>b0wter.couchdb.nuspec</NuspecFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
@@ -19,36 +18,41 @@
     <Compile Include="RequestResult.fs" />
     <Compile Include="ErrorRequestResult.fs" />
     <Compile Include="Core.fs" />
+    <Compile Include="Server/AllDbs.fs" />
+    <Compile Include="Server/Info.fs" />
+    <Compile Include="Server/DbsInfo.fs" />
+    <Compile Include="Server/Authenticate.fs" />
+    <Compile Include="Server/ActiveTasks.fs" />
+    <Compile Include="Databases/Infos.fs" />
+    <Compile Include="Databases/Exists.fs" />
+    <Compile Include="Databases/Create.fs" />
+    <Compile Include="Databases/Delete.fs" />
+    <Compile Include="Databases/AllDocuments.fs" />
+    <Compile Include="Databases/AddDocument.fs" />
+    <Compile Include="Databases/Find.fs" />
+    <Compile Include="Databases/View.fs" />
+    <Compile Include="Databases/BulkAdd.fs" />
+    <Compile Include="Databases/BulkUpdate.fs" />
+    <Compile Include="Databases/BulkDelete.fs" />
+    <Compile Include="HttpVerbs/Head.fs" />
+    <Compile Include="HttpVerbs/Get.fs" />
+    <Compile Include="HttpVerbs/Put.fs" />
+    <Compile Include="HttpVerbs/Delete.fs" />
+    <Compile Include="HttpVerbs/Copy.fs" />
+    <Compile Include="Documents/Head.fs" />
+    <Compile Include="Documents/Get.fs" />
+    <Compile Include="Documents/Put.fs" />
+    <Compile Include="Documents/Delete.fs" />
+    <Compile Include="Documents/Copy.fs" />
+    <Compile Include="DesignDocuments/Head.fs" />
+    <Compile Include="DesignDocuments/Get.fs" />
+    <Compile Include="DesignDocuments/Put.fs" />
+    <Compile Include="DesignDocuments/Delete.fs" />
+    <Compile Include="DesignDocuments/Copy.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FifteenBelow.Json.Core" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="*" />
     <PackageReference Include="b0wter.FSharp" Version="4.7.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Server\AllDbs.fs" />
-    <Compile Include="Server\Info.fs" />
-    <Compile Include="Server\DbsInfo.fs" />
-    <Compile Include="Server\Authenticate.fs" />
-    <Compile Include="Server\ActiveTasks.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Databases\Infos.fs" />
-    <Compile Include="Databases\Exists.fs" />
-    <Compile Include="Databases\Create.fs" />
-    <Compile Include="Databases\Delete.fs" />
-    <Compile Include="Databases\AllDocuments.fs" />
-    <Compile Include="Databases\AddDocument.fs" />
-    <Compile Include="Databases\Find.fs" />
-    <Compile Include="Databases\BulkAdd.fs" />
-    <Compile Include="Databases\BulkUpdate.fs" />
-    <Compile Include="Databases\BulkDelete.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Documents\Head.fs" />
-    <Compile Include="Documents\Get.fs" />
-    <Compile Include="Documents\Put.fs" />
-    <Compile Include="Documents\Delete.fs" />
-    <Compile Include="Documents\Copy.fs" />
   </ItemGroup>
 </Project>

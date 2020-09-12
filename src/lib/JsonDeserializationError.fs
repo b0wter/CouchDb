@@ -13,4 +13,5 @@ module JsonDeserializationError =
     let create (json, reason) =
         { json = json; reason = reason }
     
-
+    let asString (t: T) =
+        sprintf "Error: %s%sJson:%s%s" t.reason System.Environment.NewLine System.Environment.NewLine t.json

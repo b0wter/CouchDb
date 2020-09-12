@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Documents
+namespace b0wter.CouchDb.Lib.DesignDoc
 
 module Put =
 
@@ -12,7 +12,7 @@ module Put =
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
-                let url = (sprintf "%s/%s" dbName (document |> docId |> string)) 
+                let url = (sprintf "%s/_design/%s" dbName (document |> docId |> string)) 
                 return! HttpVerbs.Put.query<'a> dbProps url docId docRev document
         }
 

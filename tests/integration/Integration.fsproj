@@ -52,6 +52,7 @@
     <Compile Include="Databases\AllDocuments.fs" />
     <Compile Include="Databases\AddDocuments.fs" />
     <Compile Include="Databases\Find.fs" />
+    <Compile Include="Databases\Views.fs" />
     <Compile Include="Databases\BulkAdd.fs" />
     <Compile Include="Databases\BulkDelete.fs" />
   </ItemGroup>
