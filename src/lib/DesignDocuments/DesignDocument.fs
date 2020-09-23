@@ -101,9 +101,9 @@ module Converter =
             let json = JObject.Load(reader)
             let jsonViews = json.["views"]
             let views = jsonViews.Children() |> Seq.map jViewToView |> List.ofSeq
-            let id = json.["_id"].Value.ToString()
-            let rev = json.["_rev"].Value.ToString() |> Some
-            let language = json.["language"].Value.ToString()
+            let id = json.Value<string>("_id")
+            let rev = json.Value<string>("_rev") |> Some
+            let language = json.Value<string>("language")
             DesignDocument.createDoc id rev views language :> obj
 
         override this.WriteJson(writer, value, _) =
