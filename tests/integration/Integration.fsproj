@@ -39,6 +39,9 @@
     <Compile Include="DocumentTestModels\HierarchicalSimpel.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DesignDocumentTestModels\Default.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Server\AllDbs.fs" />
     <Compile Include="Server\Info.fs" />
     <Compile Include="Server\DbsInfo.fs" />
