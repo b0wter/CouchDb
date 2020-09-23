@@ -14,7 +14,7 @@ module Head =
     /// Should also contain the content-lenght but System.Net.Http.HttpClient hides
     /// the header until after it finished processing the stream!
     /// See: https://social.msdn.microsoft.com/Forums/windowsapps/en-US/cb7417b5-ca3e-44f6-a272-9e2f8fc5d9b8 \
-    ///            /portable-httpclient-hides-contentlength-and-contentencoding-headers-with-gzip-encoding?forum=wpdevelop
+    ///      /portable-httpclient-hides-contentlength-and-contentencoding-headers-with-gzip-encoding?forum=wpdevelop
     type Response = {
         ETag: string
     }
