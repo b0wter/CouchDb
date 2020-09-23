@@ -7,13 +7,17 @@ module Get =
 
     type Result<'a> = HttpVerbs.Get.Result<'a>
 
-    let query<'a> dbProps dbName id queryParameters =
+    let queryWith<'a> dbProps dbName id queryParameters customConverters =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return Result<'a>.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
                 let url = (sprintf "%s/%s" dbName (id |> string))
-                return! HttpVerbs.Get.query<'a> dbProps dbName url id queryParameters
+                return! HttpVerbs.Get.query<'a> dbProps url id queryParameters customConverters
         }
+
+    let query<'a> dbProps dbName id queryParameters = queryWith<'a> dbProps dbName id queryParameters []
+
+    let queryAsResultWith dbProps dbName id queryParameters customConverters = queryWith dbProps dbName id queryParameters customConverters |> Async.map HttpVerbs.Get.asResult
 
     let queryAsResult dbProps dbName id queryParameters = query dbProps dbName id queryParameters |> Async.map HttpVerbs.Get.asResult

@@ -13,7 +13,9 @@ module Put =
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
                 let url = (sprintf "%s/%s" dbName (document |> docId |> string)) 
-                return! HttpVerbs.Put.query<'a> dbProps url docId docRev document
+                return! HttpVerbs.Put.query<'a> dbProps url [] docId docRev document
         }
 
     let queryAsResult dbProps dbName docId docRev document = query dbProps dbName docId docRev document |> Async.map HttpVerbs.Put.asResult
+
+    let asResult = HttpVerbs.Put.asResult

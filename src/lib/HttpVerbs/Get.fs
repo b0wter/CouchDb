@@ -126,4 +126,4 @@ module Get =
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
     /// Runs query followed by asResult.
-    let queryAsResult<'a> props name url id queryParameters = query<'a> props name url id queryParameters |> Async.map asResult<'a>
+    let queryAsResult<'a> props url id queryParameters customConverters = query<'a> props url id queryParameters customConverters |> Async.map asResult<'a>

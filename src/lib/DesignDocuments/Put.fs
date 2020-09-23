@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.DesignDoc
+namespace b0wter.CouchDb.Lib.DesignDocuments
 
 module Put =
 
@@ -7,13 +7,18 @@ module Put =
 
     type Result = HttpVerbs.Put.Result
 
-    let query<'a> dbProps dbName docId docRev document =
+    let private designDocumentId (d: DesignDocument.DesignDocument) = d.id
+    let private designDocumentRev (d: DesignDocument.DesignDocument) = d.rev
+
+    let query<'a> dbProps dbName (document: DesignDocument.DesignDocument) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
-                let url = (sprintf "%s/_design/%s" dbName (document |> docId |> string)) 
-                return! HttpVerbs.Put.query<'a> dbProps url docId docRev document
+                let url = (sprintf "%s/_design/%s" dbName (document |> designDocumentId |> string)) 
+                return! HttpVerbs.Put.query<DesignDocument.DesignDocument> dbProps url [ Converter.DesignDocumentConverter() ] designDocumentId designDocumentRev document
         }
 
-    let queryAsResult dbProps dbName docId docRev document = query dbProps dbName docId docRev document |> Async.map HttpVerbs.Put.asResult
+    let asResult = HttpVerbs.Put.asResult
+
+    let queryAsResult dbProps dbName document = query dbProps dbName document |> Async.map HttpVerbs.Put.asResult

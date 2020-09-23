@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.DesignDoc
+namespace b0wter.CouchDb.Lib.DesignDocuments
 
 module Head =
 
