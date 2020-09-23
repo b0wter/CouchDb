@@ -1,6 +1,6 @@
 packages/
 docs/
 .idea/
-src/base/lib/
 .ionide/
 .vscode/
+src/cli
