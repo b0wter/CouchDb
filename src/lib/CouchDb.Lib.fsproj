@@ -3,6 +3,7 @@
     <AssemblyName>b0wter.CouchDb</AssemblyName>
     <RootNamespace>b0wter.CouchDb.Lib</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>b0wter.couchdb.nuspec</NuspecFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
