@@ -10,12 +10,12 @@ module BulkAdd =
     
     type Success = {
         ok: bool
-        id: System.Guid
+        id: string
         rev: string 
     }
     
     type Failure = {
-        id: System.Guid 
+        id: string
         error: string
         reason: string
     }

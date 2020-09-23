@@ -41,9 +41,9 @@ module Delete =
     /// Documents with this field will not be returned within requests anymore, but stay in the database.
     /// You must supply the current (latest) revision, either by using the rev parameter or by using
     /// the If-Match header to specify the revision.
-    let query<'a> (props: DbProperties.T) (url: string) (docId: System.Guid) (docRev: string) : Async<Result> =
+    let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string) : Async<Result> =
         async {
-            if docId = System.Guid.Empty then
+            if docId |> String.isNullOrWhiteSpace then
                 return DocumentIdEmpty <| RequestResult.create(None, "You need to supply a non-empty document id. The query has not been sent to the server.")
             else if System.String.IsNullOrWhiteSpace(docRev) then
                 return DocumentRevEmpty <| RequestResult.create(None, "You need to supply a non-empty document rev. The query has not been sent to the server.")

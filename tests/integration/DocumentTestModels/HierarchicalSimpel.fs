@@ -4,7 +4,7 @@ module HierarchicalSimpel =
     open FsUnit.Xunit   
     
     type T = {
-        _id: System.Guid
+        _id: string
         _rev: string option
         ``type``: string
         myString: string
@@ -24,7 +24,7 @@ module HierarchicalSimpel =
             mySubs = subs
         }
     
-    let defaultInstance = create ((System.Guid.Parse("c56b6f65-8e4c-43dc-bea1-562d30eab205")), 42, "string", 3.14, [1; 2; 3; 4])
+    let defaultInstance = create ("c56b6f65-8e4c-43dc-bea1-562d30eab205", 42, "string", 3.14, [1; 2; 3; 4])
     
     let compareWithoutRev (a: T) (b: T) =
         a._id |> should equal b._id

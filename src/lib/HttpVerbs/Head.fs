@@ -59,9 +59,9 @@ module Head =
     ///
     /// The given `id` will be converted to a string using the ToString() method.
     /// </summary>
-    let query(props: DbProperties.T) (url: string) (id: System.Guid) : Async<Result> =
+    let query(props: DbProperties.T) (url: string) (id: string) : Async<Result> =
         async {
-            if id = System.Guid.Empty then
+            if String.isNullOrWhiteSpace id then
                 return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let request = createHead props url []

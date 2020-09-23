@@ -7,7 +7,7 @@ module Copy =
 
     type Result = HttpVerbs.Copy.Result
 
-    let query<'a> (props: DbProperties.T) (dbName: string) (docId: System.Guid) (docRev: string option) (destinationId: System.Guid) (destinationRev: string option) =
+    let query<'a> (props: DbProperties.T) (dbName: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
@@ -16,4 +16,4 @@ module Copy =
                 return! HttpVerbs.Copy.query<'a> props url docId docRev destinationId destinationRev
         }
 
-    let queryAsResult dbProps dbName (docId: System.Guid) docRev destinationId destinationRev = query dbProps dbName docId docRev destinationId destinationRev |> Async.map HttpVerbs.Copy.asResult
+    let queryAsResult dbProps dbName docId docRev destinationId destinationRev = query dbProps dbName docId docRev destinationId destinationRev |> Async.map HttpVerbs.Copy.asResult

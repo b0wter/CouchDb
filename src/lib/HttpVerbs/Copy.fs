@@ -12,7 +12,7 @@ open b0wter.FSharp
 module Copy =
     
     type Response = {
-        id: System.Guid
+        id: string
         ok: bool
         rev: string
     }
@@ -45,11 +45,11 @@ module Copy =
     /// Copying a document is only possible within the same database.
     /// If the destination of the document already exists you need to supply the `destinationRev`.
     /// If you supply a `docRev` the given revision will be copied.
-    let query<'a> (props: DbProperties.T) (url: string) (docId: System.Guid) (docRev: string option) (destinationId: System.Guid) (destinationRev: string option) : Async<Result> =
+    let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) : Async<Result> =
         async {
-            if destinationId = System.Guid.Empty then
+            if destinationId |> String.isNullOrWhiteSpace then
                 return DestinationIdMissing <| RequestResult.create(None, "You need to supply a non-empty destination id. The query has not been sent to the server.")
-            else if docId = System.Guid.Empty then
+            else if docId |> String.isNullOrWhiteSpace then
                 return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let destination = match destinationRev with

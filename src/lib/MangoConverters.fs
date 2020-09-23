@@ -14,21 +14,21 @@ module MangoConverters =
     /// </summary>
     let private dataTypeAndNameToJProperty (d: DataType) (operation: string) =
         match d with
-        | Bool b            -> JProperty(operation, b)
-        | Integer i             -> JProperty(operation, i)
-        | Float f           -> JProperty(operation, f)
-        | Text s -> JProperty(operation, s)
-        | Date d            -> JProperty(operation, d.ToString(dateTimeFormat))
-        | Id i              -> JProperty(operation, i.ToString())
+        | Bool b    -> JProperty(operation, b)
+        | Integer i -> JProperty(operation, i)
+        | Float f   -> JProperty(operation, f)
+        | Text s    -> JProperty(operation, s)
+        | Date d    -> JProperty(operation, d.ToString(dateTimeFormat))
+        | Id i      -> JProperty(operation, i.ToString())
 
     let private typeFieldToString (t: TypeField) =
         match t with
-        | Null -> "null"
+        | Null    -> "null"
         | Boolean -> "boolean"
-        | Number -> "number"
-        | String -> "string"
-        | Array -> "array"
-        | Object -> "object"
+        | Number  -> "number"
+        | String  -> "string"
+        | Array   -> "array"
+        | Object  -> "object"
 
     let private nameAndPropertyToJOject (name: string) (property: JProperty) =
         JProperty(name, property)

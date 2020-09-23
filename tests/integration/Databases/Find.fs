@@ -11,9 +11,9 @@ module Find =
     open b0wter.FSharp.Collections
     open FsUnit.CustomMatchers
     
-    let id1 = System.Guid.Parse("39346820-3700-4d09-b86c-e68653c98ca7")
-    let id2 = System.Guid.Parse("c51b3eae-73a5-4e18-9c29-701645cfb91e")
-    let id3 = System.Guid.Parse("94429f08-0b16-4076-be3e-bc47d4deea21")
+    let id1 = ("39346820-3700-4d09-b86c-e68653c98ca7")
+    let id2 = ("c51b3eae-73a5-4e18-9c29-701645cfb91e")
+    let id3 = ("94429f08-0b16-4076-be3e-bc47d4deea21")
     
     let model1 = DocumentTestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
     let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
@@ -44,7 +44,7 @@ module Find =
         [<Fact>]
         member this.``getFirst on a successful query returns the first element of a query`` () =
             async {
-                let selector = condition "_id" <| Equal (Id id1)
+                let selector = condition "_id" <| Equal (Text id1)
                 let expression = createExpression selector
                 let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.Default.T>.Success @>)
@@ -233,7 +233,7 @@ module Find =
         [<Fact>]
         member this.``Running a selector matching a single element returns a single JObject``() =
             async {
-                let selector = condition "_id" (Equal <| Id id1)
+                let selector = condition "_id" (Equal <| Text id1)
                 let expression = createExpression selector
                 let! result = Databases.Find.queryObjects Initialization.defaultDbProperties this.DbName expression
                 

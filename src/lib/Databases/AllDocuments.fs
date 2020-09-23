@@ -15,7 +15,7 @@ module AllDocuments =
         rev: string
     }
     type ResponseRow = {
-        id: System.Guid
+        id: string
         key: string
         value: ResponseRowValue option
     }

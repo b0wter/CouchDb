@@ -48,7 +48,7 @@ module Delete =
         member this.``Deleting a document with an empty id returns DocumentIdEmpty result`` () =
             async {
                 let bogusRev = "ThisIsABogusRev"
-                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName System.Guid.Empty bogusRev
+                let! result = Documents.Delete.query Initialization.defaultDbProperties dbName System.String.Empty bogusRev
                 result |> should be (ofCase<@ Documents.Delete.Result.DocumentIdEmpty @>)
             }
             

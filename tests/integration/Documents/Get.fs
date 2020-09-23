@@ -37,7 +37,7 @@ module Get =
         [<Fact>]
         member this.``Retrieving a non-existing document returns NotFound`` () =
             async {
-                let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
+                let id = "3f4ae7a0-f4f3-489b-a3b8-eba22450fae4"
                 let! result = Documents.Get.query<Default.T> Initialization.defaultDbProperties this.DbName id []
                 result |> should be (ofCase<@ Documents.Get.Result<Default.T>.NotFound @>)
             }
@@ -45,14 +45,14 @@ module Get =
         [<Fact>]
         member this.``Retrieving a document without specifying an id returns DocumentIdMissing`` () =
             async {
-                let! result = Documents.Get.query<Default.T> Initialization.defaultDbProperties this.DbName System.Guid.Empty []
+                let! result = Documents.Get.query<Default.T> Initialization.defaultDbProperties this.DbName System.String.Empty []
                 result |> should be (ofCase<@ Documents.Get.Result<Default.T>.DocumentIdMissing @>)
             }
                 
         [<Fact>]
         member this.``Retrieving a document without specifying a db name returns DbNameMissing`` () =
             async {
-                let id = System.Guid.Parse("3f4ae7a0-f4f3-489b-a3b8-eba22450fae4")
+                let id = "3f4ae7a0-f4f3-489b-a3b8-eba22450fae4"
                 let! result = Documents.Get.query<Default.T> Initialization.defaultDbProperties "" id []
                 result |> should be (ofCase<@ Documents.Get.Result<Default.T>.DbNameMissing @>)
             }

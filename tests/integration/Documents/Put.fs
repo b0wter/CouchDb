@@ -101,6 +101,6 @@ module Put =
         [<Fact>]
         member this.``Putting a document with an empty id returns DocumentIdMissing`` () =
             async {
-                let! first = Documents.Put.query Initialization.defaultDbProperties dbName (fun _ -> System.Guid.Empty) getTestDocumentRev Default.defaultInstance
+                let! first = Documents.Put.query Initialization.defaultDbProperties dbName (fun _ -> System.String.Empty) getTestDocumentRev Default.defaultInstance
                 first |> should be (ofCase <@ Documents.Put.Result.DocumentIdMissing @>)
             }

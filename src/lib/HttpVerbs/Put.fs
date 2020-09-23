@@ -12,7 +12,7 @@ open b0wter.FSharp
 module Put =
 
     type Response = {
-        id: System.Guid
+        id: string
         ok: bool
         rev: string
     }
@@ -42,15 +42,15 @@ module Put =
     /// Unlike the POST /{db}, you must specify the document ID in the request URL.
     /// When updating an existing document, the current document revision must be included in the document 
     /// (i.e. the request body), as the rev query parameter, or in the If-Match request header.
-    let query<'a> (props: DbProperties.T) (url: string) (docId: 'a -> System.Guid) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
+    let query<'a> (props: DbProperties.T) (url: string) converters (docId: 'a -> string) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
         async {
-            if document |> docId = System.Guid.Empty then
+            if document |> docId |> String.isNullOrWhiteSpace then
                 return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let queryParams = match document |> docRev with
                                   | Some rev -> [ StringQueryParameter("rev", rev) :> BaseQueryParameter ]
                                   | None -> []
-                let request = createJsonPut props url document queryParams
+                let request = createCustomJsonPut props url converters document queryParams
                 let! result = sendRequest request
                 return match result.statusCode with
                         | Some 201 ->
@@ -76,4 +76,4 @@ module Put =
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
     /// Runs query followed by asResult.
-    let queryAsResult<'a> props url docId docRev document = query<'a> props url docId docRev document |> Async.map asResult
+    let queryAsResult<'a> props url converters docId docRev document = query<'a> props url converters docId docRev document |> Async.map asResult

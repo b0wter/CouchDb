@@ -11,7 +11,7 @@ module Hierarchical =
     }
     
     type T = {
-        _id: System.Guid
+        _id: string
         _rev: string option
         ``type``: string
         myString: string
@@ -35,7 +35,7 @@ module Hierarchical =
             }
         }
     
-    let defaultInstance = create ((System.Guid.Parse("c56b6f65-8e4c-43dc-bea1-562d30eab205")), 42, "string", 3.14, "substring", -42, -3.14)
+    let defaultInstance = create ("c56b6f65-8e4c-43dc-bea1-562d30eab205", 42, "string", 3.14, "substring", -42, -3.14)
     
     let compareSubField (a: SubField) (b: SubField) =
         a.subFloat |> should equal b.subFloat

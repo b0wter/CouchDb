@@ -98,16 +98,16 @@ module Get =
     ///
     /// The given `id` will be converted to a string using the ToString() method.
     /// </summary>
-    let query<'a> (props: DbProperties.T) (name: string) (url: string) (id: System.Guid) (queryParameters: BaseQueryParameter list): Async<Result<'a>> =
+    let query<'a> (props: DbProperties.T) (url: string) (id: string) (queryParameters: BaseQueryParameter list) (customConverters: Newtonsoft.Json.JsonConverter list) : Async<Result<'a>> =
         async {
-            if id = System.Guid.Empty then
+            if id |> String.isNullOrWhiteSpace then
                 return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let request = createGet props url queryParameters
                 let! result = sendRequest request
                 return match result.statusCode with
                        | Some 200 | Some 304 ->
-                         let document = result.content |> deserializeJson<'a>
+                         let document = result.content |> deserializeJsonWith<'a> customConverters
                          let meta = result.content |> deserializeJson<MetaFields>
                          match (document, meta) with
                          | (Ok d, Ok m) -> DocumentExists { meta = m; content = d }

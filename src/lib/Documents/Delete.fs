@@ -7,7 +7,7 @@ module Delete =
 
     type Result = HttpVerbs.Delete.Result
 
-    let query<'a> dbProps dbName (docId: System.Guid) (docRev: string) =
+    let query<'a> dbProps dbName (docId: string) (docRev: string) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
@@ -16,4 +16,4 @@ module Delete =
                 return! HttpVerbs.Delete.query<'a> dbProps url docId docRev
         }
 
-    let queryAsResult dbProps dbName (docId: System.Guid) (docRev: string) = query dbProps dbName docId docRev |> Async.map HttpVerbs.Delete.asResult
+    let queryAsResult dbProps dbName docId (docRev: string) = query dbProps dbName docId docRev |> Async.map HttpVerbs.Delete.asResult

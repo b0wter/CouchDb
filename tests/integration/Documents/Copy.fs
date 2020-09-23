@@ -18,7 +18,7 @@ module Copy =
         [<Fact>]
         member this.``Copying an existing document without supplying a doc rev returns Created result`` () =
             async {
-                let targetId = System.Guid.Parse("466dbe23-98e8-4d39-be9c-d44c56e2d15a")
+                let targetId = "466dbe23-98e8-4d39-be9c-d44c56e2d15a"
                 
                 let! addDocument = Documents.Put.query<Default.T> Initialization.defaultDbProperties this.DbName getTestDocumentId getTestDocumentRev Default.defaultInstance
                 do addDocument |> should be (ofCase <@ Documents.Put.Result.Created @>)
@@ -42,7 +42,7 @@ module Copy =
         [<Fact>]
         member this.``Copying a non-existing document returns a NotFound result`` () =
             async {
-                let targetId = System.Guid.Parse("466dbe23-98e8-4d39-be9c-d44c56e2d15a")
+                let targetId = "466dbe23-98e8-4d39-be9c-d44c56e2d15a"
                 let! copyDocument = Documents.Copy.query Initialization.defaultDbProperties this.DbName Default.defaultInstance._id None targetId None
                 copyDocument |> should be (ofCase <@ Documents.Copy.Result.NotFound @>)
             }
@@ -63,7 +63,7 @@ module Copy =
         [<Fact>]
         member this.``Copying from a non-existing database returns a NotFound result`` () =
             async {
-                let targetId = System.Guid.Parse("466dbe23-98e8-4d39-be9c-d44c56e2d15a")
+                let targetId = "466dbe23-98e8-4d39-be9c-d44c56e2d15a"
                 let! copyDocument = Documents.Copy.query Initialization.defaultDbProperties "non-existing-db" Default.defaultInstance._id None targetId None
                 copyDocument |> should be (ofCase <@ Documents.Copy.Result.NotFound @>)
             }
