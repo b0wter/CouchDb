@@ -8,7 +8,7 @@
         <projectUrl>https://github.com/b0wter/CouchDb</projectUrl>
         <license type="expression">GPL-3.0-only</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-	<releaseNotes>%RELEASE_NOTES%</releaseNotes>
+        <releaseNotes>%RELEASE_NOTES%</releaseNotes>
         <description>Easy to use library to talk to CouchDb from F#.</description>
         <tags>database couchdb fsharp</tags>
         <dependencies>
@@ -19,11 +19,18 @@
 		<dependency id="b0wter.FSharp" version="4.7.0" />
 		<dependency id="Newtonsoft.Json" version="12.0.2" />
         </dependencies>
+        <contentFiles>
+            <files include="bin/Release/netstandard2.0/b0wter.CouchDb.xml" buildAction="content" flatten="true" copyToOutput="true"/>
+        </contentFiles>
+        <dependencies>
+            <group targetFramework=".netstandard2.0" />
+        </dependencies>
     </metadata>
     <files>
         <file src="CouchDb.Lib.fsproj" target="src"/>
         <file src="*.fs" target="src"/>
-	<file src="**/*.fs" target="src"/>
-	<file src="bin/Release/netstandard2.0/b0wter.CouchDb.dll" target="lib/netstandard2.0"/>
+        <file src="**/*.fs" target="src"/>
+        <file src="bin/Release/netstandard2.0/b0wter.CouchDb.dll" target="lib/netstandard2.0"/>
+        <file src="bin/Release/netstandard2.0/b0wter.CouchDb.xml" target="lib/netstandard2.0"/>
     </files>
 </package>

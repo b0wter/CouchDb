@@ -5,6 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <NuspecFile>b0wter.couchdb.nuspec</NuspecFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Exception.fs" />

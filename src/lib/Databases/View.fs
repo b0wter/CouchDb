@@ -219,28 +219,33 @@ module View =
     let query<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) =
         queryWith<'key, 'value> props dbName designDoc view (Single EmptyQueryParameters)
         
-
     /// Queries the given view of the design document and converts only the emitted keys to `'key`. The values are returned as `JObject`s.
-    let queryJObjectsWith<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string)  (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
-        jObjectsQuery<'key> props dbName designDoc view queryParameters
-        (*
+    /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
+    let queryJObjectsWith<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
         async {
             let! result = jObjectsQuery<'key> props dbName designDoc view queryParameters
             return match result with
                     | Ok (r, _, _) -> Success r
                     | Error e -> mapError e
         }
-        *)
 
+    /// Queries the given view of the design document and converts only the emitted keys to `'key`. The values are returned as `JObject`s.
+    /// Does not allow the definition of query parameters. Use `queryWith` instead.
+    let queryJObjects<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) : Async<Result<'key, JObject>> =
+        queryJObjectsWith<'key> props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
 
     /// Runs `queryObjects` followed by `asResult`.
-    let queryObjectsAsResult props dbName designDoc view queryParameters =
+    let queryJObjectsWithAsResult props dbName designDoc view queryParameters =
         queryJObjectsWith props dbName designDoc view queryParameters |> Async.map asResult
-        
 
-    /// Runs `query` followed by `asResult`.
+    /// Runs `queryObjectsWith` followed by `asResult`.
+    let queryJObjectsAsResult props dbName designDoc view =
+        queryJObjectsWithAsResult props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
+        
+    /// Runs `queryWith` followed by `asResult`.
     let queryWithAsResult<'key, 'value> props dbName designDoc view queryParameters = queryWith<'key, 'value> props dbName designDoc view queryParameters |> Async.map asResult
 
+    /// Runs `query` followed by `asResult`.
     let queryAsResult<'key, 'value> props dbName designDoc view = query<'key, 'value> props dbName designDoc view |> Async.map asResult
 
     /// Returns all rows of a response in a single list.
