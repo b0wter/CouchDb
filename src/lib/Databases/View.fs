@@ -167,7 +167,9 @@ module View =
             let request = match queryParameters with
                           | Single s -> createCustomJsonPost props url [] s []
                           | Multi m -> createCustomJsonPost props url [] m []
+            
             let! result = sendRequest request
+            
             if result.statusCode.IsSome && result.statusCode.Value = 200 then
                 let results = if isSingleQuery then result.content |> deserializeJson<SingleResponse<'key, JObject>> |> Result.map List.singleton
                               else result.content |> deserializeJson<MultiQueryResponse<'key, JObject>> |> Result.map (fun x -> x.results)
@@ -245,3 +247,10 @@ module View =
         match response with
         | Response.Single s -> s.rows
         | Response.Multi m -> m |> List.collect (fun r -> r.rows)
+
+    /// Returns the response as a list of `SingleResponse`.
+    /// Will return a list with a single element for a single response query.
+    let responseAsSingleResponses (response: Response<_, _>) : SingleResponse<_, _> list =
+        match response with
+        | Response.Single s -> [ s ]
+        | Response.Multi m -> m

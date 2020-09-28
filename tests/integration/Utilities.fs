@@ -111,15 +111,3 @@ module Utilities =
         do result |> List.iter (should be (ofCase <@ Databases.AddDocument.Result.Created @>))
         
         member this.DbName = dbName
-
-        (*
-        /// Will create the given database, add the documents and run `toRun`.
-        member this.RunWithDbAndDocs dbName docs (toRun: unit -> Async<unit>) =
-            async {
-                let! result = docs |>
-                              List.map (Databases.AddDocument.query Initialization.defaultDbProperties dbName)
-                              |> Async.Parallel
-                do result |> Array.iter (should be (ofCase <@ Databases.AddDocument.Result.Created @>))
-                return! toRun ()
-            }
-        *)
