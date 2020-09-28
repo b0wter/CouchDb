@@ -241,7 +241,7 @@ module View =
 
     /// Returns all rows of a response in a single list.
     /// If the response is a `Response.Multi` then the items of all lists will be collected.
-    let responseAsList (response: Response<_, 'value>) : 'value list =
+    let responseAsRows (response: Response<_, 'value>) : Row<'a, 'value> list =
         match response with
-        | Response.Single s -> s.rows |> List.map (fun r -> r.value)
-        | Response.Multi m -> m |> List.collect (fun r -> r.rows |> List.map (fun r -> r.value))
+        | Response.Single s -> s.rows
+        | Response.Multi m -> m |> List.collect (fun r -> r.rows)
