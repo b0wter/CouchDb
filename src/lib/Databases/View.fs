@@ -146,12 +146,6 @@ module View =
         | BadRequest e | Unauthorized e | JsonDeserializationError e | NotFound e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
-    let private parseObjectAsSingleResponse json statusCode headers offset totalRows (objects: JObject list) : Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.T> =
-        objects
-        |> (List.map (fun j -> j |> Json.JObject.toObject<Row<'key, JObject>>) >> Utilities.switchListResult)
-        |> Result.map (fun rows -> ((Response.Single { SingleResponse.rows = rows; SingleResponse.offset = offset; SingleResponse.totalRows = totalRows }), statusCode, headers))
-        |> Result.mapError (fun e -> RequestResult.createForJson (JsonDeserializationError.create (json, e), statusCode, headers))
-
     /// Queries the server and does some basic parsing.
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
@@ -186,6 +180,7 @@ module View =
                 return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
         }
 
+    /// Deserializes a `JObject` as the given `value`.
     let private mapSingleResponse<'key, 'value> (response: SingleResponse<'key, JObject>) : FSharp.Core.Result<SingleResponse<'key, 'value>, string> =
         let rec step (acc: Row<'key, 'value> list) (remaining: Row<'key, JObject> list) : FSharp.Core.Result<SingleResponse<'key, 'value>, string> =
             match remaining with
@@ -197,7 +192,8 @@ module View =
                               | Error e -> Core.Result<SingleResponse<'key, 'value>, string>.Error e
         step [] response.rows
 
-    /// Is build on top of `jObjectsQuery` and uses `Json.JObject.toObjects` to deserialize the `JObject list` into a list of actual objects.
+    /// Queries the given view of the design document and converts the emitted keys to `'key` and the values of the rows to `'value`.
+    /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
     let queryWith<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, 'value>> =
         async {
             match! jObjectsQuery props dbName designDoc view queryParameters with
@@ -218,18 +214,24 @@ module View =
             | Error e -> return (mapError e)
         }
 
+    /// Queries the given view of the design document and converts the emitted keys to `'key` and the values of the rows to `'value`.
+    /// Does not allow the definition of query parameters. Use `queryWith` instead.
     let query<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) =
         queryWith<'key, 'value> props dbName designDoc view (Single EmptyQueryParameters)
         
 
-    /// Is build on top of `jObjectsQuery` and maps the result into a `Database.Find.Result<JObject>`.
+    /// Queries the given view of the design document and converts only the emitted keys to `'key`. The values are returned as `JObject`s.
     let queryJObjectsWith<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string)  (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
+        jObjectsQuery<'key> props dbName designDoc view queryParameters
+        (*
         async {
             let! result = jObjectsQuery<'key> props dbName designDoc view queryParameters
             return match result with
                     | Ok (r, _, _) -> Success r
                     | Error e -> mapError e
         }
+        *)
+
 
     /// Runs `queryObjects` followed by `asResult`.
     let queryObjectsAsResult props dbName designDoc view queryParameters =
