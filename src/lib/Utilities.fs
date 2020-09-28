@@ -8,6 +8,14 @@ module Utilities =
         match FSharpValue.GetUnionFields(x, typeof<'a>) with
         | case, _ -> case.Name  
 
+    let switchListResult (results: Result<'a, 'b> list) : Result<'a list, 'b> =
+        let rec step (acc: 'a list) (remaining: Result<'a, 'b> list) =
+            match remaining with
+            | (Ok a) :: tail -> step (a :: acc) tail
+            | Error e :: _ -> Error e
+            | [] -> Ok (acc |> List.rev)
+        step [] results
+
     module UrlTemplate =
 
         type UrlTemplate1<'a> = {

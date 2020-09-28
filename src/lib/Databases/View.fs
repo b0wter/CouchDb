@@ -8,30 +8,44 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 open Newtonsoft.Json
-open b0wter.CouchDb.Lib
+open Newtonsoft.Json.Linq
 
 module View =
 
-    type SingleResponse<'a> = {
+    /// This type is only required for internal use and makes the
+    /// deserialization code cleaner. It cannot be made private because
+    /// Newtonsoft.Json does not work with private types.
+    /// A row contains a single response from a view.
+    /// A view will always return a list of rows.
+    type Row<'key, 'value> = {
+        id: string
+        key: 'key
+        value: 'value
+    }
+
+    /// Response for a single successful query.
+    type SingleResponse<'key, 'value> = {
         offset: int
-        rows: 'a list
+        rows: Row<'key, 'value> list
+        [<JsonProperty("total_rows")>]
         totalRows: int
         // The `update_seq` property is missing
         // because it is dynamic.
     }
 
-    type Response<'a>
-        = Single of SingleResponse<'a>
-        | Multi of SingleResponse<'a> list
-
-    type MetaData = {
-        offset: int
-        [<JsonProperty("total_rows")>]
-        totalRows: int
+    /// This type is only required for internal use and makes the
+    /// deserialization code cleaner. It cannot be made private because
+    /// Newtonsoft.Json does not work with private types.
+    type MultiQueryResponse<'key, 'value> = {
+        results: SingleResponse<'key, 'value> list
     }
 
-    type Result<'a>
-        = Success of Response<'a>
+    type Response<'key, 'value>
+        = Single of SingleResponse<'key, 'value>
+        | Multi of SingleResponse<'key, 'value> list
+
+    type Result<'key, 'value>
+        = Success of Response<'key, 'value>
         /// Invalid request
         | BadRequest of RequestResult.T
         /// Read permission required
@@ -43,6 +57,7 @@ module View =
         /// If the response from the server could not be interpreted.
         | Unknown of RequestResult.T
 
+    /// Additional settings for a single view query.
     type SingleQueryParameters = {
         conflicts: bool option
         descending: bool option
@@ -77,6 +92,8 @@ module View =
         updateSeq: bool option
     }
 
+    /// Instance of `SingleQueryParameters` with every property
+    /// set to a default value.
     let EmptyQueryParameters = {
         conflicts = None
         descending = None
@@ -102,6 +119,7 @@ module View =
         updateSeq = None
     }
 
+    /// Parameter to execute multiple queries for the given view.
     type MultiQueryParameters = {
         queries: SingleQueryParameters list
     }
@@ -121,114 +139,109 @@ module View =
         | _ ->
             Unknown r
 
-
     /// Returns the result from the query as a generic `FSharp.Core.Result`.
-    let asResult<'a> (r: Result<'a>) =
+    let asResult (r: Result<_, _>) =
         match r with
         | Success x -> Ok x
         | BadRequest e | Unauthorized e | JsonDeserializationError e | NotFound e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
 
+    let private parseObjectAsSingleResponse json statusCode headers offset totalRows (objects: JObject list) : Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.T> =
+        objects
+        |> (List.map (fun j -> j |> Json.JObject.toObject<Row<'key, JObject>>) >> Utilities.switchListResult)
+        |> Result.map (fun rows -> ((Response.Single { SingleResponse.rows = rows; SingleResponse.offset = offset; SingleResponse.totalRows = totalRows }), statusCode, headers))
+        |> Result.mapError (fun e -> RequestResult.createForJson (JsonDeserializationError.create (json, e), statusCode, headers))
+
     /// Queries the server and does some basic parsing.
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
     /// The `JOject` has a single property named `docs` that contains a list of `JObjects`.
-    let private jObjectsQuery (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) =
+    let private jObjectsQuery<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.T>> =
         async {
-            let url = sprintf "%s/_design/%s/_view/%s" dbName designDoc view
+            let isSingleQuery = match queryParameters with | Single _ -> true | Multi _ -> false
+            let url = if isSingleQuery then
+                        sprintf "%s/_design/%s/_view/%s" dbName designDoc view
+                      else
+                        sprintf "%s/_design/%s/_view/%s/queries" dbName designDoc view
             // The match makes sure that we dont need a custom json converter that serializes the content in a "non-union-type-way".
             let request = match queryParameters with
                           | Single s -> createCustomJsonPost props url [] s []
                           | Multi m -> createCustomJsonPost props url [] m []
             let! result = sendRequest request
             if result.statusCode.IsSome && result.statusCode.Value = 200 then
-                let deserializationKey = match queryParameters with | Single _ -> "rows" | Multi _ -> "results"
-                let objects = result.content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty deserializationKey) |> Result.bind Json.JObject.getJArray |> Result.bind Json.JObject.jArrayAsJObjects
-                //TODO: The metadata is not extracted properly for multiple queries.
-                let metaData = objects |> Result.bind (fun r -> deserializeJson<MetaData> result.content |> Result.mapError JsonDeserializationError.asString)
-                return match objects, metaData with
-                       | Ok a, Ok m -> 
-                           match queryParameters with
-                           | Single _ -> 
-                                Ok (Response.Single { SingleResponse.rows = a; SingleResponse.offset = m.offset; SingleResponse.totalRows = m.totalRows }, result.statusCode, result.headers)
-                           | Multi _ ->
-                                failwith "rekt"
-                       | Error e, _ -> 
-                           let jsonError = JsonDeserializationError.create(result.content, sprintf "Error occured while deserializing the `rows/results property and transforming its contents into `JObject`s: %s" e)
-                           let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
-                           Error <| requestResult
-                       | _, Error e ->
-                           let jsonError = JsonDeserializationError.create(result.content, sprintf "Error occured while deserializing the metadata and transforming its contents into a `JObject`: %s" e)
-                           let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
-                           Error <| requestResult
-                           (*
-                           let requestResult = RequestResult.createForJson({e with reason = sprintf "Error occured while deserializing the meta data: %s" e.reason }, result.statusCode, result.headers)
-                           Error <| requestResult
-                           *)
+                let results = if isSingleQuery then result.content |> deserializeJson<SingleResponse<'key, JObject>> |> Result.map List.singleton
+                              else result.content |> deserializeJson<MultiQueryResponse<'key, JObject>> |> Result.map (fun x -> x.results)
+                
+                return match results with
+                       | Ok singles when isSingleQuery ->
+                            Ok (Response.Single (singles |> List.exactlyOne), result.statusCode, result.headers)
+                       | Ok singles ->
+                            Ok (Response.Multi singles, result.statusCode, result.headers)
+                       | Error e ->
+                            Error (RequestResult.createForJson(e, result.statusCode, result.headers))
+
             else
                 return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
         }
 
+    let private mapSingleResponse<'key, 'value> (response: SingleResponse<'key, JObject>) : FSharp.Core.Result<SingleResponse<'key, 'value>, string> =
+        let rec step (acc: Row<'key, 'value> list) (remaining: Row<'key, JObject> list) : FSharp.Core.Result<SingleResponse<'key, 'value>, string> =
+            match remaining with
+            | [] -> 
+                let r = Ok { SingleResponse.offset = response.offset; SingleResponse.totalRows = response.totalRows; SingleResponse.rows = (acc |> List.rev) }
+                r
+            | head :: tail -> match head.value |> Json.JObject.toObject<'value> with
+                              | Ok converted -> step ({ id = head.id; key = head.key; value = converted } :: acc) tail
+                              | Error e -> Core.Result<SingleResponse<'key, 'value>, string>.Error e
+        step [] response.rows
+
     /// Is build on top of `jObjectsQuery` and uses `Json.JObject.toObjects` to deserialize the `JObject list` into a list of actual objects.
-    let private queryWith<'a> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'a>> =
+    let queryWith<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, 'value>> =
         async {
             match! jObjectsQuery props dbName designDoc view queryParameters with
             | Ok (o, statusCode, headers) -> 
                 match o with
                 | Response.Single s -> 
-                    match s.rows |> Json.JObject.toObjects<'a> with
-                    | Ok docs -> 
-                        return Success (Response.Single { SingleResponse.rows = docs; SingleResponse.offset = s.offset; SingleResponse.totalRows = s.totalRows })
-                    | Error e -> 
+                    match s |> mapSingleResponse with
+                    | Ok mapped -> return Success (Response.Single mapped)
+                    | Error e ->
                         let error = JsonDeserializationError.create(s.rows.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
                         return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
                 | Response.Multi m ->
-                    return failwith "multi"
-                (*
-                match o.rows |> Json.JObject.toObjects<'a> with
-                | Ok docs -> 
-                    return Success ({ Response.rows = docs; Response.offset = o.offset; Response.totalRows = o.totalRows })
-                | Error e -> 
-                    let error = JsonDeserializationError.create(o.rows.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
-                    return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
-                    *)
+                    match m |> List.map mapSingleResponse |> Utilities.switchListResult with
+                    | Ok mapped -> return Success (Response.Multi mapped)
+                    | Error e ->
+                        let error = JsonDeserializationError.create(sprintf "The serialization to provide this output was performed without custom converters!%s%s" System.Environment.NewLine (JsonConvert.SerializeObject(m)), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
+                        return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
             | Error e -> return (mapError e)
         }
 
-    /// Queries the database using a custom-built mango expression. 
-    /// If you want to print the serialized operator use `queryWithOutput` instead.
-    let query<'a> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string)  (queryParameters: QueryParameters)=
-        queryWith<'a> props dbName designDoc view queryParameters
-
+    let query<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) =
+        queryWith<'key, 'value> props dbName designDoc view (Single EmptyQueryParameters)
+        
 
     /// Is build on top of `jObjectsQuery` and maps the result into a `Database.Find.Result<JObject>`.
-    let private queryJObjectsWith (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string)  (queryParameters: QueryParameters): Async<Result<Linq.JObject>> =
+    let queryJObjectsWith<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string)  (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
         async {
-            let! result = jObjectsQuery props dbName designDoc view queryParameters
+            let! result = jObjectsQuery<'key> props dbName designDoc view queryParameters
             return match result with
                     | Ok (r, _, _) -> Success r
                     | Error e -> mapError e
         }
 
-
     /// Runs `queryObjects` followed by `asResult`.
     let queryObjectsAsResult props dbName designDoc view queryParameters =
-        queryJObjectsWith props dbName designDoc view queryParameters |> Async.map asResult<Linq.JObject>
+        queryJObjectsWith props dbName designDoc view queryParameters |> Async.map asResult
         
 
     /// Runs `query` followed by `asResult`.
-    let queryAsResult<'a> props dbName designDoc view queryParameters = query<'a> props dbName designDoc view queryParameters |> Async.map asResult<'a>
+    let queryWithAsResult<'key, 'value> props dbName designDoc view queryParameters = queryWith<'key, 'value> props dbName designDoc view queryParameters |> Async.map asResult
 
-    (*
-    /// Retrieves the first element of a successful query or an error message.
-    /// Useful if you know that your query will return a single element.
-    /// Also returns an error if the query is successful but did not return any documents.
-    let getFirst (r: Result<'a>) : Result<'a, string> =
-        r
-        |> asResult
-        |> Result.mapBoth (fun ok -> ok.rows |> List.tryHead)  (fun error -> sprintf "[%s] %s" error.case error.content)
-        |> function
-           | Ok (Some o) -> Ok o
-           | Ok None -> Error "The query was successful but did not return any documents."
-           | Error e -> Error e
-    *)
+    let queryAsResult<'key, 'value> props dbName designDoc view = query<'key, 'value> props dbName designDoc view |> Async.map asResult
+
+    /// Returns all rows of a response in a single list.
+    /// If the response is a `Response.Multi` then the items of all lists will be collected.
+    let responseAsList (response: Response<_, 'value>) : 'value list =
+        match response with
+        | Response.Single s -> s.rows |> List.map (fun r -> r.value)
+        | Response.Multi m -> m |> List.collect (fun r -> r.rows |> List.map (fun r -> r.value))

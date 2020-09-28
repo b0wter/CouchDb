@@ -16,7 +16,7 @@
     <Compile Include="Utilities.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.7.0" />
+    <PackageReference Include="b0wter.FSharp" Version="4.10.0" />
     <PackageReference Include="FsUnit.xUnit" Version="3.5.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.0.0" />
@@ -74,10 +74,5 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="b0wter.FSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\fsharp_base\src\base\lib\Debug\netstandard2.0\b0wter.FSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
