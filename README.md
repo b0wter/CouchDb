@@ -39,27 +39,28 @@ Databases endpoint
 |-------------------------|------|-----|------|-----|--------|
 | /db                     | ✔️    | ✔️   | ✔️    | ✔️   | ✔️      |
 | /db/_all_docs           |      | ✔️   | ✔️    |     |        |
-| /db/_design_docs        |      | ❌   | ❌    |     |        |
-| /db/_bulk_get           |      |     | ❌    |     |        |
-| /db/_bulk_docs          |      |     | ️✔️    |     |        |
+| /db/_design_docs        |      | ✔️   | ✔️    |     |        |
+| /db/_bulk_get (*)       |      |     | ❌   |     |        |
+| /db/_bulk_docs          |      |     | ✔️    |     |        |
 | /db/_find               |      |     | ✔️    |     |        |
-| /db/_index              |      | ❌   | ❌    |     | ❌      |
-| /db/_explain            |      |     | ❌    |     |        |
-| /db/_shards             |      | ❌   |      |     |        |
-| /db/_shards/doc         |      | ❌   |      |     |        |
-| /db/_sync_shards        |      |     | ❌    |     |        |
-| /db/_changes            |      | ❌   |      |     |        |
-| /db/_compact            |      |     | ❌    |     |        |
-| /db/_compact/design-doc |      |     | ❌    |     |        |
-| /db/_ensure_full_commit |      |     | ❌    |     |        |
-| /db/_view_cleanup       |      |     | ❌    |     |        |
-| /db/_security           |      | ❌   |      | ❌   |        |
-| /db/_purge              |      |     | ❌    |     |        |
-| /db/_purged_infos_limit |      | ❌   |      | ❌   |        |
-| /db/_missing_revs       |      |     | ❌    |     |        |
-| /db/_revs_diff          |      |     | ❌    |     |        |
-| /db/_revs_limit         |      | ❌   |      | ❌   |        |
+| /db/_index              |      | ❌  | ❌   |     | ❌     |
+| /db/_explain            |      |     | ❌   |     |        |
+| /db/_shards             |      | ❌  |      |     |        |
+| /db/_shards/doc         |      | ❌  |      |     |        |
+| /db/_sync_shards        |      |     | ❌   |     |        |
+| /db/_changes            |      | ❌  |      |     |        |
+| /db/_compact            |      |     | ❌   |     |        |
+| /db/_compact/design-doc |      |     | ❌   |     |        |
+| /db/_ensure_full_commit |      |     | ❌   |     |        |
+| /db/_view_cleanup       |      |     | ❌   |     |        |
+| /db/_security           |      | ❌  |      | ❌  |        |
+| /db/_purge              |      |     | ❌   |     |        |
+| /db/_purged_infos_limit |      | ❌  |      | ❌  |        |
+| /db/_missing_revs       |      |     | ❌   |     |        |
+| /db/_revs_diff          |      |     | ❌   |     |        |
+| /db/_revs_limit         |      | ❌  |      | ❌  |        |
 
+_(*) `/db/_bulk_get` is not implemented because `POST /{db}/_all_docs` is implemented and serves the same purpose._
 
 Server endpoint
 ---------------
@@ -90,6 +91,22 @@ Documents endpoint
 |--------------------|------|-----|------|-----|--------|------|
 | /db/doc            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️   |
 | /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |      |
+
+Design Documents endpoint
+-------------------------
+| Endpoint                                          | HEAD | GET | POST | PUT | DELETE | COPY |
+|---------------------------------------------------|------|-----|------|-----|--------|------|
+| /db/_design/design-doc                            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️   |
+| /db/_design/design-doc/attachment                 | ❌    | ❌   |      | ❌   | ❌      |      |
+| /db/_design/design-doc/_info                      | ❌    |     |      |     |        |      |
+| /db/_design/design-doc/_view/view-name            |      | ✔️   | ✔️   |     |        |      |
+| /db/_design/design-doc/_search/index-name         |      | ❌   |      |     |        |      |
+| /db/_design/design-doc/_search_info/index-name    |      | ❌   |      |     |        |      |
+| /db/_design/design-doc/_update/update-name        |      |     | ❌    |     |        |      |
+| /db/_design/design-doc/_update/update-name/doc-id |      |     |      | ❌   |        |      |
+
+
+The `show`, `list` and `rewrite` functions for design documents will not be implemented since the feature will be removed with CouchDb 4.0.
 
 How-to
 ======
