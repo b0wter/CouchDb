@@ -41,8 +41,8 @@ module View =
                     match result with
                     | Ok r ->
                         let responses = r |> Databases.View.responseAsSingleResponses |> List.exactlyOne
-                        do responses.totalRows |> should equal 3
-                        do responses.rows.Length |> should equal 3
+                        do responses.TotalRows |> should equal 3
+                        do responses.Rows.Length |> should equal 3
                     | Error e ->
                         failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
                 | Error e ->
@@ -54,16 +54,16 @@ module View =
             async {
                 match! DesignDocuments.Put.queryAsResult Initialization.defaultDbProperties this.DbName designDoc with
                 | Ok _ ->
-                    let singleQueryParameter = { Databases.View.EmptyQueryParameters with limit = Some 268435456}
-                    let queryParameters = (Databases.View.QueryParameters.Multi {Databases.View.MultiQueryParameters.queries = [ singleQueryParameter; singleQueryParameter ] })
+                    let singleQueryParameter = { Databases.View.EmptyQueryParameters with Limit = Some 268435456}
+                    let queryParameters = (Databases.View.QueryParameters.Multi {Databases.View.MultiQueryParameters.Queries = [ singleQueryParameter; singleQueryParameter ] })
                     let! result = Databases.View.queryWithAsResult<string, Default.T> Initialization.defaultDbProperties this.DbName designDocId view1Name queryParameters
                     match result with
                     | Ok r ->
                         let responses = r |> Databases.View.responseAsSingleResponses 
                         do responses.Length |> should equal 2
                         do responses |> List.iter (fun response -> 
-                            do response.totalRows |> should equal 3
-                            do response.rows.Length |> should equal 3)
+                            do response.TotalRows |> should equal 3
+                            do response.Rows.Length |> should equal 3)
                     | Error e ->
                         failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
                 | Error e ->
@@ -75,17 +75,17 @@ module View =
             async {
                 match! DesignDocuments.Put.queryAsResult Initialization.defaultDbProperties this.DbName designDoc with
                 | Ok _ ->
-                    let singleQueryParameter = { Databases.View.EmptyQueryParameters with limit = Some 2 }
+                    let singleQueryParameter = { Databases.View.EmptyQueryParameters with Limit = Some 2 }
                     let queryParameters = (Databases.View.QueryParameters.Single singleQueryParameter)
                     let! result = Databases.View.queryWithAsResult<string, Default.T> Initialization.defaultDbProperties this.DbName designDocId view1Name queryParameters
                     match result with
                     | Ok r ->
                         let response = r |> Databases.View.responseAsSingleResponses |> List.exactlyOne
-                        do response.offset |> should equal 0
+                        do response.Offset |> should equal 0
                         // Total rows returns the total number of rows for the view,
                         // not the number of rows returned (if limited by e.g. `limit`).
-                        do response.totalRows |> should equal 3 
-                        do response.rows.Length |> should equal 2
+                        do response.TotalRows |> should equal 3 
+                        do response.Rows.Length |> should equal 2
                     | Error e ->
                         failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
                 | Error e ->

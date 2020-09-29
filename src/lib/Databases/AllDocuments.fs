@@ -5,24 +5,23 @@ namespace b0wter.CouchDb.Lib.Databases
 //
 
 open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 
 module AllDocuments =
     type ResponseRowValue = {
-        rev: string
+        Rev: string
     }
     type ResponseRow = {
-        id: string
-        key: string
-        value: ResponseRowValue option
+        Id: string
+        Key: string
+        Value: ResponseRowValue option
     }
     type Response = {
-        offset: int option
-        rows: ResponseRow list
-        total_rows: int
+        Offset: int option
+        Rows: ResponseRow list
+        [<Newtonsoft.Json.JsonProperty("total_rows")>]
+        TotalRows: int
     }
 
     type Result
@@ -34,17 +33,17 @@ module AllDocuments =
         | Unknown of RequestResult.T
 
     type KeyCollection = {
-        keys: string list
+        Keys: string list
     }
 
     let private query (request: Async<System.Net.Http.HttpResponseMessage>) =
         async {
             let! result = (sendRequest request)
-            return match result.statusCode with
+            return match result.StatusCode with
                    | Some 200 -> 
-                        match deserializeJsonWith<Response> [] result.content with
+                        match deserializeJsonWith<Response> [] result.Content with
                         | Ok r    -> Success r
-                        | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Error: %s %s JSON: %s" e.reason System.Environment.NewLine e.json, result.headers)
+                        | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                    | Some 400     -> BadRequest <| result
                    | Some 401     -> Unauthorized <| result
                    | Some 404     -> NotFound <| result
@@ -56,7 +55,7 @@ module AllDocuments =
         query request
 
     let querySelected (props: DbProperties.T) (dbName: string) (keys: string list) : Async<Result> =
-        let keyCollection = { keys = keys }
+        let keyCollection = { Keys = keys }
         let request = createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection []
         query request
 

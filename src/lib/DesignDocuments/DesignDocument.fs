@@ -19,13 +19,13 @@ module DesignDocument =
         | View -> "view"
 
     type View = {
-        name: string
-        ``type``: FunctionType
-        func: string
+        Name: string
+        ``Type``: FunctionType
+        Func: string
     }
 
     let createView name ``type`` func =
-        { name = name; ``type`` = ``type``; func = func }
+        { Name = name; ``Type`` = ``type``; Func = func }
 
     let parseFunc (s: string) : FunctionType option =
         match s.ToLower() with
@@ -38,41 +38,41 @@ module DesignDocument =
     type DesignDocument = 
         {
             [<JsonProperty("_id")>]
-            id: string
+            Id: string
             [<JsonProperty("_rev")>]
-            rev: string option
-            views: View list
-            language: string
+            Rev: string option
+            Views: View list
+            Language: string
         }
 
     let createDoc id rev views language = 
-        { id = id; rev = rev; views = views; language = language }
+        { Id = id; Rev = rev; Views = views; Language = language }
 
     let createDocWithIdAndRev id rev views =
-        { id = id; rev = rev; views = views; language = "javascript" }
+        { Id = id; Rev = rev; Views = views; Language = "javascript" }
 
     let createDocWithId id views =
-        { id = id; rev = None; views = views; language = "javascript" }
+        { Id = id; Rev = None; Views = views; Language = "javascript" }
 
     let viewAsJson (v: View) : JProperty =
         let json = JObject()
-        let property = JProperty(v.``type`` |> functionTypeAsString, v.func)
+        let property = JProperty(v.``Type`` |> functionTypeAsString, v.Func)
         do json.Add(property)
-        JProperty(v.name, json)
+        JProperty(v.Name, json)
 
     let designDocumentAsJObject (d: DesignDocument) : JObject =
         let serializer = JsonSerializer.Create(b0wter.CouchDb.Lib.Json.settings())
         let json = JObject()
-        let properties = d.views |> List.map viewAsJson
+        let properties = d.Views |> List.map viewAsJson
         do properties |> List.iter (fun p -> json.Add(p))
         let parent = JObject.FromObject(d, serializer)
         do parent.["views"].Parent.Remove()
         do parent.Add("views", json)
         parent
 
-    let id (d: DesignDocument) = d.id
+    let id (d: DesignDocument) = d.Id
     
-    let rev (d: DesignDocument) = d.rev
+    let rev (d: DesignDocument) = d.Rev
 
 module Converter =
     open Newtonsoft.Json

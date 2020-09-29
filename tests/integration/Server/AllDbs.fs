@@ -23,9 +23,9 @@ module AllDbs =
                         s |> should haveLength dbNames.Length
                         dbNames |> List.iter (fun x -> s |> should contain x)
                     | Server.AllDbs.Result.JsonDeserialisationError e ->
-                        failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
+                        failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.Content
                     | Server.AllDbs.Result.Unknown e ->
-                        failwith <| sprintf "Request returned an error (status code: %i): %s" (e.statusCode |?| -1) e.content
+                        failwith <| sprintf "Request returned an error (status code: %i): %s" (e.StatusCode |?| -1) e.Content
                 | Error e ->
                    return failwith e
             }
@@ -38,7 +38,7 @@ module AllDbs =
                 | Server.AllDbs.Result.Success s ->
                     s |> should be Empty
                 | Server.AllDbs.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.Content
                 | Server.AllDbs.Result.Unknown _ ->
                     failwith "The result is not empty when it should be."
             }

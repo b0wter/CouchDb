@@ -34,7 +34,7 @@ module Put =
                     
                     // add the document for the second time (with an updated rev)
                     //
-                    let newDocument = { Default.defaultInstance with _rev = Some x.rev; myInt = 1337 }
+                    let newDocument = { Default.defaultInstance with _rev = Some x.Rev; myInt = 1337 }
                     let! second = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev newDocument
                     second |> should be (ofCase <@ Documents.Put.Result.Created @>)
 
@@ -42,14 +42,14 @@ module Put =
                     //
                     let! check = Documents.Get.query<Default.T> Initialization.defaultDbProperties dbName Default.defaultInstance._id []
                     match check with
-                    | Documents.Get.Result.DocumentExists x -> x.content.myInt |> should equal 1337
+                    | Documents.Get.Result.DocumentExists x -> x.Content.myInt |> should equal 1337
                     | _ -> failwith "The retrieval of the document (using Documents.Info) failed!"
                     
                     // check that there is only a single document in the database
                     //
                     let! count = Server.DbsInfo.query Initialization.defaultDbProperties [ dbName ]
                     match count with
-                    | Server.DbsInfo.Result.Success s -> s.[0].info.Value.doc_count |> should equal 1
+                    | Server.DbsInfo.Result.Success s -> s.[0].Info.Value.DocCount |> should equal 1
                     | _ -> failwith "Putting the updated document resulted in the creation of a new document!"
 
                 | _ -> failwith "Adding the initial document failed."

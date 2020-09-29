@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Requires the installation of a third-party linter.
+# User the following command to install fsharplint globally:
+# ~ dotnet tool install -g dotnet-fsharplint
+
+dotnet fsharplint lint CouchDb.Lib.fsproj --lint-config lint.config

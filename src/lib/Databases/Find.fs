@@ -8,35 +8,40 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open b0wter.FSharp
 open Newtonsoft.Json
-open b0wter.CouchDb.Lib
 
 module Find =
     
     // TODO: Think about having two query methods: `query` and `queryWithExecutionStats`. This would remove the option.
     
     type ExecutionStats = {
-        total_keys_examined: int
-        total_docs_examined: int
-        total_quorum_docs_examined: int
-        results_returned: int
-        execution_time_ms: float
+        [<JsonProperty("total_keys_examined")>]
+        TotalKeysExamined: int
+        [<JsonProperty("total_docs_examined")>]
+        TotalDocsExamined: int
+        [<JsonProperty("total_quorum_docs_examined")>]
+        TotalQuorumDocsExamined: int
+        [<JsonProperty("results_returned")>]
+        ResultsReturned: int
+        [<JsonProperty("execution_time_ms")>]
+        ExecutionTimeMs: float
     }
 
     type MetaData = {
-        warning: string option
-        execution_stats: ExecutionStats option
-        bookmarks: string option
+        Warning: string option
+        [<JsonProperty("execution_stats")>]
+        ExecutionStats: ExecutionStats option
+        Bookmarks: string option
     }
 
     /// The documents of this response have already been parsed
     /// and converted into class/record instances.
     type Response<'a> = { 
-        docs: 'a list
-        warning: string option
-        execution_stats: ExecutionStats option
-        bookmarks: string option
+        Docs: 'a list
+        Warning: string option
+        [<JsonProperty("execution_stats")>]
+        ExecutionStats: ExecutionStats option
+        Bookmarks: string option
     }
-
 
     type Result<'a>
         /// Request completed successfully
@@ -58,7 +63,7 @@ module Find =
     /// Turns a `RequestResult.T` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
     let private mapError (r: RequestResult.T) =
-        match r.statusCode with
+        match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r
         | Some 404 -> NotFound r
@@ -84,21 +89,21 @@ module Find =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
             let! result = sendRequest request
-            if result.statusCode.IsSome && result.statusCode.Value = 200 then
-                let objects = result.content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty "docs") |> Result.bind Json.JObject.getJArray |> Result.bind Json.JObject.jArrayAsJObjects
-                let metadata = deserializeJson<MetaData> result.content
+            if result.StatusCode.IsSome && result.StatusCode.Value = 200 then
+                let objects = result.Content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty "docs") |> Result.bind Json.JObject.getJArray |> Result.bind Json.JObject.jArrayAsJObjects
+                let metadata = deserializeJson<MetaData> result.Content
 
                 return match objects, metadata with
-                        | Ok a, Ok m -> Ok ({ Response.docs = a; Response.bookmarks = m.bookmarks; Response.execution_stats = m.execution_stats; Response.warning = m.warning }, result.statusCode, result.headers)
+                        | Ok a, Ok m -> Ok ({ Response.Docs = a; Response.Bookmarks = m.Bookmarks; Response.ExecutionStats = m.ExecutionStats; Response.Warning = m.Warning }, result.StatusCode, result.Headers)
                         | Error e, _ -> 
-                            let jsonError = JsonDeserializationError.create(result.content, sprintf "Error occured while deserializing the `docs` property and transforming its contents into `JObject`s: %s" e)
-                            let requestResult = RequestResult.createForJson(jsonError, result.statusCode, result.headers)
+                            let jsonError = JsonDeserializationError.create(result.Content, sprintf "Error occured while deserializing the `docs` property and transforming its contents into `JObject`s: %s" e)
+                            let requestResult = RequestResult.createForJson(jsonError, result.StatusCode, result.Headers)
                             Error <| requestResult
                         | _, Error e ->
-                            let requestResult = RequestResult.createForJson({e with reason = sprintf "Error occured while deserializing the meta data: %s" e.reason }, result.statusCode, result.headers)
+                            let requestResult = RequestResult.createForJson({e with Reason = sprintf "Error occured while deserializing the meta data: %s" e.Reason }, result.StatusCode, result.Headers)
                             Error <| requestResult
             else
-                return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
+                return Error <| RequestResult.createWithHeaders(result.StatusCode, result.Content, result.Headers)
         }
 
 
@@ -107,11 +112,11 @@ module Find =
         async {
             match! jObjectsQuery printSerializedOperators props dbName expression with
             | Ok (o, statusCode, headers) -> 
-                match o.docs |> Json.JObject.toObjects<'a> with
+                match o.Docs |> Json.JObject.toObjects<'a> with
                 | Ok docs -> 
-                    return Success ({ Response.docs = docs; Response.bookmarks = o.bookmarks; Response.execution_stats = o.execution_stats; Response.warning = o.warning })
+                    return Success ({ Response.Docs = docs; Response.Bookmarks = o.Bookmarks; Response.ExecutionStats = o.ExecutionStats; Response.Warning = o.Warning })
                 | Error e -> 
-                    let error = JsonDeserializationError.create(o.docs.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
+                    let error = JsonDeserializationError.create(o.Docs.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
                     return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
             | Error e -> return (mapError e)
         }
@@ -172,7 +177,7 @@ module Find =
     let getFirst (r: Result<'a>) : Result<'a, string> =
         r
         |> asResult
-        |> Result.mapBoth (fun ok -> ok.docs |> List.tryHead)  (fun error -> sprintf "[%s] %s" error.case error.content)
+        |> Result.mapBoth (fun ok -> ok.Docs |> List.tryHead)  (fun error -> sprintf "[%s] %s" error.Case error.Content)
         |> function
            | Ok (Some o) -> Ok o
            | Ok None -> Error "The query was successful but did not return any documents."

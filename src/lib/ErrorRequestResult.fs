@@ -7,23 +7,23 @@ module ErrorRequestResult =
     /// Wraps all http information of a failed CouchDb request. The case is no longer type-safe since
     /// it's stored as a string.
     type T = {
-        statusCode: RequestResult.StatusCode
-        content: string
-        headers: RequestResult.Headers
-        case: string
+        StatusCode: RequestResult.StatusCode
+        Content: string
+        Headers: RequestResult.Headers
+        Case: string
     }
     
     /// Creates an `ErrorRequestResult.T`.
     let create (statusCode, content, headers, case) =
-        { statusCode = statusCode; content = content; headers = headers; case = case }
+        { StatusCode = statusCode; Content = content; Headers = headers; Case = case }
     
     /// Creates an `ErrorRequestResult.T` from a `RequestResult.T` and a case name.
     let fromRequestResult (r: RequestResult.T, case) =
         {
-            statusCode = r.statusCode
-            content = r.content
-            headers = r.headers
-            case = case
+            StatusCode = r.StatusCode
+            Content = r.Content
+            Headers = r.Headers
+            Case = case
         }
         
     /// Creates an `ErrorRequestResult.T` from a `RequestResult.T` and a case.
@@ -34,4 +34,4 @@ module ErrorRequestResult =
         
     /// Returns a string in the format: "[$CASE] $CONTENT"
     let asString e =
-        sprintf "[%s] %s" e.case e.content
+        sprintf "[%s] %s" e.Case e.Content

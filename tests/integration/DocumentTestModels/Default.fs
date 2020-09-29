@@ -2,6 +2,7 @@ namespace b0wter.CouchDb.Tests.Integration.DocumentTestModels
 
 module Default =
     open FsUnit.Xunit
+    open Newtonsoft.Json
     
     type T = {
         _id: string

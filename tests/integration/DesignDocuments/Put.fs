@@ -31,16 +31,16 @@ module Put =
                     // add the document for the second time (with an updated rev)
                     //
                     let newViewName = "ThisIsANewView"
-                    let newViews = { Default.defaultDoc.views.Head with name = newViewName } :: (Default.defaultDoc.views |> List.tail)
-                    let newDocument = { Default.defaultDoc with rev = Some x.rev; views = newViews }
+                    let newViews = { Default.defaultDoc.Views.Head with Name = newViewName } :: (Default.defaultDoc.Views |> List.tail)
+                    let newDocument = { Default.defaultDoc with Rev = Some x.Rev; Views = newViews }
                     let! second = DesignDocuments.Put.query Initialization.defaultDbProperties dbName newDocument
                     second |> should be (ofCase <@ DesignDocuments.Put.Result.Created @>)
 
                     // retrieve the document and check that is has the new content
                     //
-                    let! check = DesignDocuments.Get.query Initialization.defaultDbProperties dbName Default.defaultDoc.id []
+                    let! check = DesignDocuments.Get.query Initialization.defaultDbProperties dbName Default.defaultDoc.Id []
                     match check with
-                    | DesignDocuments.Get.Result.DocumentExists x -> x.content.views.Head.name |> should equal newViewName
+                    | DesignDocuments.Get.Result.DocumentExists x -> x.Content.Views.Head.Name |> should equal newViewName
                     | _ -> 
                         let internalError = check |> DesignDocuments.Get.asResult |> function Ok _ -> "Response indicates success altough the test failed. Look into this!" | Error e -> e |> ErrorRequestResult.asString
                         failwith (sprintf "The retrieval of the document (using DesignDocuments.Info) failed: %s%s" System.Environment.NewLine internalError)
@@ -49,7 +49,7 @@ module Put =
                     //
                     let! count = Server.DbsInfo.query Initialization.defaultDbProperties [ dbName ]
                     match count with
-                    | Server.DbsInfo.Result.Success s -> s.[0].info.Value.doc_count |> should equal 1
+                    | Server.DbsInfo.Result.Success s -> s.[0].Info.Value.DocCount |> should equal 1
                     | _ -> failwith "Putting the updated document resulted in the creation of a new document!"
 
                 | _ -> failwith "Adding the initial document failed."
@@ -66,8 +66,8 @@ module Put =
                     // add the document for the first time
                     //
                     let newViewName = "ThisIsANewView"
-                    let newViews = { Default.defaultDoc.views.Head with name = newViewName } :: (Default.defaultDoc.views |> List.tail)
-                    let newDocument = { Default.defaultDoc with views = newViews }
+                    let newViews = { Default.defaultDoc.Views.Head with Name = newViewName } :: (Default.defaultDoc.Views |> List.tail)
+                    let newDocument = { Default.defaultDoc with Views = newViews }
                     let! second = DesignDocuments.Put.query Initialization.defaultDbProperties dbName newDocument
                     second |> should be (ofCase <@ DesignDocuments.Put.Result.Conflict @>)
 
@@ -104,7 +104,7 @@ module Put =
         [<Fact>]
         member this.``Putting a design document with an empty id returns DesignDocumentIdMissing`` () =
             async {
-                let emptyGuidDocument = { Default.defaultDoc with id = System.String.Empty }
+                let emptyGuidDocument = { Default.defaultDoc with Id = System.String.Empty }
                 let! first = DesignDocuments.Put.query Initialization.defaultDbProperties dbName emptyGuidDocument
                 first |> should be (ofCase <@ DesignDocuments.Put.Result.DocumentIdMissing @>)
             }

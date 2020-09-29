@@ -21,7 +21,7 @@ module Exists =
             if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createHead props name []
             let! result = sendRequest request
-            return match result.statusCode with
+            return match result.StatusCode with
                     | Some 200 -> Exists
                     | Some 404 -> DoesNotExist
                     | _ -> Unknown result

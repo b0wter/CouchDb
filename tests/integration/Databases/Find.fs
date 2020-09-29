@@ -65,9 +65,9 @@ module Find =
                 let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
-                    let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
-                    let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 
-                    let m3 = testModels.docs |> List.find (fun x -> x._id = id3)
+                    let m1 = testModels.Docs |> List.find (fun x -> x._id = id1) 
+                    let m2 = testModels.Docs |> List.find (fun x -> x._id = id2) 
+                    let m3 = testModels.Docs |> List.find (fun x -> x._id = id3)
                     
                     do (m1 |> DocumentTestModels.Default.compareWithoutRev model1)
                     do (m2 |> DocumentTestModels.Default.compareWithoutRev model2) 
@@ -84,8 +84,8 @@ module Find =
                 let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
-                    do testModels.docs |> should haveLength 1
-                    do testModels.docs.Head |> DocumentTestModels.Default.compareWithoutRev model1
+                    do testModels.Docs |> should haveLength 1
+                    do testModels.Docs.Head |> DocumentTestModels.Default.compareWithoutRev model1
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
             
@@ -97,8 +97,8 @@ module Find =
                 let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
-                    do testModels.docs |> should haveLength 1
-                    do testModels.docs.Head |> DocumentTestModels.Default.compareWithoutRev model3
+                    do testModels.Docs |> should haveLength 1
+                    do testModels.Docs.Head |> DocumentTestModels.Default.compareWithoutRev model3
                 | _ -> failwith <| sprintf "Find query failed, got result: %s" (result.GetType().FullName)
             }
             
@@ -113,9 +113,9 @@ module Find =
                 let! result = Databases.Find.query<DocumentTestModels.Default.T> Initialization.defaultDbProperties this.DbName expression
                 match result with
                 | Databases.Find.Result.Success testModels ->
-                    testModels.docs |> should haveLength 2
-                    let m1 = testModels.docs |> List.find (fun x -> x._id = id1) 
-                    let m2 = testModels.docs |> List.find (fun x -> x._id = id2) 
+                    testModels.Docs |> should haveLength 2
+                    let m1 = testModels.Docs |> List.find (fun x -> x._id = id1) 
+                    let m2 = testModels.Docs |> List.find (fun x -> x._id = id2) 
                     
                     do (m1 |> DocumentTestModels.Default.compareWithoutRev model1)
                     do (m2 |> DocumentTestModels.Default.compareWithoutRev model2)
@@ -147,9 +147,9 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 2
-                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
-                    let s3 = s.docs |> List.find (fun x -> x._id = id3)
+                    do s.Docs |> should haveLength 2
+                    let s2 = s.Docs |> List.find (fun x -> x._id = id2)
+                    let s3 = s.Docs |> List.find (fun x -> x._id = id3)
                     
                     do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
                     do (s3 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel3)
@@ -170,9 +170,9 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 2
-                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
-                    let s3 = s.docs |> List.find (fun x -> x._id = id3)
+                    do s.Docs |> should haveLength 2
+                    let s2 = s.Docs |> List.find (fun x -> x._id = id2)
+                    let s3 = s.Docs |> List.find (fun x -> x._id = id3)
                     
                     do (s2 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel2)
                     do (s3 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel3)
@@ -193,8 +193,8 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 1
-                    let s2 = s.docs |> List.find (fun x -> x._id = id2)
+                    do s.Docs |> should haveLength 1
+                    let s2 = s.Docs |> List.find (fun x -> x._id = id2)
                     
                     do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
@@ -212,7 +212,7 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 3
+                    do s.Docs |> should haveLength 3
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
 
@@ -225,7 +225,7 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 2
+                    do s.Docs |> should haveLength 2
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
         
@@ -238,6 +238,6 @@ module Find =
                 
                 match result with
                 | Databases.Find.Result.Success s ->
-                    do s.docs |> should haveLength 1
+                    do s.Docs |> should haveLength 1
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }

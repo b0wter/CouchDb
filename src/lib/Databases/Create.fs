@@ -19,7 +19,7 @@ module Create =
         let Replicas r = IntQueryParameter("r", r)
     
     type Response = {
-        ok: bool
+        Ok: bool
     }
 
     type Result
@@ -30,8 +30,8 @@ module Create =
         | AlreadyExists of RequestResult.T
         | Unknown of RequestResult.T
 
-    let TrueCreateResult = { ok = true}
-    let FalseCreateResult = { ok = false}
+    let TrueCreateResult = { Ok = true}
+    let FalseCreateResult = { Ok = false}
 
     /// <summary>
     /// Runs a PUT query that will create a new database. The database name may only consist of the following characters:
@@ -43,7 +43,7 @@ module Create =
             if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| RequestResult.create (None, "You need to set a database name.") else
             let request = createPut props name parameters
             let! result = (sendRequest request) 
-            let r = match result.statusCode with
+            let r = match result.StatusCode with
                     | Some 201 -> Created TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult
                     | Some 400 -> InvalidDbName <| result

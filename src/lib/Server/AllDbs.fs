@@ -23,10 +23,10 @@ module AllDbs =
         async { 
             let request = createGet props "_all_dbs" []
             let! result = sendRequest request
-            return match result.statusCode with
-                    | Some 200 -> match deserializeJson<Response> result.content with
+            return match result.StatusCode with
+                    | Some 200 -> match deserializeJson<Response> result.Content with
                                   | Ok response -> Success response
-                                  | Error r -> JsonDeserialisationError <| RequestResult.createForJson(r, result.statusCode, result.headers)
+                                  | Error r -> JsonDeserialisationError <| RequestResult.createForJson(r, result.StatusCode, result.Headers)
                     | _ -> Unknown result
         }
 

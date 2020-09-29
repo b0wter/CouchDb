@@ -35,9 +35,9 @@ module Core =
                 let! content = try response.Content.ReadAsStringAsync() |> Async.AwaitTask with ex -> async { return sprintf "Reading the body threw an exception: %s" ex.Message }
                 let headers = response.Headers |> Seq.map (fun x -> (x.Key, System.String.Join(",", x.Value))) |> Map.ofSeq
                 return {
-                    statusCode = Some status
-                    content = content
-                    headers = headers
+                    StatusCode = Some status
+                    Content = content
+                    Headers = headers
                 }
             with
             | ex ->
@@ -49,8 +49,8 @@ module Core =
     /// Wraps a status code and string contents. This may represent a success as well as an error.
     /// </summary>
     type QueryResult = {
-        statusCode: int option
-        content: string
+        StatusCode: int option
+        Content: string
     }
 
     /// <summary>
@@ -67,7 +67,7 @@ module Core =
             result
         with
         | :? Newtonsoft.Json.JsonException as ex ->
-            Error { json = content; reason = ex.Message }
+            Error { Json = content; Reason = ex.Message }
 
     /// <summary>
     /// Takes a SuccessRequestResult and deserialises its content.

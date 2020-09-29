@@ -12,9 +12,9 @@ open b0wter.FSharp
 module Copy =
     
     type Response = {
-        id: string
-        ok: bool
-        rev: string
+        Id: string
+        Ok: bool
+        Rev: string
     }
 
     type Result
@@ -59,15 +59,15 @@ module Copy =
                 let queryParams = match docRev with | Some rev -> [ StringQueryParameter("rev", rev)  :> BaseQueryParameter ] | None -> []
                 let request = createCopy props url queryParams [ destinationHeader ]
                 let! result = sendRequest request
-                return match result.statusCode with
+                return match result.StatusCode with
                         | Some 201 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Created response
-                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 202 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 400 -> BadRequest <| result
                         | Some 401 -> Unauthorized <| result
                         | Some 404 -> NotFound <| result

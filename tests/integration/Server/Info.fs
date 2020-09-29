@@ -16,16 +16,16 @@ module Info =
                 let! result = Server.Info.query Initialization.defaultDbProperties
                 match result with
                 | Server.Info.Result.Success response -> 
-                    response.couchdb |> should equal "Welcome"
-                    response.version |> should not' <| be NullOrEmptyString
-                    response.uuid |> should not' <| equal (System.Guid.Empty)
-                    response.vendor.name |> should not' <| be NullOrEmptyString
-                    response.git_sha |> should not' <| be NullOrEmptyString
-                    response.features |> should not' <| be Empty
+                    response.Couchdb |> should equal "Welcome"
+                    response.Version |> should not' <| be NullOrEmptyString
+                    response.Uuid |> should not' <| equal (System.Guid.Empty)
+                    response.Vendor.Name |> should not' <| be NullOrEmptyString
+                    response.GitSha |> should not' <| be NullOrEmptyString
+                    response.Features |> should not' <| be Empty
                 | Server.Info.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.Content
                 | Server.Info.Result.Unknown x ->
-                    failwith x.content
+                    failwith x.Content
             }
     
 

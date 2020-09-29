@@ -68,15 +68,15 @@ module Head =
                 let! result = sendRequest request
                 let trimETag (tag: string) = tag.TrimStart([|'"'|]).TrimEnd([|'"'|])
 
-                return match result.statusCode with
+                return match result.StatusCode with
                        | Some 200 -> 
-                            if result.headers.ContainsKey("ETag") then
-                                DocumentExists { ETag = result.headers.["ETag"] |> trimETag }
+                            if result.Headers.ContainsKey("ETag") then
+                                DocumentExists { ETag = result.Headers.["ETag"] |> trimETag }
                             else
                                 Unknown result
                        | Some 304 -> 
-                            if result.headers.ContainsKey("ETag") && result.headers.ContainsKey("Content-Length") then
-                                NotModified { ETag = result.headers.["ETag"] |> trimETag }
+                            if result.Headers.ContainsKey("ETag") && result.Headers.ContainsKey("Content-Length") then
+                                NotModified { ETag = result.Headers.["ETag"] |> trimETag }
                             else
                                 Unknown result
                        | Some 401 -> Unauthorized result

@@ -10,15 +10,15 @@ open b0wter.FSharp
 
 module Authenticate =
     type Vendor = {
-        version: string
-        name: string
+        Version: string
+        Name: string
     }
     
     type Response = {
-        couchdb: string
-        uuid: string
-        version: string
-        vendor: Vendor    
+        CouchDb: string
+        Uuid: string
+        Version: string
+        Vendor: Vendor    
     }
     
     type Result
@@ -40,14 +40,14 @@ module Authenticate =
     /// </summary>
     let query (props: DbProperties.T) =
         async {
-            let formData = [("name", props.credentials.username :> obj); ("password", props.credentials.password :> obj)] |> Map.ofList
+            let formData = [("name", props.Credentials.Username :> obj); ("password", props.Credentials.Password :> obj)] |> Map.ofList
             let request = createFormPost props "_session" formData []
             let! result = sendRequest request 
-            return match result.statusCode with
+            return match result.StatusCode with
                     | Some 200 | Some 302->
-                        match deserializeJson<Response> result.content with
+                        match deserializeJson<Response> result.Content with
                         | Ok r -> Success r
-                        | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                        | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | Some 401 -> Unauthorized result
                     | _ -> Unknown result
         }

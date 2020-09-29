@@ -19,26 +19,26 @@ module Utilities =
     module UrlTemplate =
 
         type UrlTemplate1<'a> = {
-            parameter: 'a
-            parameterToString: 'a -> string
-            url: string
+            Parameter: 'a
+            ParameterToString: 'a -> string
+            Url: string
         }
 
         type UrlTemplate2<'a, 'b> = {
-            parameter1: 'a
-            parameter1ToString: 'a -> string
-            parameter2: 'b
-            parameter2ToString: 'a -> string
-            url: string
+            Parameter1: 'a
+            Parameter1ToString: 'a -> string
+            Parameter2: 'b
+            Parameter2ToString: 'a -> string
+            Url: string
         }
 
         type UrlTemplate3<'a, 'b, 'c> = {
-            parameter1: 'a
-            parameter1ToString: 'a -> string
-            parameter2: 'b
-            parameter2ToString: 'b -> string
-            parameter3: 'c
-            parameter3ToString: 'c -> string
+            Parameter1: 'a
+            Parameter1ToString: 'a -> string
+            Parameter2: 'b
+            Parameter2ToString: 'b -> string
+            Parameter3: 'c
+            Parameter3ToString: 'c -> string
         }
 
         type UrlTemplate<'a, 'b, 'c>
@@ -48,4 +48,4 @@ module Utilities =
 
 
         let create1 (converter: 'a -> string) (url: string) (value: 'a) =
-            SingleParameter { parameter = value; parameterToString = converter; url = url }
+            SingleParameter { Parameter = value; ParameterToString = converter; Url = url }

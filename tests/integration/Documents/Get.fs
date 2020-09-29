@@ -17,17 +17,17 @@ module Get =
             async {
                 match! Databases.AddDocument.query Initialization.defaultDbProperties this.DbName Default.defaultInstance with
                 | Databases.AddDocument.Result.Created x ->
-                    do x.ok |> should be True
-                    do x.id |> should equal (Default.defaultInstance._id.ToString())
-                    do x.rev |> should not' (be EmptyString)
+                    do x.Ok |> should be True
+                    do x.Id |> should equal (Default.defaultInstance._id.ToString())
+                    do x.Rev |> should not' (be EmptyString)
                     
                     match! Documents.Get.query<Default.T> Initialization.defaultDbProperties this.DbName Default.defaultInstance._id [] with
                     | Documents.Get.Result.DocumentExists x ->
                         // You cannot check the complete object for equality since the returned result has a revision.
-                        x.content._id |> should equal Default.defaultInstance._id
-                        x.content.myInt |> should equal Default.defaultInstance.myInt
-                        x.content.myFirstString |> should equal Default.defaultInstance.myFirstString
-                        x.content.mySecondString |> should equal Default.defaultInstance.mySecondString
+                        x.Content._id |> should equal Default.defaultInstance._id
+                        x.Content.myInt |> should equal Default.defaultInstance.myInt
+                        x.Content.myFirstString |> should equal Default.defaultInstance.myFirstString
+                        x.Content.mySecondString |> should equal Default.defaultInstance.mySecondString
                     | x -> failwith <| sprintf "Expected NotModified but got %s" (x.GetType().FullName)
                     
                 | _ -> failwith <| sprintf "Database preparation failed, could not add document to db."

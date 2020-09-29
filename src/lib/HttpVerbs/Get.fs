@@ -30,27 +30,34 @@ module Get =
         
     type MetaFields = {
         /// Deletion flag. Available if document was removed
-        _deleted: bool
+        [<JsonProperty("_deleted")>]
+        Deleted: bool
         /// Attachment’s stubs. Available if document has any attachments
-        _attachments: obj list
+        [<JsonProperty("_attachments")>]
+        Attachments: obj list
         /// List of conflicted revisions. Available if requested with `conflicts=true` query parameter
-        _conflicts: string list
+        [<JsonProperty("_conflicts")>]
+        Conflicts: string list
         /// List of deleted conflicted revisions. Available if requested with `deleted_conflicts=true` query parameter
-        _deleted_conflicts: string list
+        [<JsonProperty("_deleted_conflicts")>]
+        DeletedConflicts: string list
         /// Document’s update sequence in current database. Available if requested with `local_seq=true` query parameter
-        _local_seq: string
+        [<JsonProperty("_local_seq")>]
+        LocalSeq: string
         /// List of objects with information about local revisions and their status.
         /// Available if requested with `open_revs` query parameter
-        _revs_info: string list
+        [<JsonProperty("_revs_info")>]
+        RevsInfo: string list
         /// List of local revision tokens without. Available if requested with `revs=true` query parameter
-        _revisions: string list
+        [<JsonProperty("_revisions")>]
+        Revisions: string list
     }
     
     type Response<'a> = {
         /// Meta information for this document
-        meta: MetaFields
+        Meta: MetaFields
         /// Actual document.
-        content: 'a
+        Content: 'a
     }
     
     type Result<'a>
@@ -105,14 +112,14 @@ module Get =
             else
                 let request = createGet props url queryParameters
                 let! result = sendRequest request
-                return match result.statusCode with
+                return match result.StatusCode with
                        | Some 200 | Some 304 ->
-                         let document = result.content |> deserializeJsonWith<'a> customConverters
-                         let meta = result.content |> deserializeJson<MetaFields>
+                         let document = result.Content |> deserializeJsonWith<'a> customConverters
+                         let meta = result.Content |> deserializeJson<MetaFields>
                          match (document, meta) with
-                         | (Ok d, Ok m) -> DocumentExists { meta = m; content = d }
-                         | (Error e, _) -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
-                         | (_, Error e) -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                         | (Ok d, Ok m) -> DocumentExists { Meta = m; Content = d }
+                         | (Error e, _) -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
+                         | (_, Error e) -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                        | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result
                        | _        -> Unknown result

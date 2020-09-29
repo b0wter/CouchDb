@@ -10,16 +10,17 @@ open b0wter.FSharp
 
 module Info =
     type VendorInfo = {
-        name: string
+        Name: string
     }
 
     type Response = {
-        couchdb: string
-        uuid: System.Guid
-        vendor: VendorInfo
-        version: string
-        git_sha: string
-        features: string list
+        Couchdb: string
+        Uuid: System.Guid
+        Vendor: VendorInfo
+        Version: string
+        [<Newtonsoft.Json.JsonProperty("git_sha")>]
+        GitSha: string
+        Features: string list
     }
 
     type Result
@@ -31,10 +32,10 @@ module Info =
         async {
             let request = createGet props "/" []
             let! result = sendRequest request
-            return match result.statusCode with
-                    | Some 200 -> match deserializeJson<Response> result.content with
+            return match result.StatusCode with
+                    | Some 200 -> match deserializeJson<Response> result.Content with
                                   | Ok response -> Success response
-                                  | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                                  | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | _ -> Unknown result
         }
         

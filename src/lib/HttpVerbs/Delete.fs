@@ -51,15 +51,15 @@ module Delete =
                 let queryParams = [ StringQueryParameter("rev", docRev) :> BaseQueryParameter ]
                 let request = createDelete props url queryParams
                 let! result = sendRequest request
-                return match result.statusCode with
+                return match result.StatusCode with
                         | Some 200 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Result.Ok response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 202 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.statusCode, sprintf "Reason: %s%sJson:%s" e.reason System.Environment.NewLine e.json, result.headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 400 -> BadRequest result
                         | Some 401 -> Unauthorized result
                         | Some 404 -> NotFound result

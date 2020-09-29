@@ -10,44 +10,55 @@ open b0wter.FSharp
 
 module DbsInfo =
     type Cluster = {
-        n: int
-        q: int
-        r: int
-        w: int
+        N: int
+        Q: int
+        R: int
+        W: int
     }
 
     type Other = {
-        data_size: int
+        [<Newtonsoft.Json.JsonProperty("data_size")>]
+        DataSize: int
     }
 
     type Sizes = {
-        active: int
-        external: int
-        file: int
+        Active: int
+        External: int
+        File: int
     }
 
     type Info = {
-        cluster: Cluster
-        compact_running: bool
-        data_size: int
-        db_name: string
-        disk_format_version: int
-        disk_size: int
-        doc_count: int
-        doc_del_count: int
-        instance_start_time: string
-        purge_seq: string
-        sizes: Sizes
-        update_seq: string
+        Cluster: Cluster
+        [<Newtonsoft.Json.JsonProperty("compact_running")>]
+        CompactRunning: bool
+        [<Newtonsoft.Json.JsonProperty("data_size")>]
+        DataSize: int
+        [<Newtonsoft.Json.JsonProperty("db_name")>]
+        DbName: string
+        [<Newtonsoft.Json.JsonProperty("disk_format_version")>]
+        DiskFormatVersion: int
+        [<Newtonsoft.Json.JsonProperty("disk_size")>]
+        DiskSize: int
+        [<Newtonsoft.Json.JsonProperty("doc_count")>]
+        DocCount: int
+        [<Newtonsoft.Json.JsonProperty("doc_del_count")>]
+        DocDelCount: int
+        [<Newtonsoft.Json.JsonProperty("instance_start_time")>]
+        InstanceStartTime: string
+        [<Newtonsoft.Json.JsonProperty("purge_seq")>]
+        PurgeSeq: string
+        Sizes: Sizes
+        [<Newtonsoft.Json.JsonProperty("update_seq")>]
+        UpdateSeq: string
     }
 
     type Response = {
-        key: string 
-        info: Info option
+        Key: string 
+        Info: Info option
     }
 
     type MultipleNames = {
-        keys: string list
+        Keys: string list
     }
 
     type Result
@@ -75,15 +86,15 @@ module DbsInfo =
             if names.IsEmpty then
                 return KeyError <| RequestResult.create (None, "You have not supplied database names. No query was sent to the server.")
             else
-                let payload = { keys = names}
+                let payload = { Keys = names}
                 let request = createJsonPost props "_dbs_info" payload []
                 let! result = sendRequest request 
-                return match result.statusCode with
-                        | Some 200 -> match deserializeJson result.content with
+                return match result.StatusCode with
+                        | Some 200 -> match deserializeJson result.Content with
                                       | Ok r -> Success r
-                                      | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
-                        | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
-                        | _   -> Unknown <| RequestResult.createWithHeaders (result.statusCode, result.content, result.headers)
+                                      | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
+                        | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.StatusCode, result.Content, result.Headers)
+                        | _   -> Unknown <| RequestResult.createWithHeaders (result.StatusCode, result.Content, result.Headers)
         }
         
     /// Returns the result from the query as a generic `FSharp.Core.Result`.

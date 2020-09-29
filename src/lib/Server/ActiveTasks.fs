@@ -13,17 +13,17 @@ module ActiveTasks =
 
     type Task = {
         [<JsonProperty("chandes_done")>]
-        changesDone: int
-        database: string
-        pid: string 
-        progress: int
+        ChangesDone: int
+        Database: string
+        Pid: string 
+        Progress: int
         [<JsonProperty("started_on")>]
-        startedOn: uint64
+        StartedOn: uint64
         [<JsonProperty("total_changes")>]
-        totalChanges: int
+        TotalChanges: int
         ``type``: string
         [<JsonProperty("updated_on")>]
-        updatedOn: uint64       
+        UpdatedOn: uint64       
     }
 
     type Response = Task list
@@ -38,10 +38,10 @@ module ActiveTasks =
         async {
             let request = createGet props "_active_tasks" []
             let! result = sendRequest request
-            return match result.statusCode with
-                    | Some 200 -> match deserializeJson result.content with
+            return match result.StatusCode with
+                    | Some 200 -> match deserializeJson result.Content with
                                   | Ok r -> Success r
-                                  | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                                  | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | Some 401 -> Unauthorized result
                     | _ -> Unknown result
         }

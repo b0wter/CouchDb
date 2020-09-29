@@ -10,9 +10,9 @@ open b0wter.FSharp
 
 module AddDocument =
     type Response = {
-        id: string
-        ok: bool
-        rev: string
+        Id: string
+        Ok: bool
+        Rev: string
     }
 
     type Result
@@ -38,15 +38,15 @@ module AddDocument =
             if obj |> isNull then return DocumentIsNull <| RequestResult.create(None, "The document you supplied is null. No query has been sent to the server.") else
             let request = createJsonPost props dbName obj []
             let! result = sendRequest request 
-            match result.statusCode with
+            match result.StatusCode with
             | Some 201 | Some 202 ->
-                return match deserializeJson<Response> result.content with
+                return match deserializeJson<Response> result.Content with
                         | Ok o -> Created o
-                        | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                        | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
             | Some 401 -> return Unauthorized result
             | Some 404 -> return DbDoesNotExist result
             | Some 409 -> return DocumentIdConflict result
-            | x -> return Unknown <| RequestResult.createWithHeaders (x, result.content, result.headers)
+            | x -> return Unknown <| RequestResult.createWithHeaders (x, result.Content, result.Headers)
         }
 
     /// Returns the result from the query as a generic `FSharp.Core.Result`.

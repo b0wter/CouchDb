@@ -6,12 +6,12 @@ module JsonDeserializationError =
     /// Wraps an error reason and the corresponding json in a record.
     /// </summary>
     type T = {
-        json: string
-        reason: string
+        Json: string
+        Reason: string
     }
     
     let create (json, reason) =
-        { json = json; reason = reason }
+        { Json = json; Reason = reason }
     
     let asString (t: T) =
-        sprintf "Error: %s%sJson:%s%s" t.reason System.Environment.NewLine System.Environment.NewLine t.json
+        sprintf "Error: %s%sJson:%s%s" t.Reason System.Environment.NewLine System.Environment.NewLine t.Json

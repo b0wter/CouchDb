@@ -24,11 +24,11 @@ module DbsInfo =
                 //           when run on Azure DevOps so I had to remove it.
 
                 let validateInfo (response: Server.DbsInfo.Response) =
-                    match response.info with
+                    match response.Info with
                     | Some info ->
-                        info.db_name |> should not' <| be NullOrEmptyString
-                        info.disk_format_version |> should be (greaterThan 0)
-                    | None -> failwith <| sprintf "The response does not contain a proper Info instance for database: '%s'." response.key
+                        info.DbName |> should not' <| be NullOrEmptyString
+                        info.DiskFormatVersion |> should be (greaterThan 0)
+                    | None -> failwith <| sprintf "The response does not contain a proper Info instance for database: '%s'." response.Key
                     
                 do match Initialization.createDatabases [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously with Ok _ -> () | Error e -> failwith e
                     
@@ -40,9 +40,9 @@ module DbsInfo =
                 | Server.DbsInfo.Result.KeyError _ ->
                     failwith "Returned a KeyError where a Success was expected."
                 | Server.DbsInfo.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.Content
                 | Server.DbsInfo.Result.Unknown f ->
-                    failwith <| sprintf "Returned a Failure where a Success was expected. Reason: %s" f.content
+                    failwith <| sprintf "Returned a Failure where a Success was expected. Reason: %s" f.Content
             }
             
         [<Fact>]
@@ -52,11 +52,11 @@ module DbsInfo =
                 match result with
                 | Server.DbsInfo.Result.Success s ->
                     do s.Length |> should equal 2
-                    do s |> Array.forall (fun x -> x.info.IsNone) |> should be True
-                | Server.DbsInfo.Result.KeyError e -> failwith <| sprintf "Encountered a KeyError response. This request needs to set keys! Details :%s" e.content
-                | Server.DbsInfo.Result.Unknown e -> failwith <| sprintf "Encountered an error, details: %s" e.content
+                    do s |> Array.forall (fun x -> x.Info.IsNone) |> should be True
+                | Server.DbsInfo.Result.KeyError e -> failwith <| sprintf "Encountered a KeyError response. This request needs to set keys! Details :%s" e.Content
+                | Server.DbsInfo.Result.Unknown e -> failwith <| sprintf "Encountered an error, details: %s" e.Content
                 | Server.DbsInfo.Result.JsonDeserialisationError e ->
-                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.content
+                    failwith <| sprintf "The result could not be parsed:%s%s" System.Environment.NewLine e.Content
             }
             
         [<Fact>]

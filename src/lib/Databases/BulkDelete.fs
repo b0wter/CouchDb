@@ -4,6 +4,7 @@ module BulkDelete =
     
     open b0wter.CouchDb.Lib
     open b0wter.FSharp
+    open Newtonsoft.Json
     
     type Result
         /// Document(s) have been created or updated (201). *Beware*, CouchDb returns created
@@ -30,9 +31,12 @@ module BulkDelete =
         | NotFound of RequestResult.T
     
     type DeleteUpdate<'a, 'b>(id: 'a, rev: 'b) = 
-        member this._id = id
-        member this._rev = rev
-        member this._deleted = true
+        [<JsonProperty("_id")>]
+        member this.Id = id
+        [<JsonProperty("_rev")>]
+        member this.Rev = rev
+        [<JsonProperty("_deleted")>]
+        member this.Deleted = true
         
     /// This query wraps `BulkAdd.query` but requires that each doc passes the given idSetCheck and revSetCheck.
     /// This makes sure that the documents are updates not insertions.

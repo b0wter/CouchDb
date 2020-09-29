@@ -26,14 +26,14 @@ module Copy =
                 let! countDocuments = Server.DbsInfo.query Initialization.defaultDbProperties [this.DbName]
                 match countDocuments with
                 | Server.DbsInfo.Result.Success infos ->
-                    do infos.[0].info.Value.doc_count |> should equal 1
+                    do infos.[0].Info.Value.DocCount |> should equal 1
                     
                     let! copyDocument = Documents.Copy.query Initialization.defaultDbProperties this.DbName Default.defaultInstance._id None targetId None
                     match copyDocument with
                     | Documents.Copy.Result.Created c ->
-                        do c.id |> should equal targetId
-                        do c.ok |> should be True
-                        do c.rev |> should not' (be EmptyString)
+                        do c.Id |> should equal targetId
+                        do c.Ok |> should be True
+                        do c.Rev |> should not' (be EmptyString)
                     | _ -> failwith "Copy query not successful."
                         
                 | _ -> failwith "The document to copy was not added successfully. The document count is not 1."

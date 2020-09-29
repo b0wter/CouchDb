@@ -11,11 +11,11 @@ open b0wter.FSharp
 
 module Delete =
     type Response = {
-        ok: bool
+        Ok: bool
     }
 
-    let TrueCreateResult = { ok = true}
-    let FalseCreateResult = { ok = false}
+    let TrueCreateResult = { Ok = true}
+    let FalseCreateResult = { Ok = false}
     
     /// <summary>
     /// Deleted - Database removed successfully (quorum is met and database is deleted by at least one node)
@@ -37,7 +37,7 @@ module Delete =
         async {
             let request = createDelete props name []
             let! result = sendRequest request
-            let r = match result.statusCode with
+            let r = match result.StatusCode with
                     | Some 200 -> Deleted TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult
                     | Some 400 -> BadRequest result

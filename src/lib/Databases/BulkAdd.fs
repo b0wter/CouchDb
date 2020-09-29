@@ -9,30 +9,30 @@ module BulkAdd =
     open b0wter.CouchDb.Lib.Core
     
     type Success = {
-        ok: bool
-        id: string
-        rev: string 
+        Ok: bool
+        Id: string
+        Rev: string 
     }
     
     type Failure = {
-        id: string
-        error: string
-        reason: string
+        Id: string
+        Error: string
+        Reason: string
     }
 
     let failureAsString (f: Failure) =
-        sprintf "%s - %s" f.error f.reason
+        sprintf "%s - %s" f.Error f.Reason
     
     type InsertResult
         = Success of Success
         | Failure of Failure
     
-    let insertResultId ir = match ir with | Success s -> s.id | Failure f -> f.id
+    let insertResultId ir = match ir with | Success s -> s.Id | Failure f -> f.Id
     
     type Response = InsertResult list
     
     /// Checks if a `Response` contains one or more `InsertResult.Failure`.
-    let allSuccessful (r: Response) = r |> List.exists (fun x -> match x with Success s -> s.ok = false | Failure _ -> true)
+    let allSuccessful (r: Response) = r |> List.exists (fun x -> match x with Success s -> s.Ok = false | Failure _ -> true)
     
     type Result
         /// Document(s) have been created or updated (201)
@@ -51,7 +51,7 @@ module BulkAdd =
         | Unknown of RequestResult.T
         
     type DocumentContainer<'a> = {
-        docs: 'a list
+        Docs: 'a list
     }
     
     type InsertResultConverter() =
@@ -86,14 +86,14 @@ module BulkAdd =
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return DbNameMissing <| RequestResult.create(None, "You need to supply a non-null, non-whitespace database name. No query has been sent to the server.")
             else
-                let content = { docs = docs }
+                let content = { Docs = docs }
                 let url = sprintf "%s/_bulk_docs" dbName
                 let request = createJsonPost props url content []
                 let! result = sendRequest request
-                return match result.statusCode with
-                       | Some 201 -> match result.content |> deserializeJsonWith<Response> [ InsertResultConverter() :> JsonConverter ] with
+                return match result.StatusCode with
+                       | Some 201 -> match result.Content |> deserializeJsonWith<Response> [ InsertResultConverter() :> JsonConverter ] with
                                      | Ok o -> Created o
-                                     | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                                     | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                        | Some 400 -> BadRequest result
                        | Some 404 -> NotFound result
                        | Some 417 -> ExpectationFailed result

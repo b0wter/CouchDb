@@ -18,8 +18,8 @@ module AllDocuments =
                 let! result = Databases.AllDocuments.queryAll Initialization.defaultDbProperties this.DbName
                 match result with
                 | Databases.AllDocuments.Success s ->
-                    s.total_rows |> should equal 0
-                    s.rows |> should be Empty
+                    s.TotalRows |> should equal 0
+                    s.Rows |> should be Empty
                 | _ -> failwith <| sprintf "Expected Database.AllDocuments.Success but got a %s" (result.GetType().FullName)
             }
             

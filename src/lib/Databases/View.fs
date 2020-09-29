@@ -18,17 +18,17 @@ module View =
     /// A row contains a single response from a view.
     /// A view will always return a list of rows.
     type Row<'key, 'value> = {
-        id: string
-        key: 'key
-        value: 'value
+        Id: string
+        Key: 'key
+        Value: 'value
     }
 
     /// Response for a single successful query.
     type SingleResponse<'key, 'value> = {
-        offset: int
-        rows: Row<'key, 'value> list
+        Offset: int
+        Rows: Row<'key, 'value> list
         [<JsonProperty("total_rows")>]
-        totalRows: int
+        TotalRows: int
         // The `update_seq` property is missing
         // because it is dynamic.
     }
@@ -37,7 +37,7 @@ module View =
     /// deserialization code cleaner. It cannot be made private because
     /// Newtonsoft.Json does not work with private types.
     type MultiQueryResponse<'key, 'value> = {
-        results: SingleResponse<'key, 'value> list
+        Results: SingleResponse<'key, 'value> list
     }
 
     type Response<'key, 'value>
@@ -59,69 +59,69 @@ module View =
 
     /// Additional settings for a single view query.
     type SingleQueryParameters = {
-        conflicts: bool option
-        descending: bool option
+        Conflicts: bool option
+        Descending: bool option
         [<JsonProperty("end_key")>]
-        endKey: string option
+        EndKey: string option
         [<JsonProperty("end_key_doc_id")>]
-        endKeyDocId: string option
-        group: bool option
+        EndKeyDocId: string option
+        Group: bool option
         [<JsonProperty("group_level")>]
-        groupLevel: int option
+        GroupLevel: int option
         [<JsonProperty("include_docs")>]
-        includeDocs: bool option
-        attachments: bool option
+        IncludeDocs: bool option
+        Attachments: bool option
         [<JsonProperty("att_encoding_info")>]
-        attachmentEncodingInfo: bool option
+        AttachmentEncodingInfo: bool option
         [<JsonProperty("inclusive_end")>]
-        inclusiveEnd: bool option
-        keys: string list option
-        key: string option
-        limit: int option
-        reduce: bool option
-        skip: int option
-        sorted: bool option
-        stable: bool option
-        stale: string option
+        InclusiveEnd: bool option
+        Keys: string list option
+        Key: string option
+        Limit: int option
+        Reduce: bool option
+        Skip: int option
+        Sorted: bool option
+        Stable: bool option
+        Stale: string option
         [<JsonProperty("startkey")>]
-        startKey: string option
+        StartKey: string option
         [<JsonProperty("start_key_doc_id")>]
-        startKeyDocId: string option
-        update: string option
+        StartKeyDocId: string option
+        Update: string option
         [<JsonProperty("update_seq")>]
-        updateSeq: bool option
+        UpdateSeq: bool option
     }
 
     /// Instance of `SingleQueryParameters` with every property
     /// set to a default value.
     let EmptyQueryParameters = {
-        conflicts = None
-        descending = None
-        endKey = None
-        endKeyDocId = None
-        group = None
-        groupLevel = None
-        includeDocs = None
-        attachments = None
-        attachmentEncodingInfo = None
-        inclusiveEnd = None
-        keys = None
-        key = None
-        limit = None
-        reduce = None
-        skip = None
-        sorted = None
-        stable = None
-        stale = None
-        startKey = None
-        startKeyDocId = None
-        update = None
-        updateSeq = None
+        Conflicts = None
+        Descending = None
+        EndKey = None
+        EndKeyDocId = None
+        Group = None
+        GroupLevel = None
+        IncludeDocs = None
+        Attachments = None
+        AttachmentEncodingInfo = None
+        InclusiveEnd = None
+        Keys = None
+        Key = None
+        Limit = None
+        Reduce = None
+        Skip = None
+        Sorted = None
+        Stable = None
+        Stale = None
+        StartKey = None
+        StartKeyDocId = None
+        Update = None
+        UpdateSeq = None
     }
 
     /// Parameter to execute multiple queries for the given view.
     type MultiQueryParameters = {
-        queries: SingleQueryParameters list
+        Queries: SingleQueryParameters list
     }
 
     type QueryParameters
@@ -131,7 +131,7 @@ module View =
     /// Turns a `RequestResult.T` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
     let private mapError (r: RequestResult.T) =
-        match r.statusCode with
+        match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r
         | Some 404 -> NotFound r
@@ -164,20 +164,20 @@ module View =
             
             let! result = sendRequest request
             
-            if result.statusCode.IsSome && result.statusCode.Value = 200 then
-                let results = if isSingleQuery then result.content |> deserializeJson<SingleResponse<'key, JObject>> |> Result.map List.singleton
-                              else result.content |> deserializeJson<MultiQueryResponse<'key, JObject>> |> Result.map (fun x -> x.results)
+            if result.StatusCode.IsSome && result.StatusCode.Value = 200 then
+                let results = if isSingleQuery then result.Content |> deserializeJson<SingleResponse<'key, JObject>> |> Result.map List.singleton
+                              else result.Content |> deserializeJson<MultiQueryResponse<'key, JObject>> |> Result.map (fun x -> x.Results)
                 
                 return match results with
                        | Ok singles when isSingleQuery ->
-                            Ok (Response.Single (singles |> List.exactlyOne), result.statusCode, result.headers)
+                            Ok (Response.Single (singles |> List.exactlyOne), result.StatusCode, result.Headers)
                        | Ok singles ->
-                            Ok (Response.Multi singles, result.statusCode, result.headers)
+                            Ok (Response.Multi singles, result.StatusCode, result.Headers)
                        | Error e ->
-                            Error (RequestResult.createForJson(e, result.statusCode, result.headers))
+                            Error (RequestResult.createForJson(e, result.StatusCode, result.Headers))
 
             else
-                return Error <| RequestResult.createWithHeaders(result.statusCode, result.content, result.headers)
+                return Error <| RequestResult.createWithHeaders(result.StatusCode, result.Content, result.Headers)
         }
 
     /// Deserializes a `JObject` as the given `value`.
@@ -185,12 +185,12 @@ module View =
         let rec step (acc: Row<'key, 'value> list) (remaining: Row<'key, JObject> list) : FSharp.Core.Result<SingleResponse<'key, 'value>, string> =
             match remaining with
             | [] -> 
-                let r = Ok { SingleResponse.offset = response.offset; SingleResponse.totalRows = response.totalRows; SingleResponse.rows = (acc |> List.rev) }
+                let r = Ok { SingleResponse.Offset = response.Offset; SingleResponse.TotalRows = response.TotalRows; SingleResponse.Rows = (acc |> List.rev) }
                 r
-            | head :: tail -> match head.value |> Json.JObject.toObject<'value> with
-                              | Ok converted -> step ({ id = head.id; key = head.key; value = converted } :: acc) tail
+            | head :: tail -> match head.Value |> Json.JObject.toObject<'value> with
+                              | Ok converted -> step ({ Id = head.Id; Key = head.Key; Value = converted } :: acc) tail
                               | Error e -> Core.Result<SingleResponse<'key, 'value>, string>.Error e
-        step [] response.rows
+        step [] response.Rows
 
     /// Queries the given view of the design document and converts the emitted keys to `'key` and the values of the rows to `'value`.
     /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
@@ -203,7 +203,7 @@ module View =
                     match s |> mapSingleResponse with
                     | Ok mapped -> return Success (Response.Single mapped)
                     | Error e ->
-                        let error = JsonDeserializationError.create(s.rows.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
+                        let error = JsonDeserializationError.create(s.Rows.ToString(), sprintf "Error while converting `JObjects` to the actual objects: %s" e)
                         return JsonDeserializationError (RequestResult.createForJson(error, statusCode, headers))
                 | Response.Multi m ->
                     match m |> List.map mapSingleResponse |> Utilities.switchListResult with
@@ -252,8 +252,8 @@ module View =
     /// If the response is a `Response.Multi` then the items of all lists will be collected.
     let responseAsRows (response: Response<_, 'value>) : Row<'a, 'value> list =
         match response with
-        | Response.Single s -> s.rows
-        | Response.Multi m -> m |> List.collect (fun r -> r.rows)
+        | Response.Single s -> s.Rows
+        | Response.Multi m -> m |> List.collect (fun r -> r.Rows)
 
     /// Returns the response as a list of `SingleResponse`.
     /// Will return a list with a single element for a single response query.

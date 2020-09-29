@@ -6,13 +6,13 @@ module Credentials =
     /// Credentials for the CouchDb login.
     type T = {
         [<JsonProperty("name")>]
-        username: string
-        password: string
+        Username: string
+        Password: string
     }
 
     /// Creates a credentials instance.
     let create (username , password) =
-        { username = username; password = password }
+        { Username = username; Password = password }
 
     /// Represents all possible states the credentials might have.
     type CredentialStatus
@@ -27,7 +27,7 @@ module Credentials =
 
     /// Takes credentials and checks their validity.
     let validate (t: T) : CredentialStatus =
-        match (t.username |> System.String.IsNullOrWhiteSpace, t.password |> System.String.IsNullOrWhiteSpace) with
+        match (t.Username |> System.String.IsNullOrWhiteSpace, t.Password |> System.String.IsNullOrWhiteSpace) with
         | true, true -> MissingUsernameAndPassword
         | true, false -> MissingPassword
         | false, true -> MissingUsername

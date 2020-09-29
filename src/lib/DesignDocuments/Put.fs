@@ -7,8 +7,8 @@ module Put =
 
     type Result = HttpVerbs.Put.Result
 
-    let private designDocumentId (d: DesignDocument.DesignDocument) = d.id
-    let private designDocumentRev (d: DesignDocument.DesignDocument) = d.rev
+    let private designDocumentId (d: DesignDocument.DesignDocument) = d.Id
+    let private designDocumentRev (d: DesignDocument.DesignDocument) = d.Rev
 
     let query<'a> dbProps dbName (document: DesignDocument.DesignDocument) =
         async {

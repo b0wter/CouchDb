@@ -22,7 +22,7 @@ module Delete =
                 let! addResult = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev Default.defaultInstance
                 match addResult with
                 | Documents.Put.Result.Created x ->
-                    let! removeResult = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.rev
+                    let! removeResult = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.Rev
                     removeResult |> should be (ofCase <@ Documents.Delete.Result.Ok @>)
                     
                 | _ -> failwith "Adding the initial document failed."
@@ -72,14 +72,14 @@ module Delete =
                     // Set the revision and update the contents of the document.
                     // Then update it again. This will result in a new revision that we don't care about.
                     //
-                    let updatedDocument = { Default.defaultInstance with _rev = Some x.rev; myInt = 1337 }
+                    let updatedDocument = { Default.defaultInstance with _rev = Some x.Rev; myInt = 1337 }
                     let! update = Documents.Put.query Initialization.defaultDbProperties dbName getTestDocumentId getTestDocumentRev updatedDocument
                     match update with
                     | Documents.Put.Result.Created y ->
                         
                         // Delete using the old revision (from when the document was initially added, not updated).
                         //
-                        let! delete = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.rev
+                        let! delete = Documents.Delete.query Initialization.defaultDbProperties dbName Default.defaultInstance._id x.Rev
                         delete |> should be (ofCase <@ Documents.Delete.Result.Conflict @>)
                         
                     | _ -> failwith "Updating the initial document failed!"

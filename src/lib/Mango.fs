@@ -13,8 +13,8 @@ module Mango =
     /// Defines the key to sort on and the direction to sort in.
     /// </summary>
     type DirectionalSort = {
-        property: string
-        direction: SortDirection
+        Property: string
+        Direction: SortDirection
     }
 
     /// <summary>
@@ -87,13 +87,13 @@ module Mango =
     /// A single condition to check. Contains the name of the key to check, the parameter to use for comparison and the operation.
     type ConditionalOperator = {
         /// Name of the property to run condition on.
-        name: string
+        Name: string
         /// Name of the parents. This is translated into a subfield query.
         /// 
         /// See: https://docs.couchdb.org/en/stable/api/database/find.html#subfields
-        parents: string list
+        Parents: string list
         /// Contains the operation and the parameter to perform the actual comoparison.
-        operation: Condition
+        Operation: Condition
     }
     /// Combination operators are used to combine selectors. 
     /// In addition to the common boolean operators found in most programming languages, 
@@ -133,16 +133,18 @@ module Mango =
     /// If you need multiple operators use a `CombinationOperator`.
     /// </summary>
     and Expression = {
-        selector: Operator
-        limit: int option
-        skip: int option
-        sort: Sorting option
-        use_index: string list option
-        r: int
-        bookmark: string option
-        update: bool option
-        stable: bool option
-        execution_stats: bool option
+        Selector: Operator
+        Limit: int option
+        Skip: int option
+        Sort: Sorting option
+        [<Newtonsoft.Json.JsonProperty("use_index")>]
+        UseIndex: string list option
+        R: int
+        Bookmark: string option
+        Update: bool option
+        Stable: bool option
+        [<Newtonsoft.Json.JsonProperty("execution_stats")>]
+        ExecutionStats: bool option
         (* Currently not supported:
             - fields
             - stale
@@ -152,27 +154,27 @@ module Mango =
     /// Creates an <see cref="Expression"/> with default settings for all fields but the selector.
     let createExpression (operator: Operator) =
         {
-            selector = operator
-            limit = None
-            skip = None
-            sort = None
-            use_index = None
-            r = 1
-            bookmark = None
-            update = None
-            stable = None
-            execution_stats = None
+            Selector = operator
+            Limit = None
+            Skip = None
+            Sort = None
+            UseIndex = None
+            R = 1
+            Bookmark = None
+            Update = None
+            Stable = None
+            ExecutionStats = None
         }
 
     let createExpressionWithLimit (operator: Operator) (limit: int) =
-        { selector = operator; limit = Some limit; skip = None; sort = None; use_index = None; 
-          r = 1; bookmark = None ; update = None; stable = None; execution_stats = None }
+        { Selector = operator; Limit = Some limit; Skip = None; Sort = None; UseIndex = None; 
+          R = 1; Bookmark = None ; Update = None; Stable = None; ExecutionStats = None }
         
     let conditionWithParents parents field operation =
         Conditional {
-            ConditionalOperator.name = field;
-            ConditionalOperator.parents = parents;
-            ConditionalOperator.operation = operation
+            ConditionalOperator.Name = field;
+            ConditionalOperator.Parents = parents;
+            ConditionalOperator.Operation = operation
         }
         
     let condition =

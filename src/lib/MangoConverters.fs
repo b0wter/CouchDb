@@ -46,7 +46,7 @@ module MangoConverters =
 
     let private conditionalOperatorToJObject (c: ConditionalOperator) =
         let object = JObject()
-        let jProperty = match c.operation with
+        let jProperty = match c.Operation with
                         | Less x                    -> dataTypeAndNameToJProperty x "$lt"
                         | LessOrEqual x             -> dataTypeAndNameToJProperty x "$lte"
                         | Equal x                   -> dataTypeAndNameToJProperty x "$eq"
@@ -84,7 +84,7 @@ module MangoConverters =
             let jObject = castValue |> conditionalOperatorToJObject
 
             let parentJObject = JObject()
-            do parentJObject.Add(castValue.name, jObject)
+            do parentJObject.Add(castValue.Name, jObject)
             do parentJObject.WriteTo(writer)
 
 
@@ -93,7 +93,7 @@ module MangoConverters =
             match o with
             | Combinator combinator -> combinator |> combinationToJObject
             | Conditional conditional -> let elementSelector = conditional |> conditionalOperatorToJObject
-                                         let name = if conditional.parents.IsEmpty then conditional.name else System.String.Join(".", conditional.parents |> Seq.ofList) + "." + conditional.name
+                                         let name = if conditional.Parents.IsEmpty then conditional.Name else System.String.Join(".", conditional.Parents |> Seq.ofList) + "." + conditional.Name
                                          if System.String.IsNullOrWhiteSpace(name) then
                                              elementSelector
                                          else

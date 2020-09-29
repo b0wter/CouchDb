@@ -25,19 +25,19 @@ module BulkDelete =
                 let! allDocs = Databases.AllDocuments.queryAllAsResult Initialization.defaultDbProperties this.DbName
                 match allDocs with
                 | Ok o ->
-                    do o.rows |> should haveLength 3
-                    let idsAndRevs = [id1; id2; id3] |> List.map (fun id -> (id, (o.rows |> List.find (fun row -> row.id = id)).value.Value.rev))
+                    do o.Rows |> should haveLength 3
+                    let idsAndRevs = [id1; id2; id3] |> List.map (fun id -> (id, (o.Rows |> List.find (fun row -> row.Id = id)).Value.Value.Rev))
                     
                     let! deleteMany = Databases.BulkDelete.query Initialization.defaultDbProperties this.DbName (System.String.IsNullOrWhiteSpace >> not) (System.String.IsNullOrWhiteSpace >> not) idsAndRevs
                     do deleteMany |> should be (ofCase <@ Databases.BulkDelete.Result.Created @>)
                     
                     let! documentCountCheck = Server.DbsInfo.queryAsResult Initialization.defaultDbProperties [this.DbName]
+
                     match documentCountCheck with
                     | Ok o ->
-                        do o.[0].info.Value.doc_count |> should equal 0
-                        do o.[0].info.Value.doc_del_count |> should equal 3
+                        do o.[0].Info.Value.DocCount |> should equal 0
+                        do o.[0].Info.Value.DocDelCount |> should equal 3
                     | Error e ->
                         failwith (e |> ErrorRequestResult.asString)
                 | Error e -> failwith (e |> ErrorRequestResult.asString)
             }
-

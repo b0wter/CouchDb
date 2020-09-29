@@ -9,10 +9,10 @@ module DbProperties =
 
     /// Contains all information necessary to connect to a CouchDb instance.
     type T = {
-        credentials: Credentials.T
-        host: string
-        port: int
-        connectionType: ConnectionType
+        Credentials: Credentials.T
+        Host: string
+        Port: int
+        ConnectionType: ConnectionType
     }
 
     /// Contains all possible states of a `DbProperties.T` instance.
@@ -28,13 +28,13 @@ module DbProperties =
         | (h, _) when System.String.IsNullOrWhiteSpace(h) -> HostIsEmpty
         | _ ->
             {
-                credentials = credentials
-                host = host
-                port = port
-                connectionType = connectionType
+                Credentials = credentials
+                Host = host
+                Port = port
+                ConnectionType = connectionType
             } |> Valid
 
     /// Uses the `connectionType`, `host` and `port` fields to create base url for a CouchDb server.
     let baseEndpoint (t: T) =
-        let protocol = match t.connectionType with | Http -> "http" | Https -> "https"
-        sprintf "%s://%s:%i/" protocol t.host t.port
+        let protocol = match t.ConnectionType with | Http -> "http" | Https -> "https"
+        sprintf "%s://%s:%i/" protocol t.Host t.Port

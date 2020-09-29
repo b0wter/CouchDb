@@ -23,10 +23,10 @@ module Infos =
             if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createGet props name []
             let! result = sendRequest request
-            return match result.statusCode with
-                    | Some 200 -> match deserializeJson result.content with
+            return match result.StatusCode with
+                    | Some 200 -> match deserializeJson result.Content with
                                     | Ok r -> Success r
-                                    | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.statusCode, result.headers)
+                                    | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | Some 404 -> NotFound result
                     | _ -> Unknown result
         }

@@ -36,7 +36,7 @@ module Initialization =
             | Server.Authenticate.Result.Found _ -> return true 
             | Server.Authenticate.Result.Unauthorized _ -> return failwith "Unknown username/password"
             | Server.Authenticate.Result.JsonDeserialisationError _ -> return failwith "JsonDeserialization of the servers response failed."
-            | Server.Authenticate.Result.Unknown x -> return failwith <| sprintf "Unkown error occured: %s" x.content
+            | Server.Authenticate.Result.Unknown x -> return failwith <| sprintf "Unkown error occured: %s" x.Content
         }
         
     /// <summary>
@@ -51,19 +51,19 @@ module Initialization =
                 let deleteResult = dbNames |> List.map (fun name ->
                     async {
                         match! Databases.Delete.query defaultDbProperties name with
-                        | Databases.Delete.Result.Deleted deleted -> return deleted.ok
-                        | Databases.Delete.Result.Accepted deleted -> return deleted.ok
-                        | Databases.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.content
-                        | Databases.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.content
-                        | Databases.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.content
-                        | Databases.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.content
+                        | Databases.Delete.Result.Deleted deleted -> return deleted.Ok
+                        | Databases.Delete.Result.Accepted deleted -> return deleted.Ok
+                        | Databases.Delete.Result.Unauthorized x -> return failwith <| sprintf "Could not delete database, authorization missing. Details: %s" x.Content
+                        | Databases.Delete.Result.Unknown x -> return failwith <| sprintf "Could not delete database, encountered an unknown error. Details: %s" x.Content
+                        | Databases.Delete.Result.NotFound x -> return failwith <| sprintf "Could not delete database because of an NotFound error. Details: %s" x.Content
+                        | Databases.Delete.Result.BadRequest x -> return failwith <| sprintf "Could not delete database because of an BadRequest error. Details: %s" x.Content
                     })
                 let! deleteResult = Async.Parallel deleteResult
                 return deleteResult |> Array.forall ((=) true)
             | Server.AllDbs.Result.JsonDeserialisationError f ->
-                return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed: %s%s" System.Environment.NewLine f.content
+                return failwith <| sprintf "Database deletion was probably successfull but the response could not be parsed: %s%s" System.Environment.NewLine f.Content
             | Server.AllDbs.Result.Unknown f ->
-                return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.content
+                return failwith <| sprintf "Could not prepare the database because the database names could not be retrieved. Reason: %s" f.Content
         }
         
     /// <summary>
@@ -74,10 +74,10 @@ module Initialization =
             let queries = names |> List.map (fun name ->
                 async {
                     match! Databases.Create.query defaultDbProperties name [] with
-                    | Databases.Create.Result.Unauthorized x ->  return Error (sprintf "[%s] %s: %s" name "unauthorized" x.content)
-                    | Databases.Create.Result.AlreadyExists x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
-                    | Databases.Create.Result.InvalidDbName x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
-                    | Databases.Create.Result.Unknown x ->       return Error (sprintf "[%s] %s: %s" name "unknown" x.content)
+                    | Databases.Create.Result.Unauthorized x ->  return Error (sprintf "[%s] %s: %s" name "unauthorized" x.Content)
+                    | Databases.Create.Result.AlreadyExists x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.Content)
+                    | Databases.Create.Result.InvalidDbName x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.Content)
+                    | Databases.Create.Result.Unknown x ->       return Error (sprintf "[%s] %s: %s" name "unknown" x.Content)
                     | Databases.Create.Result.Accepted _ ->      return Ok true
                     | Databases.Create.Result.Created _ ->       return Ok true
                 })

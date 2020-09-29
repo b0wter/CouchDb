@@ -12,9 +12,9 @@ open b0wter.FSharp
 module Put =
 
     type Response = {
-        id: string
-        ok: bool
-        rev: string
+        Id: string
+        Ok: bool
+        Rev: string
     }
     
     type Result
@@ -52,15 +52,15 @@ module Put =
                                   | None -> []
                 let request = createCustomJsonPut props url converters document queryParams
                 let! result = sendRequest request
-                return match result.statusCode with
+                return match result.StatusCode with
                         | Some 201 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | Ok response -> Created response
-                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 201, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 201, result.Headers)
                         | Some 202 ->
-                            match deserializeJsonWith [] result.content with
+                            match deserializeJsonWith [] result.Content with
                             | Ok response -> Accepted response
-                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 202, result.headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, Some 202, result.Headers)
                         | Some 400 -> BadRequest result
                         | Some 401 -> Unauthorized result
                         | Some 404 -> NotFound result
