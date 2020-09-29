@@ -40,7 +40,7 @@ Databases endpoint
 | /db                     | ✔️    | ✔️   | ✔️    | ✔️   | ✔️      |
 | /db/_all_docs           |      | ✔️   | ✔️    |     |        |
 | /db/_design_docs        |      | ✔️   | ✔️    |     |        |
-| /db/_bulk_get (*)       |      |     | ❌   |     |        |
+| /db/_bulk_get (*)       |      |     | 🚫   |     |        |
 | /db/_bulk_docs          |      |     | ✔️    |     |        |
 | /db/_find               |      |     | ✔️    |     |        |
 | /db/_index              |      | ❌  | ❌   |     | ❌     |
