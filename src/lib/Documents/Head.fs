@@ -7,6 +7,8 @@ module Head =
 
     type Result = HttpVerbs.Head.Result
 
+    type Response = HttpVerbs.Head.Response
+
     let query dbProps dbName id =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
@@ -17,3 +19,5 @@ module Head =
         }
 
     let queryAsResult dbProps dbName id = query dbProps dbName id |> Async.map HttpVerbs.Head.asResult
+
+    let asResult = HttpVerbs.Head.asResult

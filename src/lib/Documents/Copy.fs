@@ -7,6 +7,8 @@ module Copy =
 
     type Result = HttpVerbs.Copy.Result
 
+    type Response = HttpVerbs.Copy.Response
+
     let query<'a> (props: DbProperties.T) (dbName: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
@@ -17,3 +19,5 @@ module Copy =
         }
 
     let queryAsResult dbProps dbName docId docRev destinationId destinationRev = query dbProps dbName docId docRev destinationId destinationRev |> Async.map HttpVerbs.Copy.asResult
+
+    let asResult = HttpVerbs.Copy.asResult

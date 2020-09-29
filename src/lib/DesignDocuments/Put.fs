@@ -7,6 +7,8 @@ module Put =
 
     type Result = HttpVerbs.Put.Result
 
+    type Response = HttpVerbs.Put.Response
+
     let private designDocumentId (d: DesignDocument.DesignDocument) = d.Id
     let private designDocumentRev (d: DesignDocument.DesignDocument) = d.Rev
 

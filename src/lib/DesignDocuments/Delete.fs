@@ -7,6 +7,8 @@ module Delete =
 
     type Result = HttpVerbs.Delete.Result
 
+    type Response = HttpVerbs.Delete.Response
+
     let query<'a> dbProps dbName docId (docRev: string) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
@@ -17,3 +19,5 @@ module Delete =
         }
 
     let queryAsResult dbProps dbName docId (docRev: string) = query dbProps dbName docId docRev |> Async.map HttpVerbs.Delete.asResult
+
+    let asResult = HttpVerbs.Delete.asResult

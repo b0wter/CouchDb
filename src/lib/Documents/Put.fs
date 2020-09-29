@@ -7,6 +7,8 @@ module Put =
 
     type Result = HttpVerbs.Put.Result
 
+    type Response = HttpVerbs.Put.Response
+
     let query<'a> dbProps dbName docId docRev document =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then

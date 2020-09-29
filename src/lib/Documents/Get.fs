@@ -7,6 +7,8 @@ module Get =
 
     type Result<'a> = HttpVerbs.Get.Result<'a>
 
+    type Response<'a> = HttpVerbs.Get.Response<'a>
+
     let queryWith<'a> dbProps dbName id queryParameters customConverters =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
@@ -21,3 +23,5 @@ module Get =
     let queryAsResultWith dbProps dbName id queryParameters customConverters = queryWith dbProps dbName id queryParameters customConverters |> Async.map HttpVerbs.Get.asResult
 
     let queryAsResult dbProps dbName id queryParameters = query dbProps dbName id queryParameters |> Async.map HttpVerbs.Get.asResult
+
+    let asResult = HttpVerbs.Get.asResult
