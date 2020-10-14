@@ -166,7 +166,7 @@ module Mango =
             ExecutionStats = None
         }
 
-    let createExpressionWithLimit (operator: Operator) (limit: int) =
+    let createExpressionWithLimit (limit: int) (operator: Operator) =
         { Selector = operator; Limit = Some limit; Skip = None; Sort = None; UseIndex = None; 
           R = 1; Bookmark = None ; Update = None; Stable = None; ExecutionStats = None }
         
