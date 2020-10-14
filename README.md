@@ -25,10 +25,10 @@ Features
 Note that (optional) query parameter are currently *not supported*! Even for endpoints that are marked as working. Query parameters that are required (like the `rev` parameter for `/db/docid/` `[PUT]`) are supported.
 
 | Authentication | Status |
-|--------|--------|
-| Cookie | ✔️      |
-| Basic  | ❌      |
-| Proxy  | ❌      |
+|----------------|--------|
+| Cookie         | ✔️      |
+| Basic          | ❌     |
+| Proxy          | ❌     |
 
 There are currently no plans to support the other two authentication methods. If you feel like you need them please open an issue or (better) open a pull request.
 
@@ -43,7 +43,7 @@ Databases endpoint
 | /db/_bulk_get (*)       |      |     | 🚫   |     |        |
 | /db/_bulk_docs          |      |     | ✔️    |     |        |
 | /db/_find               |      |     | ✔️    |     |        |
-| /db/_index              |      | ❌  | ❌   |     | ❌     |
+| /db/_index (**)         |      | ⚠️   | ✔️    |     | ❌     |
 | /db/_explain            |      |     | ❌   |     |        |
 | /db/_shards             |      | ❌  |      |     |        |
 | /db/_shards/doc         |      | ❌  |      |     |        |
@@ -61,6 +61,7 @@ Databases endpoint
 | /db/_revs_limit         |      | ❌  |      | ❌  |        |
 
 _(*) `/db/_bulk_get` is not implemented because `POST /{db}/_all_docs` is implemented and serves the same purpose._
+_(**) `GET /db/_index` currently only returns a `JObject` for the `partial_filter_selector` property in the response._
 
 Server endpoint
 ---------------
@@ -70,40 +71,40 @@ Server endpoint
 | /_active_tasks              |      | ✔️   |      |     |        |
 | /_all_dbs                   |      | ✔️   |      |     |        |
 | /_dbs_info                  |      |     | ✔️    |     |        |
-| /_cluster_setup             |      | ❌   | ❌    |     |        |
-| /_db_updates                |      | ❌   |      |     |        |
-| /_membership                |      | ❌   |      |     |        |
-| /_replicate                 |      |     | ❌    |     |        |
-| /_scheduler/jobs            |      | ❌   |      |     |        |
-| /_scheduler/docs            |      | ❌   |      |     |        |
-| /_node/{node-name}/_stats   |      | ❌   |      |     |        |
-| /_node/{node-name}/_system  |      | ❌   |      |     |        |
-| /_node/{node-name}/_restart |      |     | ❌    |     |        |
-| /_utils                     |      | ❌   |      |     |        |
-| /_up                        |      | ❌   |      |     |        |
-| /_uuids                     |      | ❌   |      |     |        |
-| /favicon.ico                |      | ❌   |      |     |        |
+| /_cluster_setup             |      | ❌  | ❌   |     |        |
+| /_db_updates                |      | ❌  |      |     |        |
+| /_membership                |      | ❌  |      |     |        |
+| /_replicate                 |      |     | ❌   |     |        |
+| /_scheduler/jobs            |      | ❌  |      |     |        |
+| /_scheduler/docs            |      | ❌  |      |     |        |
+| /_node/{node-name}/_stats   |      | ❌  |      |     |        |
+| /_node/{node-name}/_system  |      | ❌  |      |     |        |
+| /_node/{node-name}/_restart |      |     | ❌   |     |        |
+| /_utils                     |      | ❌  |      |     |        |
+| /_up                        |      | ❌  |      |     |        |
+| /_uuids                     |      | ❌  |      |     |        |
+| /favicon.ico                |      | ❌  |      |     |        |
 
 
 Documents endpoint
 ------------------
 | Endpoint           | HEAD | GET | POST | PUT | DELETE | COPY |
 |--------------------|------|-----|------|-----|--------|------|
-| /db/doc            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️   |
-| /db/doc/attachment | ❌    | ❌   | ❌    | ❌   | ❌      |      |
+| /db/doc            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️    |
+| /db/doc/attachment | ❌   | ❌  | ❌   | ❌  | ❌     |      |
 
 Design Documents endpoint
 -------------------------
 | Endpoint                                          | HEAD | GET | POST | PUT | DELETE | COPY |
 |---------------------------------------------------|------|-----|------|-----|--------|------|
-| /db/_design/design-doc                            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️   |
-| /db/_design/design-doc/attachment                 | ❌    | ❌   |      | ❌   | ❌      |      |
-| /db/_design/design-doc/_info                      | ❌    |     |      |     |        |      |
-| /db/_design/design-doc/_view/view-name            |      | ✔️   | ✔️   |     |        |      |
-| /db/_design/design-doc/_search/index-name         |      | ❌   |      |     |        |      |
-| /db/_design/design-doc/_search_info/index-name    |      | ❌   |      |     |        |      |
-| /db/_design/design-doc/_update/update-name        |      |     | ❌    |     |        |      |
-| /db/_design/design-doc/_update/update-name/doc-id |      |     |      | ❌   |        |      |
+| /db/_design/design-doc                            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️    |
+| /db/_design/design-doc/attachment                 | ❌   | ❌  |      | ❌  | ❌     |      |
+| /db/_design/design-doc/_info                      | ❌   |     |      |     |        |      |
+| /db/_design/design-doc/_view/view-name            |      | ✔️   | ✔️    |     |        |      |
+| /db/_design/design-doc/_search/index-name         |      | ❌  |      |     |        |      |
+| /db/_design/design-doc/_search_info/index-name    |      | ❌  |      |     |        |      |
+| /db/_design/design-doc/_update/update-name        |      |     | ❌   |     |        |      |
+| /db/_design/design-doc/_update/update-name/doc-id |      |     |      | ❌  |        |      |
 
 
 The `show`, `list` and `rewrite` functions for design documents will not be implemented since the feature will be removed with CouchDb 4.0.
