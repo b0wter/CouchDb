@@ -11,6 +11,8 @@ trigger:
     exclude:
       - '*.md'
       - '*.MD'
+      - 'README.md'
+      - 'SECURITY.md'
       - '.gitignore'
 
 pool:
