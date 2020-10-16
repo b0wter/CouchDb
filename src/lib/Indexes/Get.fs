@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Databases
+namespace b0wter.CouchDb.Lib.Indexes
 
 //
 // Queries: /{db}/_index [POST]
@@ -11,7 +11,7 @@ open Newtonsoft.Json.Linq
 open Newtonsoft.Json
 open System.Collections.Generic
 
-module GetIndices =
+module Get =
 
     type SortOrder
         = Ascending

@@ -40,9 +40,11 @@
     <Compile Include="Databases/BulkAdd.fs" />
     <Compile Include="Databases/BulkUpdate.fs" />
     <Compile Include="Databases/BulkDelete.fs" />
-    <Compile Include="Databases/CreateIndex.fs" />
-    <Compile Include="Databases/GetIndices.fs" />
-    <Compile Include="Databases/DeleteIndex.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Indexes/Create.fs" />
+    <Compile Include="Indexes/Get.fs" />
+    <Compile Include="Indexes/Delete.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HttpVerbs/Head.fs" />

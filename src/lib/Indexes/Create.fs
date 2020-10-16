@@ -1,4 +1,4 @@
-namespace b0wter.CouchDb.Lib.Databases
+namespace b0wter.CouchDb.Lib.Indexes
 
 //
 // Queries: /{db}/_index [POST]
@@ -10,7 +10,7 @@ open b0wter.FSharp
 open Newtonsoft.Json.Linq
 open Newtonsoft.Json
 
-module CreateIndex =
+module Create =
 
     type Index = {
         /// Field names following the sort syntax. Nested fields are also allowed, e.g. “person.name”.
@@ -34,6 +34,7 @@ module CreateIndex =
         /// Indexes can be grouped into design documents for efficiency. 
         /// However, a change to one index in a design document will invalidate 
         /// all other indexes in the same document (similar to views).
+        [<JsonProperty("ddoc")>]
         DDoc: string option
         /// Name of the index. If no name is provided, 
         /// a name will be generated automatically.
@@ -100,7 +101,9 @@ module CreateIndex =
             let! result = sendRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJson result.Content with
-                                    | Ok r -> Success r
+                                    | Ok r -> 
+                                        do printfn "%A" r
+                                        Success r
                                     | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | Some 400 -> BadRequest result
                     | Some 404 -> NotFound result
