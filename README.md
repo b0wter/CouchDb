@@ -61,6 +61,7 @@ Databases endpoint
 | /db/_revs_limit         |      | ❌  |      | ❌  |        |
 
 _(*) `/db/_bulk_get` is not implemented because `POST /{db}/_all_docs` is implemented and serves the same purpose._
+
 _(**) `GET /db/_index` currently only returns a `JObject` for the `partial_filter_selector` property in the response._
 
 Server endpoint
