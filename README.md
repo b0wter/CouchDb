@@ -43,7 +43,7 @@ Databases endpoint
 | /db/_bulk_get (*)       |      |     | 🚫   |     |        |
 | /db/_bulk_docs          |      |     | ✔️    |     |        |
 | /db/_find               |      |     | ✔️    |     |        |
-| /db/_index (**)         |      | ⚠️   | ✔️    |     | ❌     |
+| /db/_index (**)         |      | ⚠️   | ✔️    |     | ✔️      |
 | /db/_explain            |      |     | ❌   |     |        |
 | /db/_shards             |      | ❌  |      |     |        |
 | /db/_shards/doc         |      | ❌  |      |     |        |
