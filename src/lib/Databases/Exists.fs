@@ -13,8 +13,8 @@ module Exists =
     type Result
         = Exists
         | DoesNotExist
-        | DbNameMissing of RequestResult.T
-        | Unknown of RequestResult.T
+        | DbNameMissing of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {

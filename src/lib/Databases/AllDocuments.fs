@@ -26,11 +26,11 @@ module AllDocuments =
 
     type Result
         = Success of Response
-        | BadRequest of RequestResult.T
-        | Unauthorized of RequestResult.T
-        | NotFound of RequestResult.T
-        | JsonDeserialisationError of RequestResult.T
-        | Unknown of RequestResult.T
+        | BadRequest of RequestResult.TString
+        | Unauthorized of RequestResult.TString
+        | NotFound of RequestResult.TString
+        | JsonDeserialisationError of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     type KeyCollection = {
         Keys: string list

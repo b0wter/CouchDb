@@ -23,23 +23,23 @@ module Copy =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Read or write privileges required (401)
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Specified database or document ID or revision doesn’t exists (404)
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of RequestResult.T
+        | Conflict of RequestResult.TString
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
         /// Json deserialization failed
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
         /// This endpoint requires the document id of the destination to be set.
-        | DestinationIdMissing of RequestResult.T
+        | DestinationIdMissing of RequestResult.TString
         /// This endpoint requires the document id to be set.
-        | DocumentIdMissing of RequestResult.T
+        | DocumentIdMissing of RequestResult.TString
     
     /// The COPY (which is non-standard HTTP) copies an existing document to a new or existing document.
     /// Copying a document is only possible within the same database.

@@ -7,15 +7,24 @@ module RequestResult =
     
     type Headers = Map<string, string>
     type StatusCode = int option
+
+    /// <summary>
+    /// Wraps a status code and a response body (byte array) as a record.
+    /// </summary>
+    type TBinary = {
+        StatusCode: StatusCode
+        Content: byte array
+        Headers: Headers
+    }
     
     /// <summary>
     /// Wraps a status code and a response body (string) as a record.
     /// </summary>
-    type T = {
+    type TString = {
         StatusCode: StatusCode
         Content: string
         Headers: Headers
-    }       
+    }
         
     /// Creates a RequestResult for a http response (which contains all information).
     let createWithHeaders (code: StatusCode, content: string, headers: Headers) =

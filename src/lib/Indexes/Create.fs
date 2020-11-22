@@ -72,20 +72,20 @@ module Create =
     type Result
         = Success of Response
         /// Invalid request
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Admin permission required
-        | NotAuthorized of RequestResult.T
+        | NotAuthorized of RequestResult.TString
         /// Execution error
-        | InternalServerError of RequestResult.T
+        | InternalServerError of RequestResult.TString
         /// The given database does not exist.
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// A client side error occured while trying to deserialize an incoming response.
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// You tried to make a query without a database name or with an empty database name.
         /// This error occurs locally. No requests have been sent to the server.
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
         /// Catch-all for unhandled error cases.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
 
     /// Create a new index on a database.
     /// Mango is a declarative JSON querying language for CouchDB databases. 

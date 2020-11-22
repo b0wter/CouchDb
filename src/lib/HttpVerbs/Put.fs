@@ -23,21 +23,21 @@ module Put =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Write privileges required (401)
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of RequestResult.T
+        | Conflict of RequestResult.TString
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
         /// Json deserialization failed
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
         /// This endpoint requires the document id to be set.
-        | DocumentIdMissing of RequestResult.T
+        | DocumentIdMissing of RequestResult.TString
 
     /// Unlike the POST /{db}, you must specify the document ID in the request URL.
     /// When updating an existing document, the current document revision must be included in the document 

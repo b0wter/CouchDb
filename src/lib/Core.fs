@@ -27,7 +27,7 @@ module Core =
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.T> =
+    let sendRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TString> =
         async {
             try 
                 let! response = request
@@ -44,6 +44,29 @@ module Core =
                 let message = ex |> Exception.foldMessages
                 return RequestResult.create(None, message)
         }
+
+    /// <summary>
+    /// Sends a pre-made request and performs basic error handling.
+    /// </summary>
+    (*
+    let sendBinaryRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TBinary> =
+        async {
+            try 
+                let! response = request
+                let status = response.StatusCode |> int
+                let! content = response.Content.ReadAsByteArrayAsync() |> Async.AwaitTask 
+                let headers = response.Headers |> Seq.map (fun x -> (x.Key, System.String.Join(",", x.Value))) |> Map.ofSeq
+                return {
+                    RequestResult.TBinary.StatusCode = Some status
+                    RequestResult.TBinary.Content = content
+                    RequestResult.TBinary.Headers = headers
+                }
+            with
+            | ex ->
+                let message = ex |> Exception.foldMessages
+                return RequestResult.create(None, message)
+        }
+    *)
 
     /// <summary>
     /// Wraps a status code and string contents. This may represent a success as well as an error.
@@ -125,6 +148,16 @@ module Core =
     let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
         createCustomJsonPost p path [] content queryParameters
         
+    /// <summary>
+    /// Creates a POST request containing a binary payload.
+    /// </summary>
+    let createBinaryPut (p: DbProperties.T) (path: HttpPath) (content: byte array) (queryParameters: QueryParameters) =
+        let queryParameters = queryParameters |> formatQueryParameters 
+        let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
+        let request = new HttpRequestMessage(HttpMethod.Put, url)
+        do request.Content <- new ByteArrayContent(content)
+        DefaultClient.SendAsync(request) |> Async.AwaitTask
+
     /// <summary>
     /// Creates a COPY request without a body (this is a custom HTTP method defined by CouchDb).
     /// </summary>

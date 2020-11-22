@@ -69,6 +69,13 @@
     <Compile Include="DesignDocuments/Copy.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attachments/Head.fs" />
+    <Compile Include="Attachments/Get.fs" />
+    <Compile Include="Attachments/Put.fs" />
+    <Compile Include="Attachments/Delete.fs" />
+    <Compile Include="Attachments/Copy.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
     <PackageReference Include="FifteenBelow.Json.Core" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="*" />

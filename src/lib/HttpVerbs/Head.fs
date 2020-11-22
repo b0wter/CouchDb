@@ -31,23 +31,27 @@ module Head =
         /// <summary>
         /// Read privilege required
         /// </summary>
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// <summary>
         /// Document not found>
         /// </summary>
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
+        /// <summary>
+        /// An additional parameter is missing.
+        /// </summary>
+        | ParameterIsMissing of RequestResult.TString
         /// <summary>
         /// Is returned before querying the db if the id is null.
         /// </summary>
-        | DocumentIdMissing of RequestResult.T
+        | DocumentIdMissing of RequestResult.TString
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation.
         /// </summary>
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
         
     /// <summary>
     /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
@@ -90,7 +94,7 @@ module Head =
     let asResult (r: Result) =
         match r with
         | DocumentExists x | NotModified x -> Ok x
-        | NotFound e | Unauthorized e | DbNameMissing e | DocumentIdMissing e | Unknown e ->
+        | NotFound e | Unauthorized e | DbNameMissing e | ParameterIsMissing e | DocumentIdMissing e | Unknown e ->
             Error <| ErrorRequestResult.fromRequestResultAndCase(e, r)
             
     /// Runs query followed by asResult.

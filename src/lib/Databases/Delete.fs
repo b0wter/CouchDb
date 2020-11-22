@@ -28,10 +28,10 @@ module Delete =
     type Result
         = Deleted of Response
         | Accepted of Response
-        | NotFound of RequestResult.T
-        | BadRequest of RequestResult.T
-        | Unauthorized of RequestResult.T
-        | Unknown of RequestResult.T
+        | NotFound of RequestResult.TString
+        | BadRequest of RequestResult.TString
+        | Unauthorized of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {

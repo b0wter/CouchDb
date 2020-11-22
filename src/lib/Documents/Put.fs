@@ -14,7 +14,7 @@ module Put =
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
             else
-                let url = (sprintf "%s/%s" dbName (document |> docId |> string)) 
+                let url = sprintf "%s/%s" dbName (document |> docId |> string)
                 return! HttpVerbs.Put.query<'a> dbProps url [] docId docRev document
         }
 

@@ -19,7 +19,7 @@ module DeleteIndex =
 
         let createFieldIndex dbName : Async<Result<Indexes.Create.Response, string>> = 
             async {
-                let errorAsString (r: RequestResult.T) = sprintf "Could not initialise a index deletion test because the respons was: %i - %s" (r.StatusCode |?| 0)  r.Content 
+                let errorAsString (r: RequestResult.TString) = sprintf "Could not initialise a index deletion test because the respons was: %i - %s" (r.StatusCode |?| 0)  r.Content 
 
                 let index = Indexes.Create.createFieldsIndex [ "myField" ]
                 let queryParameters = { Indexes.Create.EmptyQueryParameters with Index = index; Name = Some indexName; DDoc = Some dDocName }

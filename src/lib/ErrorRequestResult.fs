@@ -13,12 +13,12 @@ module ErrorRequestResult =
         Case: string
     }
     
-    /// Creates an `ErrorRequestResult.T`.
+    /// Creates an `ErrorRequestResult.TString`.
     let create (statusCode, content, headers, case) =
         { StatusCode = statusCode; Content = content; Headers = headers; Case = case }
     
-    /// Creates an `ErrorRequestResult.T` from a `RequestResult.T` and a case name.
-    let fromRequestResult (r: RequestResult.T, case) =
+    /// Creates an `ErrorRequestResult.TString` from a `RequestResult.TString` and a case name.
+    let fromRequestResult (r: RequestResult.TString, case) =
         {
             StatusCode = r.StatusCode
             Content = r.Content
@@ -26,9 +26,9 @@ module ErrorRequestResult =
             Case = case
         }
         
-    /// Creates an `ErrorRequestResult.T` from a `RequestResult.T` and a case.
+    /// Creates an `ErrorRequestResult.TString` from a `RequestResult.TString` and a case.
     /// Uses `getUnionCaseName` to retrieve the case name.
-    let fromRequestResultAndCase<'a>(r: RequestResult.T, case: 'a) =
+    let fromRequestResultAndCase<'a>(r: RequestResult.TString, case: 'a) =
         let caseName = case |> getUnionCaseName 
         fromRequestResult(r, caseName)
         

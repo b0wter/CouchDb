@@ -29,8 +29,9 @@ module Default =
         
     let create(id, myInt, myFirstString, mySecondString, myFloat, myDate) =
         createWithRev(id, None, myInt, myFirstString, mySecondString, myFloat, myDate)
-    
-    let defaultInstance = create ("c8cb91dc-1121-43de-a858-0742327ff158", 42, "foo", "bar", 1.38064852, System.DateTime(2000, 8, 1, 12, 0, 0))
+
+    let defaultInstanceId = "c8cb91dc-1121-43de-a858-0742327ff158"
+    let defaultInstance = create (defaultInstanceId, 42, "foo", "bar", 1.38064852, System.DateTime(2000, 8, 1, 12, 0, 0))
     
     let compareWithoutRev (a: T) (b: T) =
         a._id |> should equal b._id

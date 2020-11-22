@@ -13,8 +13,8 @@ module AllDbs =
 
     type Result
         = Success of Response
-        | JsonDeserialisationError of RequestResult.T
-        | Unknown of RequestResult.T
+        | JsonDeserialisationError of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     /// <summary>
     /// Returns a list of strings containing the names of all databases.

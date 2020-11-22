@@ -25,8 +25,8 @@ module Info =
 
     type Result
         = Success of Response
-        | JsonDeserialisationError of RequestResult.T
-        | Unknown of RequestResult.T
+        | JsonDeserialisationError of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) : Async<Result> =
         async {

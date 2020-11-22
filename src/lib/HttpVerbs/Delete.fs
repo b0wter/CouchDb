@@ -19,23 +19,23 @@ module Delete =
         /// Request was accepted, but changes are not yet stored on disk (202)
         | Accepted of Response 
         /// Json deserialization failed
-        | JsonDeserialisationError of RequestResult.T
+        | JsonDeserialisationError of RequestResult.TString
         /// Document id is empty
-        | DocumentIdEmpty of RequestResult.T
+        | DocumentIdEmpty of RequestResult.TString
         /// Document rev is empty
-        | DocumentRevEmpty of RequestResult.T
+        | DocumentRevEmpty of RequestResult.TString
         /// The database name is empty.
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.T 
+        | BadRequest of RequestResult.TString 
         /// Write privileges required (401)
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// Specified revision is not the latest for target document (409)
-        | Conflict of RequestResult.T
+        | Conflict of RequestResult.TString
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
     
     /// Marks the specified document as deleted by adding a field _deleted with the value true.
     /// Documents with this field will not be returned within requests anymore, but stay in the database.

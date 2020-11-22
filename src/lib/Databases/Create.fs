@@ -25,10 +25,10 @@ module Create =
     type Result
         = Created of Response
         | Accepted of Response
-        | InvalidDbName of RequestResult.T
-        | Unauthorized of RequestResult.T
-        | AlreadyExists of RequestResult.T
-        | Unknown of RequestResult.T
+        | InvalidDbName of RequestResult.TString
+        | Unauthorized of RequestResult.TString
+        | AlreadyExists of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let TrueCreateResult = { Ok = true}
     let FalseCreateResult = { Ok = false}

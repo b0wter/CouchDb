@@ -27,11 +27,11 @@ module Authenticate =
         /// Redirect after successful authentication (302)
         | Found of Response
         /// Username or password wasn’t recognized (401)
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Deserialization of the recieved response failed.
-        | JsonDeserialisationError of RequestResult.T
+        | JsonDeserialisationError of RequestResult.TString
         /// Response could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
         
     /// <summary>
     /// Sends an authentication request to the database.

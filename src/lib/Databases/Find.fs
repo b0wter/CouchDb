@@ -47,22 +47,22 @@ module Find =
         /// Request completed successfully
         = Success of Response<'a>
         /// Invalid request
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Read permission required
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Query execution error
-        | QueryExecutionError of RequestResult.T
+        | QueryExecutionError of RequestResult.TString
         /// The database with the given name could not be found.
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// If the local deserialization of the servers response failed.
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// If the response from the server could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
 
 
-    /// Turns a `RequestResult.T` into an actual `Result<'a>`.
+    /// Turns a `RequestResult.TString` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
-    let private mapError (r: RequestResult.T) =
+    let private mapError (r: RequestResult.TString) =
         match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r

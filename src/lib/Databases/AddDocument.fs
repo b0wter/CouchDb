@@ -21,17 +21,17 @@ module AddDocument =
         /// Document data accepted, but not yet stored on disk
         | Accepted of Response
         /// Write privileges required
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// Database doesn’t exist
-        | DbDoesNotExist of RequestResult.T
+        | DbDoesNotExist of RequestResult.TString
         /// A Conflicting Document with same ID already exists
-        | DocumentIdConflict of RequestResult.T
+        | DocumentIdConflict of RequestResult.TString
         /// A local json deserialization error occured.
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// `obj` is null
-        | DocumentIsNull of RequestResult.T
+        | DocumentIsNull of RequestResult.TString
         /// Returned if the response could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) (dbName: string) (obj: obj) =
         async {

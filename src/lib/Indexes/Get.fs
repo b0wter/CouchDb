@@ -69,13 +69,13 @@ module Get =
 
     type Result
         = Success of Response
-        | NotFound of RequestResult.T
-        | BadRequest of RequestResult.T
-        | Unauthorized of RequestResult.T
-        | InternalServerError of RequestResult.T
-        | JsonDeserializationError of RequestResult.T
-        | DbNameMissing of RequestResult.T
-        | Unknown of RequestResult.T
+        | NotFound of RequestResult.TString
+        | BadRequest of RequestResult.TString
+        | Unauthorized of RequestResult.TString
+        | InternalServerError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.TString
+        | DbNameMissing of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     /// When you make a `GET` request to `/db/_index`, you get a list of all indexes in the database. 
     /// In addition to the information available through this API, 

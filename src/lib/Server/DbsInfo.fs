@@ -70,13 +70,13 @@ module DbsInfo =
         /// <summary>
         /// Returned if the keys-field is missing or the number of requested keys exceeded the server's maximum allowed number of keys.
         /// </summary>
-        | KeyError of RequestResult.T
+        | KeyError of RequestResult.TString
         /// Returned if the local deserialization of the response failed.
-        | JsonDeserialisationError of RequestResult.T
+        | JsonDeserialisationError of RequestResult.TString
         /// <summary>
         /// Generic error case. Refer to the status code and reason for more details.
         /// </summary>
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
 
     /// <summary>
     /// Returns detailed information for all databases (`names` parameter).

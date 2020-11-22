@@ -30,9 +30,9 @@ module ActiveTasks =
 
     type Result
         = Success of Response
-        | Unauthorized of RequestResult.T
-        | JsonDeserializationError of RequestResult.T
-        | Unknown of RequestResult.T
+        | Unauthorized of RequestResult.TString
+        | JsonDeserializationError of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) : Async<Result> =
         async {

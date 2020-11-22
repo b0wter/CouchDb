@@ -47,15 +47,15 @@ module View =
     type Result<'key, 'value>
         = Success of Response<'key, 'value>
         /// Invalid request
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Read permission required
-        | Unauthorized of RequestResult.T
+        | Unauthorized of RequestResult.TString
         /// The database with the given name could not be found.
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// If the local deserialization of the servers response failed.
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// If the response from the server could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
 
     /// Additional settings for a single view query.
     type SingleQueryParameters = {
@@ -128,9 +128,9 @@ module View =
         = Single of SingleQueryParameters
         | Multi of MultiQueryParameters
 
-    /// Turns a `RequestResult.T` into an actual `Result<'a>`.
+    /// Turns a `RequestResult.TString` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
-    let private mapError (r: RequestResult.T) =
+    let private mapError (r: RequestResult.TString) =
         match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r
@@ -150,7 +150,7 @@ module View =
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
     /// The `JOject` has a single property named `docs` that contains a list of `JObjects`.
-    let private jObjectsQuery<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.T>> =
+    let private jObjectsQuery<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.TString>> =
         async {
             let isSingleQuery = match queryParameters with | Single _ -> true | Multi _ -> false
             let url = if isSingleQuery then

@@ -38,17 +38,17 @@ module BulkAdd =
         /// Document(s) have been created or updated (201)
         = Created of Response
         /// The request provided invalid JSON data (400)
-        | BadRequest of RequestResult.T
+        | BadRequest of RequestResult.TString
         /// Occurs when at least one document was rejected by a validation function (417)
-        | ExpectationFailed of RequestResult.T
+        | ExpectationFailed of RequestResult.TString
         /// Occurs when the local deserialization of a response failed.
-        | JsonDeserializationError of RequestResult.T
+        | JsonDeserializationError of RequestResult.TString
         /// Requested database does not exist
-        | NotFound of RequestResult.T
+        | NotFound of RequestResult.TString
         /// Occurs of the database name is null or empty. No request has been sent to the server.
-        | DbNameMissing of RequestResult.T
+        | DbNameMissing of RequestResult.TString
         /// Occurs if response could not be interpreted.
-        | Unknown of RequestResult.T
+        | Unknown of RequestResult.TString
         
     type DocumentContainer<'a> = {
         Docs: 'a list

@@ -12,10 +12,10 @@ module Infos =
 
     type Result
         = Success of Server.DbsInfo.Info
-        | NotFound of RequestResult.T
-        | JsonDeserializationError of RequestResult.T
-        | DbNameMissing of RequestResult.T
-        | Unknown of RequestResult.T
+        | NotFound of RequestResult.TString
+        | JsonDeserializationError of RequestResult.TString
+        | DbNameMissing of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     /// Retrieves information of a single database.
     let query (props: DbProperties.T) (name: string) : Async<Result> =

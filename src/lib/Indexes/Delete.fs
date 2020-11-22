@@ -21,15 +21,15 @@ module Delete =
     
     type Result
         = Deleted of Response
-        | MissingDbName of RequestResult.T
-        | MissingDesignDocName of RequestResult.T
-        | InvalidDesignDocName of RequestResult.T
-        | MissingIndexName of RequestResult.T
-        | NotFound of RequestResult.T
-        | BadRequest of RequestResult.T
-        | Unauthorized of RequestResult.T
-        | InternalServerError of RequestResult.T
-        | Unknown of RequestResult.T
+        | MissingDbName of RequestResult.TString
+        | MissingDesignDocName of RequestResult.TString
+        | InvalidDesignDocName of RequestResult.TString
+        | MissingIndexName of RequestResult.TString
+        | NotFound of RequestResult.TString
+        | BadRequest of RequestResult.TString
+        | Unauthorized of RequestResult.TString
+        | InternalServerError of RequestResult.TString
+        | Unknown of RequestResult.TString
 
     let query (props: DbProperties.T) (dbName: string) (designDocumentName: string) (indexName: string) : Async<Result> =
         async {
