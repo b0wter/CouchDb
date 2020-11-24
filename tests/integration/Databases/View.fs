@@ -44,9 +44,9 @@ module View =
                         do responses.TotalRows |> should equal 3
                         do responses.Rows.Length |> should equal 3
                     | Error e ->
-                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
                 | Error e ->
-                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
             }
 
         [<Fact>]
@@ -65,9 +65,9 @@ module View =
                             do response.TotalRows |> should equal 3
                             do response.Rows.Length |> should equal 3)
                     | Error e ->
-                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
                 | Error e ->
-                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
             }
 
         [<Fact>]
@@ -87,7 +87,7 @@ module View =
                         do response.TotalRows |> should equal 3 
                         do response.Rows.Length |> should equal 2
                     | Error e ->
-                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                        failwith (sprintf "Could not retrieve the design document view because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
                 | Error e ->
-                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.asString e))
+                    failwith (sprintf "Could not add the design document because:%s%s" Environment.NewLine (ErrorRequestResult.textAsString e))
             }

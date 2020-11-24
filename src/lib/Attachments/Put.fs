@@ -39,20 +39,21 @@ module PutBinary =
         /// An empty attachment name was given.
         | AttachmentNameMissing of RequestResult.TString
 
+    /// Adds a binary attachment to an existing document.
     let query<'a> dbProps dbName docId docRev attachmentName attachment =
         async {
             if String.isNullOrWhiteSpace dbName then
-                return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
+                return Result.DbNameMissing <| RequestResult.createText (None, "The database name is empty. The query has not been sent to the server.")
             else if String.isNullOrWhiteSpace docId then
-                return Result.DocumentIdMissing <| RequestResult.create (None, "The document name is empty. The query has not been sent to the server.")
+                return Result.DocumentIdMissing <| RequestResult.createText (None, "The document name is empty. The query has not been sent to the server.")
             else if String.isNullOrWhiteSpace docRev then
-                return Result.DocumentRevMissing <| RequestResult.create (None, "The document rev is empty. The query has not been sent to the server.")
+                return Result.DocumentRevMissing <| RequestResult.createText (None, "The document rev is empty. The query has not been sent to the server.")
             else if String.isNullOrWhiteSpace attachmentName then
-                return Result.AttachmentNameMissing <| RequestResult.create (None, "The attachment name is empty. The query has not been sent to the server.")
+                return Result.AttachmentNameMissing <| RequestResult.createText (None, "The attachment name is empty. The query has not been sent to the server.")
             else
                 let url = sprintf "%s/%s/%s" dbName docId attachmentName
                 let request = createBinaryPut dbProps url attachment [ StringQueryParameter("rev", docRev) :> BaseQueryParameter ]
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                         | Some 201 ->
                             match deserializeJsonWith [] result.Content with

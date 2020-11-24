@@ -108,10 +108,10 @@ module Get =
     let query<'a> (props: DbProperties.T) (url: string) (id: string) (queryParameters: BaseQueryParameter list) (customConverters: Newtonsoft.Json.JsonConverter list) : Async<Result<'a>> =
         async {
             if id |> String.isNullOrWhiteSpace then
-                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
+                return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let request = createGet props url queryParameters
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                        | Some 200 | Some 304 ->
                          let document = result.Content |> deserializeJsonWith<'a> customConverters

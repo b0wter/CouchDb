@@ -12,9 +12,9 @@ module Head =
     let query dbProps dbName documentId attachmentName (revision: string option) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
-                return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
+                return Result.DbNameMissing <| RequestResult.createText (None, "The database name is empty. The query has not been sent to the server.")
             else if System.String.IsNullOrWhiteSpace(attachmentName) then
-                return Result.ParameterIsMissing <| RequestResult.create (None, "The attachmentName is empty. The query has not been sent to the server.")
+                return Result.ParameterIsMissing <| RequestResult.createText (None, "The attachmentName is empty. The query has not been sent to the server.")
             else
                 let url = sprintf "%s/%s/%s" dbName documentId attachmentName
                 let url = match revision with Some rev -> url + (sprintf "?rev=%s" (System.Web.HttpUtility.UrlEncode(rev))) | None -> url

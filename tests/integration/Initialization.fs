@@ -46,7 +46,6 @@ module Initialization =
         async {
             match! Server.AllDbs.query defaultDbProperties with
             | Server.AllDbs.Result.Success dbNames ->
-                do printfn "Found the following databases: %A" dbNames
                 if dbNames.IsEmpty then return true else
                 let deleteResult = dbNames |> List.map (fun name ->
                     async {

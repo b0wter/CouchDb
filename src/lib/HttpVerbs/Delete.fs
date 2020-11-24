@@ -25,7 +25,7 @@ module Delete =
         /// Document rev is empty
         | DocumentRevEmpty of RequestResult.TString
         /// The database name is empty.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.TString // <- this result is not returned from this module since `query` gets urls instead of db names
         /// Invalid request body or parameters (400)
         | BadRequest of RequestResult.TString 
         /// Write privileges required (401)
@@ -44,22 +44,22 @@ module Delete =
     let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string) : Async<Result> =
         async {
             if docId |> String.isNullOrWhiteSpace then
-                return DocumentIdEmpty <| RequestResult.create(None, "You need to supply a non-empty document id. The query has not been sent to the server.")
+                return DocumentIdEmpty <| RequestResult.createText(None, "You need to supply a non-empty document id. The query has not been sent to the server.")
             else if System.String.IsNullOrWhiteSpace(docRev) then
-                return DocumentRevEmpty <| RequestResult.create(None, "You need to supply a non-empty document rev. The query has not been sent to the server.")
+                return DocumentRevEmpty <| RequestResult.createText(None, "You need to supply a non-empty document rev. The query has not been sent to the server.")
             else
                 let queryParams = [ StringQueryParameter("rev", docRev) :> BaseQueryParameter ]
                 let request = createDelete props url queryParams
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                         | Some 200 ->
                             match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Result.Ok response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createTextWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 202 ->
                             match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
+                            | Error e -> JsonDeserialisationError <| RequestResult.createTextWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 400 -> BadRequest result
                         | Some 401 -> Unauthorized result
                         | Some 404 -> NotFound result

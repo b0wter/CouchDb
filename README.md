@@ -92,7 +92,7 @@ Documents endpoint
 | Endpoint           | HEAD | GET | POST | PUT | DELETE | COPY |
 |--------------------|------|-----|------|-----|--------|------|
 | /db/doc            | ✔️    | ✔️   |      | ✔️   | ✔️      | ✔️    |
-| /db/doc/attachment | ❌   | ❌  | ❌   | ❌  | ❌     |      |
+| /db/doc/attachment | ✔️    | ✔️   | ✔️    | ✔️   | ✔️      |      |
 
 Design Documents endpoint
 -------------------------

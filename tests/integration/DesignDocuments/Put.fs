@@ -42,7 +42,7 @@ module Put =
                     match check with
                     | DesignDocuments.Get.Result.DocumentExists x -> x.Content.Views.Head.Name |> should equal newViewName
                     | _ -> 
-                        let internalError = check |> DesignDocuments.Get.asResult |> function Ok _ -> "Response indicates success altough the test failed. Look into this!" | Error e -> e |> ErrorRequestResult.asString
+                        let internalError = check |> DesignDocuments.Get.asResult |> function Ok _ -> "Response indicates success altough the test failed. Look into this!" | Error e -> e |> ErrorRequestResult.textAsString
                         failwith (sprintf "The retrieval of the document (using DesignDocuments.Info) failed: %s%s" System.Environment.NewLine internalError)
                     
                     // check that there is only a single document in the database
@@ -72,7 +72,7 @@ module Put =
                     second |> should be (ofCase <@ DesignDocuments.Put.Result.Conflict @>)
 
                 | _ -> 
-                    let asResult = match DesignDocuments.Put.asResult first with Ok _ -> "Response indicates success?" | Error e -> e |> ErrorRequestResult.asString
+                    let asResult = match DesignDocuments.Put.asResult first with Ok _ -> "Response indicates success?" | Error e -> e |> ErrorRequestResult.textAsString
                     failwith (sprintf "Adding the initial document failed: %s%s%A" asResult System.Environment.NewLine Default.defaultDoc)
             }
 

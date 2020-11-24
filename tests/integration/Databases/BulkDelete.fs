@@ -38,6 +38,6 @@ module BulkDelete =
                         do o.[0].Info.Value.DocCount |> should equal 0
                         do o.[0].Info.Value.DocDelCount |> should equal 3
                     | Error e ->
-                        failwith (e |> ErrorRequestResult.asString)
-                | Error e -> failwith (e |> ErrorRequestResult.asString)
+                        failwith (e |> ErrorRequestResult.textAsString)
+                | Error e -> failwith (e |> ErrorRequestResult.textAsString)
             }

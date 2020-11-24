@@ -48,9 +48,9 @@ module Copy =
     let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) : Async<Result> =
         async {
             if destinationId |> String.isNullOrWhiteSpace then
-                return DestinationIdMissing <| RequestResult.create(None, "You need to supply a non-empty destination id. The query has not been sent to the server.")
+                return DestinationIdMissing <| RequestResult.createText(None, "You need to supply a non-empty destination id. The query has not been sent to the server.")
             else if docId |> String.isNullOrWhiteSpace then
-                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
+                return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let destination = match destinationRev with
                                   | Some rev -> sprintf "%s?rev=%s" (destinationId |> string) rev
@@ -58,16 +58,16 @@ module Copy =
                 let destinationHeader = ("Destination", destination)
                 let queryParams = match docRev with | Some rev -> [ StringQueryParameter("rev", rev)  :> BaseQueryParameter ] | None -> []
                 let request = createCopy props url queryParams [ destinationHeader ]
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                         | Some 201 ->
                             match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Created response
-                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createTextWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 202 ->
                             match deserializeJsonWith [] result.Content with
                             | FSharp.Core.Result.Ok response -> Accepted response
-                            | Error e -> JsonDeserializationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
+                            | Error e -> JsonDeserializationError <| RequestResult.createTextWithHeaders (result.StatusCode, sprintf "Reason: %s%sJson:%s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                         | Some 400 -> BadRequest <| result
                         | Some 401 -> Unauthorized <| result
                         | Some 404 -> NotFound <| result

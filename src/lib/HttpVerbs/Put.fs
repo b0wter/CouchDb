@@ -45,13 +45,13 @@ module Put =
     let query<'a> (props: DbProperties.T) (url: string) converters (docId: 'a -> string) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
         async {
             if document |> docId |> String.isNullOrWhiteSpace then
-                return DocumentIdMissing <| RequestResult.create (None, "The document id is empty. The query has not been sent to the server.")
+                return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")
             else
                 let queryParams = match document |> docRev with
                                   | Some rev -> [ StringQueryParameter("rev", rev) :> BaseQueryParameter ]
                                   | None -> []
                 let request = createCustomJsonPut props url converters document queryParams
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                         | Some 201 ->
                             match deserializeJsonWith [] result.Content with

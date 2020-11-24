@@ -1,4 +1,5 @@
 ﻿namespace b0wter.CouchDb.Lib
+open System.Text
 open QueryParameters
 
 module Core =
@@ -27,13 +28,13 @@ module Core =
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TString> =
+    let sendTextRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TString> =
         async {
             try 
                 let! response = request
                 let status = response.StatusCode |> int
                 let! content = try response.Content.ReadAsStringAsync() |> Async.AwaitTask with ex -> async { return sprintf "Reading the body threw an exception: %s" ex.Message }
-                let headers = response.Headers |> Seq.map (fun x -> (x.Key, System.String.Join(",", x.Value))) |> Map.ofSeq
+                let headers = response.Headers |> Seq.map (fun x -> (x.Key, String.Join(",", x.Value))) |> Map.ofSeq
                 return {
                     StatusCode = Some status
                     Content = content
@@ -42,31 +43,29 @@ module Core =
             with
             | ex ->
                 let message = ex |> Exception.foldMessages
-                return RequestResult.create(None, message)
+                return RequestResult.createText(None, message)
         }
-
+        
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    (*
     let sendBinaryRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TBinary> =
         async {
             try 
                 let! response = request
                 let status = response.StatusCode |> int
-                let! content = response.Content.ReadAsByteArrayAsync() |> Async.AwaitTask 
-                let headers = response.Headers |> Seq.map (fun x -> (x.Key, System.String.Join(",", x.Value))) |> Map.ofSeq
+                let! content = try response.Content.ReadAsByteArrayAsync() |> Async.AwaitTask with ex -> async { return (sprintf "Reading the body threw an exception: %s" ex.Message) |> Encoding.UTF8.GetBytes }
+                let headers = response.Headers |> Seq.map (fun x -> (x.Key, String.Join(",", x.Value))) |> Map.ofSeq
                 return {
-                    RequestResult.TBinary.StatusCode = Some status
-                    RequestResult.TBinary.Content = content
-                    RequestResult.TBinary.Headers = headers
+                    StatusCode = Some status
+                    Content = content
+                    Headers = headers
                 }
             with
             | ex ->
-                let message = ex |> Exception.foldMessages
-                return RequestResult.create(None, message)
+                let message = ex |> Exception.foldMessages |> Encoding.UTF8.GetBytes 
+                return RequestResult.createBinary(None, message)
         }
-    *)
 
     /// <summary>
     /// Wraps a status code and string contents. This may represent a success as well as an error.

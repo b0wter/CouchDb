@@ -88,7 +88,7 @@ module Find =
     let private jObjectsQuery (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             if result.StatusCode.IsSome && result.StatusCode.Value = 200 then
                 let objects = result.Content |> Json.JObject.asJObject |> Result.bind (Json.JObject.getProperty "docs") |> Result.bind Json.JObject.getJArray |> Result.bind Json.JObject.jArrayAsJObjects
                 let metadata = deserializeJson<MetaData> result.Content
@@ -103,7 +103,7 @@ module Find =
                             let requestResult = RequestResult.createForJson({e with Reason = sprintf "Error occured while deserializing the meta data: %s" e.Reason }, result.StatusCode, result.Headers)
                             Error <| requestResult
             else
-                return Error <| RequestResult.createWithHeaders(result.StatusCode, result.Content, result.Headers)
+                return Error <| RequestResult.createTextWithHeaders(result.StatusCode, result.Content, result.Headers)
         }
 
 

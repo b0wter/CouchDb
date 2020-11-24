@@ -20,9 +20,9 @@ module Infos =
     /// Retrieves information of a single database.
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
+            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createGet props name []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJson result.Content with
                                     | Ok r -> Success r

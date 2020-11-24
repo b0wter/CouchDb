@@ -38,12 +38,12 @@ module AllDocuments =
 
     let private query (request: Async<System.Net.Http.HttpResponseMessage>) =
         async {
-            let! result = (sendRequest request)
+            let! result = (sendTextRequest request)
             return match result.StatusCode with
                    | Some 200 -> 
                         match deserializeJsonWith<Response> [] result.Content with
                         | Ok r    -> Success r
-                        | Error e -> JsonDeserialisationError <| RequestResult.createWithHeaders (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.Reason System.Environment.NewLine e.Json, result.Headers)
+                        | Error e -> JsonDeserialisationError <| RequestResult.createTextWithHeaders (result.StatusCode, sprintf "Error: %s %s JSON: %s" e.Reason System.Environment.NewLine e.Json, result.Headers)
                    | Some 400     -> BadRequest <| result
                    | Some 401     -> Unauthorized <| result
                    | Some 404     -> NotFound <| result

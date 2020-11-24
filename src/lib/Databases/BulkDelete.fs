@@ -45,9 +45,9 @@ module BulkDelete =
             let ids = idsAndRevs |> List.map fst
             let revs = idsAndRevs |> List.map snd
             if ids |> List.exists (not << isIdValid) then
-                return IdCheckFailed <| RequestResult.create (None, "At least one document id failed the validation. No request has been sent to the server.")
+                return IdCheckFailed <| RequestResult.createText (None, "At least one document id failed the validation. No request has been sent to the server.")
             else if revs |> List.exists (not << isRevValid) then
-                return RevCheckFailed <| RequestResult.create (None, "At least one document rev is empty. No request has been sent to the server.")
+                return RevCheckFailed <| RequestResult.createText (None, "At least one document rev is empty. No request has been sent to the server.")
             else
                 let deleteUpdates = idsAndRevs |> List.map DeleteUpdate
                 let! result = BulkAdd.query props dbName deleteUpdates

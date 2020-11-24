@@ -35,8 +35,6 @@ module DeleteIndex =
                     // The prefix needs to be removed if you want to query CouchDb for the index name.
                     let! result = Indexes.Delete.query Initialization.defaultDbProperties this.DbName (response.Id.Replace("_design/", "")) response.Name
 
-                    do printfn "%A" result
-                    
                     result |> should be (ofCase <@ Indexes.Delete.Result.Deleted @>)
                 | Error e -> failwith <| sprintf "Could not add an index to perform the 'delete index' tests because: %s" (e.ToString())
             }

@@ -1,5 +1,6 @@
 namespace b0wter.CouchDb.Tests.Integration
 open FsUnit
+open b0wter.FSharp
 
 module Utilities =
     
@@ -41,7 +42,7 @@ module Utilities =
            do Initialization.createDatabases dbNames
               |> Async.RunSynchronously
               |> (fun x -> match x with
-                           | Ok _ -> printfn "Prefilled database is ok."
+                           | Ok _ -> ()
                            | Error e -> failwith e)
            
         /// Returns the database names that were supplied as constructor parameters.
@@ -80,7 +81,7 @@ module Utilities =
            do Initialization.createDatabases [ dbName ]
               |> Async.RunSynchronously
               |> (fun x -> match x with
-                           | Ok _ -> printfn "Prefilled database is ok."
+                           | Ok _ -> ()
                            | Error e -> failwith e)
            
         /// Returns the database names that were supplied as constructor parameters.
@@ -106,8 +107,36 @@ module Utilities =
     [<AbstractClass>]
     type PrefilledSingleDatabaseTests(dbName: string, documents: obj list) =
         inherit EmptySingleDatabaseTests (dbName)
-        let addDocument obj = Databases.AddDocument.query Initialization.defaultDbProperties dbName obj |> Async.RunSynchronously
+        let addDocument obj = Databases.AddDocument.query Initialization.defaultDbProperties dbName obj
+                              |> Async.RunSynchronously
         let result = documents |> List.map addDocument
         do result |> List.iter (should be (ofCase <@ Databases.AddDocument.Result.Created @>))
         
         member this.DbName = dbName
+
+        /// Retrieves all documents from the prefilled database.
+        member this.AllDocuments<'a> () =
+            async {
+                let id = (Mango.Id System.Guid.Empty) 
+                let selector = Mango.condition "_id" (Mango.Greater id)
+                let expression = selector |> Mango.createExpressionWithLimit System.Int32.MaxValue
+                let! result = Databases.Find.queryAsResult<'a> Initialization.defaultDbProperties dbName expression
+                match result with
+                | Ok r -> return r
+                | Error e ->
+                    return failwith (sprintf "Could not retrieve all documents from prefilled database because: %s"
+                                         (e |> ErrorRequestResult.textAsString))
+            }
+            
+        /// Assumes that the database contains a single item.
+        /// Retrieves the document and throws if there is more than one document.
+        member this.GetSingleDocument<'a> () =
+            this.AllDocuments<'a> ()
+            |> Async.map (
+                             fun r ->
+                                 if r.Docs.Length = 1 then r.Docs.[0]
+                                 else if r.Docs.Length = 0 then failwith "Tried to retrieve the single document from the database but it is empty."
+                                 else if r.Docs.Length > 1 then failwith "Tried to retrieve the single document from the database but it has more than one document."
+                                 else failwith "Getting the single document failed for unknown reasons."
+                         )
+            

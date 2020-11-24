@@ -34,17 +34,17 @@ module Delete =
     let query (props: DbProperties.T) (dbName: string) (designDocumentName: string) (indexName: string) : Async<Result> =
         async {
             if String.isNullOrWhiteSpace dbName then 
-                return MissingDbName <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.")
+                return MissingDbName <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.")
             else if String.isNullOrWhiteSpace designDocumentName then 
-                return MissingDesignDocName <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.")
+                return MissingDesignDocName <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.")
             else if String.isNullOrWhiteSpace indexName then 
-                return MissingIndexName <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.")
+                return MissingIndexName <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.")
             else if designDocumentName.StartsWith("_design/") then
-                return InvalidDesignDocName <| RequestResult.create(None, "The name of the design document stats with '_design/' which is invalid. Please remove the use only the name not the '_design/' prefix. No query has been sent to the server.")
+                return InvalidDesignDocName <| RequestResult.createText(None, "The name of the design document stats with '_design/' which is invalid. Please remove the use only the name not the '_design/' prefix. No query has been sent to the server.")
             else
                 let url = sprintf "%s/_index/%s/json/%s" dbName designDocumentName indexName
                 let request = createDelete props url []
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 let r = match result.StatusCode with
                         | Some 200 -> Deleted TrueCreateResult
                         | Some 400 -> BadRequest result

@@ -84,17 +84,17 @@ module DbsInfo =
     let query (props: DbProperties.T) (names: string list) : Async<Result> =
         async {
             if names.IsEmpty then
-                return KeyError <| RequestResult.create (None, "You have not supplied database names. No query was sent to the server.")
+                return KeyError <| RequestResult.createText (None, "You have not supplied database names. No query was sent to the server.")
             else
                 let payload = { Keys = names}
                 let request = createJsonPost props "_dbs_info" payload []
-                let! result = sendRequest request 
+                let! result = sendTextRequest request 
                 return match result.StatusCode with
                         | Some 200 -> match deserializeJson result.Content with
                                       | Ok r -> Success r
                                       | Error e -> JsonDeserialisationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
-                        | Some 400 -> KeyError <| RequestResult.createWithHeaders (result.StatusCode, result.Content, result.Headers)
-                        | _   -> Unknown <| RequestResult.createWithHeaders (result.StatusCode, result.Content, result.Headers)
+                        | Some 400 -> KeyError <| RequestResult.createTextWithHeaders (result.StatusCode, result.Content, result.Headers)
+                        | _   -> Unknown <| RequestResult.createTextWithHeaders (result.StatusCode, result.Content, result.Headers)
         }
         
     /// Returns the result from the query as a generic `FSharp.Core.Result`.

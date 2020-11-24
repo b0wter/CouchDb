@@ -31,7 +31,7 @@ module Info =
     let query (props: DbProperties.T) : Async<Result> =
         async {
             let request = createGet props "/" []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJson<Response> result.Content with
                                   | Ok response -> Success response

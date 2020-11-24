@@ -37,7 +37,7 @@ module ActiveTasks =
     let query (props: DbProperties.T) : Async<Result> =
         async {
             let request = createGet props "_active_tasks" []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJson result.Content with
                                   | Ok r -> Success r

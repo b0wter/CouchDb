@@ -12,7 +12,7 @@ module Copy =
     let query<'a> (props: DbProperties.T) (dbName: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
-                return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
+                return Result.DbNameMissing <| RequestResult.createText (None, "The database name is empty. The query has not been sent to the server.")
             else
                 let url = sprintf "%s/_design/%s" dbName (docId |> string)
                 return! HttpVerbs.Copy.query<'a> props url docId docRev destinationId destinationRev

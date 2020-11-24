@@ -12,7 +12,7 @@ module Head =
     let query dbProps dbName id =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
-                return Result.DbNameMissing <| RequestResult.create (None, "The database name is empty. The query has not been sent to the server.")
+                return Result.DbNameMissing <| RequestResult.createText (None, "The database name is empty. The query has not been sent to the server.")
             else
                 let url = (sprintf "%s/_design/%s" dbName (id |> string))
                 return! HttpVerbs.Head.query dbProps url id

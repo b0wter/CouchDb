@@ -27,7 +27,7 @@ module RequestResult =
     }
         
     /// Creates a RequestResult for a http response (which contains all information).
-    let createWithHeaders (code: StatusCode, content: string, headers: Headers) =
+    let createTextWithHeaders (code: StatusCode, content: string, headers: Headers) =
         {
             StatusCode = code
             Content = content
@@ -35,10 +35,19 @@ module RequestResult =
         }
         
     /// Creates a RequestResult for a response without headers.
-    let create (code: StatusCode, content: string) = createWithHeaders (code, content, Map.empty)
-
+    let createText (code: StatusCode, content: string) = createTextWithHeaders (code, content, Map.empty)
+    
+    let createBinaryWithHeaders (code: StatusCode, content: byte [], headers: Headers) =
+        {
+            TBinary.StatusCode = code
+            Content = content
+            Headers = headers
+        }
+    
+    let createBinary (code: StatusCode, content: byte[]) = createBinaryWithHeaders (code, content, Map.empty)
+    
     /// Creates a RequestResult whose content is specifically formatted to contain a json error.
     let createForJson (e: JsonDeserializationError.T, statusCode: StatusCode, headers) =
         let content = sprintf "JSON: %s%s%sREASON: %s%s" Environment.NewLine e.Json Environment.NewLine Environment.NewLine e.Reason
-        createWithHeaders (statusCode, content, headers)
+        createTextWithHeaders (statusCode, content, headers)
         

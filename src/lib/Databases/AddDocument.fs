@@ -35,9 +35,9 @@ module AddDocument =
 
     let query (props: DbProperties.T) (dbName: string) (obj: obj) =
         async {
-            if obj |> isNull then return DocumentIsNull <| RequestResult.create(None, "The document you supplied is null. No query has been sent to the server.") else
+            if obj |> isNull then return DocumentIsNull <| RequestResult.createText(None, "The document you supplied is null. No query has been sent to the server.") else
             let request = createJsonPost props dbName obj []
-            let! result = sendRequest request 
+            let! result = sendTextRequest request 
             match result.StatusCode with
             | Some 201 | Some 202 ->
                 return match deserializeJson<Response> result.Content with
@@ -46,7 +46,7 @@ module AddDocument =
             | Some 401 -> return Unauthorized result
             | Some 404 -> return DbDoesNotExist result
             | Some 409 -> return DocumentIdConflict result
-            | x -> return Unknown <| RequestResult.createWithHeaders (x, result.Content, result.Headers)
+            | x -> return Unknown <| RequestResult.createTextWithHeaders (x, result.Content, result.Headers)
         }
 
     /// Returns the result from the query as a generic `FSharp.Core.Result`.

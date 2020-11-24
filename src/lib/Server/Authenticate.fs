@@ -42,7 +42,7 @@ module Authenticate =
         async {
             let formData = [("name", props.Credentials.Username :> obj); ("password", props.Credentials.Password :> obj)] |> Map.ofList
             let request = createFormPost props "_session" formData []
-            let! result = sendRequest request 
+            let! result = sendTextRequest request 
             return match result.StatusCode with
                     | Some 200 | Some 302->
                         match deserializeJson<Response> result.Content with

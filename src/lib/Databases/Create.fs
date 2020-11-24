@@ -40,9 +40,9 @@ module Create =
     /// </summary>
     let query (props: DbProperties.T) (name: string) (parameters: QueryParameters) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| RequestResult.create (None, "You need to set a database name.") else
+            if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| RequestResult.createText (None, "You need to set a database name.") else
             let request = createPut props name parameters
-            let! result = (sendRequest request) 
+            let! result = (sendTextRequest request) 
             let r = match result.StatusCode with
                     | Some 201 -> Created TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult

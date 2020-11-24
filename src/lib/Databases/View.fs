@@ -162,7 +162,7 @@ module View =
                           | Single s -> createCustomJsonPost props url [] s []
                           | Multi m -> createCustomJsonPost props url [] m []
             
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             
             if result.StatusCode.IsSome && result.StatusCode.Value = 200 then
                 let results = if isSingleQuery then result.Content |> deserializeJson<SingleResponse<'key, JObject>> |> Result.map List.singleton
@@ -177,7 +177,7 @@ module View =
                             Error (RequestResult.createForJson(e, result.StatusCode, result.Headers))
 
             else
-                return Error <| RequestResult.createWithHeaders(result.StatusCode, result.Content, result.Headers)
+                return Error <| RequestResult.createTextWithHeaders(result.StatusCode, result.Content, result.Headers)
         }
 
     /// Deserializes a `JObject` as the given `value`.

@@ -95,14 +95,13 @@ module Create =
     /// **IMPORTANT**: only `json` type indices are supported.
     let query (props: DbProperties.T) (name: string) (queryParameters: QueryParameters) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
+            if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let url = sprintf "%s/_index" name
             let request = createCustomJsonPost props url [ MangoConverters.OperatorJsonConverter(false) ] queryParameters []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJson result.Content with
                                     | Ok r -> 
-                                        do printfn "%A" r
                                         Success r
                                     | Error e -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                     | Some 400 -> BadRequest result

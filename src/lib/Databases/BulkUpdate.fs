@@ -30,9 +30,9 @@ module BulkUpdate =
     let query (props: DbProperties.T) (dbName: string) (idSetCheck: 'a -> bool) (revSetCheck: 'a -> bool) (docs: 'a list) =
         async {
             if docs |> List.forall idSetCheck |> not then
-                return IdCheckFailed <| RequestResult.create (None, "The idSetCheck failed for at least one document. No request has been sent to the server.")
+                return IdCheckFailed <| RequestResult.createText (None, "The idSetCheck failed for at least one document. No request has been sent to the server.")
             else if docs |> List.forall revSetCheck |> not then
-                return RevCheckFailed <| RequestResult.create (None, "The revSetCheck failed for at least one document. No request has been sent to the server.")
+                return RevCheckFailed <| RequestResult.createText (None, "The revSetCheck failed for at least one document. No request has been sent to the server.")
             else
                 let! result = BulkAdd.query props dbName docs
                 return match result with

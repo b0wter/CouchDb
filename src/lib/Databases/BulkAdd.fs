@@ -84,12 +84,12 @@ module BulkAdd =
     let query<'a> (props: DbProperties.T) (dbName: string) (docs: 'a list) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
-                return DbNameMissing <| RequestResult.create(None, "You need to supply a non-null, non-whitespace database name. No query has been sent to the server.")
+                return DbNameMissing <| RequestResult.createText(None, "You need to supply a non-null, non-whitespace database name. No query has been sent to the server.")
             else
                 let content = { Docs = docs }
                 let url = sprintf "%s/_bulk_docs" dbName
                 let request = createJsonPost props url content []
-                let! result = sendRequest request
+                let! result = sendTextRequest request
                 return match result.StatusCode with
                        | Some 201 -> match result.Content |> deserializeJsonWith<Response> [ InsertResultConverter() :> JsonConverter ] with
                                      | Ok o -> Created o

@@ -36,7 +36,7 @@ module Delete =
     let query (props: DbProperties.T) (name: string) : Async<Result> =
         async {
             let request = createDelete props name []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             let r = match result.StatusCode with
                     | Some 200 -> Deleted TrueCreateResult
                     | Some 202 -> Accepted TrueCreateResult

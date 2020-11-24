@@ -85,10 +85,10 @@ module Get =
     /// although this is not necessary when using Mango.
     let query (props: DbProperties.T) (dbName: string) : Async<Result> =
         async {
-            if System.String.IsNullOrWhiteSpace(dbName) then return DbNameMissing <| RequestResult.create(None, "No query was sent to the server. You supplied an empty db name.") else
+            if System.String.IsNullOrWhiteSpace(dbName) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let url = sprintf "%s/_index" dbName
             let request = createGet props url []
-            let! result = sendRequest request
+            let! result = sendTextRequest request
             return match result.StatusCode with
                     | Some 200 -> match deserializeJsonWith [ FieldConverter() ] result.Content with
                                     | Ok r -> Success r
