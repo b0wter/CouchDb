@@ -19,9 +19,11 @@ module GetText =
 
     let query<'a> dbProps dbName id queryParameters = queryWith<'a> dbProps dbName id queryParameters []
 
-    let queryAsResultWith dbProps dbName docId attachmentName queryParameters customConverters = queryWith dbProps dbName docId attachmentName queryParameters customConverters |> Async.map HttpVerbs.Get.asResult
+    let queryAsResultWith dbProps dbName docId attachmentName queryParameters customConverters =
+        queryWith dbProps dbName docId attachmentName queryParameters customConverters |> Async.map HttpVerbs.Get.asResult
     
-    let queryAsResult dbProps dbName docId attachmentName queryParameters = query dbProps dbName attachmentName docId queryParameters |> Async.map HttpVerbs.Get.asResult
+    let queryAsResult dbProps dbName docId attachmentName queryParameters =
+        query dbProps dbName attachmentName docId queryParameters |> Async.map HttpVerbs.Get.asResult
 
     let asResult = HttpVerbs.Get.asResult
     
@@ -64,8 +66,10 @@ module GetBinary =
     let asResult (r: Result) : FSharp.Core.Result<Response, ErrorRequestResult.TBinary> =
         match r with
         | Success s -> Ok s
-        | NotFound e | AttachmentNameMissing e | Unauthorized e | Unknown e -> Error <| ErrorRequestResult.fromBinaryRequestResultAndCase(e, r)
+        | NotFound e | AttachmentNameMissing e | DocumentIdMissing e | Unauthorized e
+        | Unknown e -> Error <| ErrorRequestResult.fromBinaryRequestResultAndCase(e, r)
         
-    let queryWithAsResult dbProps dbName docId attachmentName queryParameters = queryWith dbProps dbName docId attachmentName queryParameters |> Async.map asResult
+    let queryWithAsResult dbProps dbName docId attachmentName queryParameters =
+        queryWith dbProps dbName docId attachmentName queryParameters |> Async.map asResult
     
     let queryAsResult dbProps dbName docId attachmentName = query dbProps dbName docId attachmentName |> Async.map asResult

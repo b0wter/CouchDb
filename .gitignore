@@ -4,3 +4,4 @@ docs/
 .ionide/
 .vscode/
 src/cli
+CouchDb.sln.DotSettings.user
