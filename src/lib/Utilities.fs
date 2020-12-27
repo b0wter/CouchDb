@@ -46,6 +46,5 @@ module Utilities =
             | TwoParameters of UrlTemplate2<'a, 'b>
             | ThreeParameters of UrlTemplate3<'a, 'b, 'c>
 
-
         let create1 (converter: 'a -> string) (url: string) (value: 'a) =
             SingleParameter { Parameter = value; ParameterToString = converter; Url = url }
