@@ -27,18 +27,18 @@ module Authenticate =
         /// Redirect after successful authentication (302)
         | Found of Response
         /// Username or password wasn’t recognized (401)
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Deserialization of the recieved response failed.
-        | JsonDeserialisationError of RequestResult.TString
+        | JsonDeserialisationError of RequestResult.StringRequestResult
         /// Response could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         
     /// <summary>
     /// Sends an authentication request to the database.
     /// The result is stored in the default cookie container so that each subsequent
     /// request is automatically authenticated.
     /// </summary>
-    let query (props: DbProperties.T) =
+    let query (props: DbProperties.DbProperties) =
         async {
             let formData = [("name", props.Credentials.Username :> obj); ("password", props.Credentials.Password :> obj)] |> Map.ofList
             let request = createFormPost props "_session" formData []

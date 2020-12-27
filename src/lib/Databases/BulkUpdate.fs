@@ -9,25 +9,25 @@ module BulkUpdate =
         /// Document(s) have been created or updated (201)
         = Created of BulkAdd.Response
         /// The request provided invalid JSON data (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Occurs when at least one document was rejected by a validation function (417)
-        | ExpectationFailed of RequestResult.TString
+        | ExpectationFailed of RequestResult.StringRequestResult
         /// Occurs when the local deserialization of a response failed.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// Occurs of the database name is null or empty. No request has been sent to the server.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Occurs if response could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         /// Returned if at least one of the documents failed the `idSetCheck`.
-        | IdCheckFailed of RequestResult.TString
+        | IdCheckFailed of RequestResult.StringRequestResult
         /// Returned if at least one of the documents failed the `revSetCheck`.
-        | RevCheckFailed of RequestResult.TString
+        | RevCheckFailed of RequestResult.StringRequestResult
         /// Requested database does not exist
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
     
     /// This query wraps `BulkAdd.query` but requires that each doc passes the given idSetCheck and revSetCheck.
     /// This makes sure that the documents are updates not insertions.
-    let query (props: DbProperties.T) (dbName: string) (idSetCheck: 'a -> bool) (revSetCheck: 'a -> bool) (docs: 'a list) =
+    let query (props: DbProperties.DbProperties) (dbName: string) (idSetCheck: 'a -> bool) (revSetCheck: 'a -> bool) (docs: 'a list) =
         async {
             if docs |> List.forall idSetCheck |> not then
                 return IdCheckFailed <| RequestResult.createText (None, "The idSetCheck failed for at least one document. No request has been sent to the server.")

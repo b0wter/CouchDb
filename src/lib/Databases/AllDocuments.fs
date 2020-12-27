@@ -26,11 +26,11 @@ module AllDocuments =
 
     type Result
         = Success of Response
-        | BadRequest of RequestResult.TString
-        | Unauthorized of RequestResult.TString
-        | NotFound of RequestResult.TString
-        | JsonDeserialisationError of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
+        | Unauthorized of RequestResult.StringRequestResult
+        | NotFound of RequestResult.StringRequestResult
+        | JsonDeserialisationError of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
     type KeyCollection = {
         Keys: string list
@@ -50,11 +50,11 @@ module AllDocuments =
                    | _            -> Unknown <| result
         }
 
-    let queryAll (props: DbProperties.T) (dbName: string) : Async<Result> =
+    let queryAll (props: DbProperties.DbProperties) (dbName: string) : Async<Result> =
         let request = createGet props (sprintf "%s/_all_docs" dbName) []
         query request
 
-    let querySelected (props: DbProperties.T) (dbName: string) (keys: string list) : Async<Result> =
+    let querySelected (props: DbProperties.DbProperties) (dbName: string) (keys: string list) : Async<Result> =
         let keyCollection = { Keys = keys }
         let request = createJsonPost props (sprintf "%s/_all_docs" dbName) keyCollection []
         query request

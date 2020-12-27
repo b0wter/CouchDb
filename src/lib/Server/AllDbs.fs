@@ -13,13 +13,13 @@ module AllDbs =
 
     type Result
         = Success of Response
-        | JsonDeserialisationError of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | JsonDeserialisationError of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
     /// <summary>
     /// Returns a list of strings containing the names of all databases.
     /// </summary>
-    let query (props: DbProperties.T) : Async<Result> =
+    let query (props: DbProperties.DbProperties) : Async<Result> =
         async { 
             let request = createGet props "_all_dbs" []
             let! result = sendTextRequest request

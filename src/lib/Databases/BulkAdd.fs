@@ -38,17 +38,17 @@ module BulkAdd =
         /// Document(s) have been created or updated (201)
         = Created of Response
         /// The request provided invalid JSON data (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Occurs when at least one document was rejected by a validation function (417)
-        | ExpectationFailed of RequestResult.TString
+        | ExpectationFailed of RequestResult.StringRequestResult
         /// Occurs when the local deserialization of a response failed.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// Requested database does not exist
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// Occurs of the database name is null or empty. No request has been sent to the server.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Occurs if response could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         
     type DocumentContainer<'a> = {
         Docs: 'a list
@@ -81,7 +81,7 @@ module BulkAdd =
         
     /// Inserts multiple documents at once. Due to how the B-tree works this is more efficient
     /// than single-document-inserts.
-    let query<'a> (props: DbProperties.T) (dbName: string) (docs: 'a list) =
+    let query<'a> (props: DbProperties.DbProperties) (dbName: string) (docs: 'a list) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then
                 return DbNameMissing <| RequestResult.createText(None, "You need to supply a non-null, non-whitespace database name. No query has been sent to the server.")

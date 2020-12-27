@@ -21,19 +21,19 @@ module AddDocument =
         /// Document data accepted, but not yet stored on disk
         | Accepted of Response
         /// Write privileges required
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Database doesn’t exist
-        | DbDoesNotExist of RequestResult.TString
+        | DbDoesNotExist of RequestResult.StringRequestResult
         /// A Conflicting Document with same ID already exists
-        | DocumentIdConflict of RequestResult.TString
+        | DocumentIdConflict of RequestResult.StringRequestResult
         /// A local json deserialization error occured.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// `obj` is null
-        | DocumentIsNull of RequestResult.TString
+        | DocumentIsNull of RequestResult.StringRequestResult
         /// Returned if the response could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
 
-    let query (props: DbProperties.T) (dbName: string) (obj: obj) =
+    let query (props: DbProperties.DbProperties) (dbName: string) (obj: obj) =
         async {
             if obj |> isNull then return DocumentIsNull <| RequestResult.createText(None, "The document you supplied is null. No query has been sent to the server.") else
             let request = createJsonPost props dbName obj []

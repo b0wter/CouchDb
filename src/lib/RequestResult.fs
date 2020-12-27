@@ -11,7 +11,7 @@ module RequestResult =
     /// <summary>
     /// Wraps a status code and a response body (byte array) as a record.
     /// </summary>
-    type TBinary = {
+    type BinaryRequestResult = {
         StatusCode: StatusCode
         Content: byte array
         Headers: Headers
@@ -20,7 +20,7 @@ module RequestResult =
     /// <summary>
     /// Wraps a status code and a response body (string) as a record.
     /// </summary>
-    type TString = {
+    type StringRequestResult = {
         StatusCode: StatusCode
         Content: string
         Headers: Headers
@@ -39,7 +39,7 @@ module RequestResult =
     
     let createBinaryWithHeaders (code: StatusCode, content: byte [], headers: Headers) =
         {
-            TBinary.StatusCode = code
+            BinaryRequestResult.StatusCode = code
             Content = content
             Headers = headers
         }
@@ -47,7 +47,7 @@ module RequestResult =
     let createBinary (code: StatusCode, content: byte[]) = createBinaryWithHeaders (code, content, Map.empty)
     
     /// Creates a RequestResult whose content is specifically formatted to contain a json error.
-    let createForJson (e: JsonDeserializationError.T, statusCode: StatusCode, headers) =
+    let createForJson (e: JsonDeserializationError.JsonDeserializationError, statusCode: StatusCode, headers) =
         let content = sprintf "JSON: %s%s%sREASON: %s%s" Environment.NewLine e.Json Environment.NewLine Environment.NewLine e.Reason
         createTextWithHeaders (statusCode, content, headers)
         

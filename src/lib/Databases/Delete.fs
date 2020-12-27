@@ -28,12 +28,12 @@ module Delete =
     type Result
         = Deleted of Response
         | Accepted of Response
-        | NotFound of RequestResult.TString
-        | BadRequest of RequestResult.TString
-        | Unauthorized of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
+        | BadRequest of RequestResult.StringRequestResult
+        | Unauthorized of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
-    let query (props: DbProperties.T) (name: string) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (name: string) : Async<Result> =
         async {
             let request = createDelete props name []
             let! result = sendTextRequest request

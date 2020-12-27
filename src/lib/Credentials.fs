@@ -4,7 +4,7 @@ module Credentials =
     open Newtonsoft.Json
 
     /// Credentials for the CouchDb login.
-    type T = {
+    type Credentials = {
         [<JsonProperty("name")>]
         Username: string
         Password: string
@@ -17,7 +17,7 @@ module Credentials =
     /// Represents all possible states the credentials might have.
     type CredentialStatus
         /// Credentials are valid, meaning they contain a username and a password.
-        = Valid of T
+        = Valid of Credentials
         /// The username is empty or missing.
         | MissingUsername
         /// The password is empty or missing.
@@ -26,7 +26,7 @@ module Credentials =
         | MissingUsernameAndPassword
 
     /// Takes credentials and checks their validity.
-    let validate (t: T) : CredentialStatus =
+    let validate (t: Credentials) : CredentialStatus =
         match (t.Username |> System.String.IsNullOrWhiteSpace, t.Password |> System.String.IsNullOrWhiteSpace) with
         | true, true -> MissingUsernameAndPassword
         | true, false -> MissingPassword

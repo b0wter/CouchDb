@@ -23,26 +23,26 @@ module Put =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Write privileges required (401)
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of RequestResult.TString
+        | Conflict of RequestResult.StringRequestResult
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Json deserialization failed
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         /// This endpoint requires the document id to be set.
-        | DocumentIdMissing of RequestResult.TString
+        | DocumentIdMissing of RequestResult.StringRequestResult
 
     /// Unlike the POST /{db}, you must specify the document ID in the request URL.
     /// When updating an existing document, the current document revision must be included in the document 
     /// (i.e. the request body), as the rev query parameter, or in the If-Match request header.
-    let query<'a> (props: DbProperties.T) (url: string) converters (docId: 'a -> string) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
+    let query<'a> (props: DbProperties.DbProperties) (url: string) converters (docId: 'a -> string) (docRev: 'a -> string option) (document: 'a) : Async<Result> =
         async {
             if document |> docId |> String.isNullOrWhiteSpace then
                 return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")

@@ -23,29 +23,29 @@ module Copy =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Read or write privileges required (401)
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Specified database or document ID or revision doesn’t exists (404)
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// Document with the specified ID already exists or specified revision is not latest for target document (409)
-        | Conflict of RequestResult.TString
+        | Conflict of RequestResult.StringRequestResult
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Json deserialization failed
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         /// This endpoint requires the document id of the destination to be set.
-        | DestinationIdMissing of RequestResult.TString
+        | DestinationIdMissing of RequestResult.StringRequestResult
         /// This endpoint requires the document id to be set.
-        | DocumentIdMissing of RequestResult.TString
+        | DocumentIdMissing of RequestResult.StringRequestResult
     
     /// The COPY (which is non-standard HTTP) copies an existing document to a new or existing document.
     /// Copying a document is only possible within the same database.
     /// If the destination of the document already exists you need to supply the `destinationRev`.
     /// If you supply a `docRev` the given revision will be copied.
-    let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) : Async<Result> =
+    let query<'a> (props: DbProperties.DbProperties) (url: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) : Async<Result> =
         async {
             if destinationId |> String.isNullOrWhiteSpace then
                 return DestinationIdMissing <| RequestResult.createText(None, "You need to supply a non-empty destination id. The query has not been sent to the server.")

@@ -30,11 +30,11 @@ module ActiveTasks =
 
     type Result
         = Success of Response
-        | Unauthorized of RequestResult.TString
-        | JsonDeserializationError of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
+        | JsonDeserializationError of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
-    let query (props: DbProperties.T) : Async<Result> =
+    let query (props: DbProperties.DbProperties) : Async<Result> =
         async {
             let request = createGet props "_active_tasks" []
             let! result = sendTextRequest request

@@ -69,13 +69,13 @@ module Get =
 
     type Result
         = Success of Response
-        | NotFound of RequestResult.TString
-        | BadRequest of RequestResult.TString
-        | Unauthorized of RequestResult.TString
-        | InternalServerError of RequestResult.TString
-        | JsonDeserializationError of RequestResult.TString
-        | DbNameMissing of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
+        | BadRequest of RequestResult.StringRequestResult
+        | Unauthorized of RequestResult.StringRequestResult
+        | InternalServerError of RequestResult.StringRequestResult
+        | JsonDeserializationError of RequestResult.StringRequestResult
+        | DbNameMissing of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
     /// When you make a `GET` request to `/db/_index`, you get a list of all indexes in the database. 
     /// In addition to the information available through this API, 
@@ -83,7 +83,7 @@ module Get =
     /// Design documents are regular documents that have an ID starting with `_design/`. 
     /// Design documents can be retrieved and modified in the same way as any other document, 
     /// although this is not necessary when using Mango.
-    let query (props: DbProperties.T) (dbName: string) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (dbName: string) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let url = sprintf "%s/_index" dbName

@@ -12,13 +12,13 @@ module Infos =
 
     type Result
         = Success of Server.DbsInfo.Info
-        | NotFound of RequestResult.TString
-        | JsonDeserializationError of RequestResult.TString
-        | DbNameMissing of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
+        | JsonDeserializationError of RequestResult.StringRequestResult
+        | DbNameMissing of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
     /// Retrieves information of a single database.
-    let query (props: DbProperties.T) (name: string) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (name: string) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createGet props name []

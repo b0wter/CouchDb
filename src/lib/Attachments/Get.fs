@@ -36,11 +36,11 @@ module GetBinary =
     
     type Result
         = Success of Response
-        | NotFound of RequestResult.TBinary
-        | Unauthorized of RequestResult.TBinary
-        | Unknown of RequestResult.TBinary
-        | DocumentIdMissing of RequestResult.TBinary
-        | AttachmentNameMissing of RequestResult.TBinary
+        | NotFound of RequestResult.BinaryRequestResult
+        | Unauthorized of RequestResult.BinaryRequestResult
+        | Unknown of RequestResult.BinaryRequestResult
+        | DocumentIdMissing of RequestResult.BinaryRequestResult
+        | AttachmentNameMissing of RequestResult.BinaryRequestResult
     
     let queryWith dbProps dbName docId attachmentName queryParameters =
         async {
@@ -63,7 +63,7 @@ module GetBinary =
         
     let query dbProps dbName docId attachmentName = queryWith dbProps dbName docId attachmentName []
         
-    let asResult (r: Result) : FSharp.Core.Result<Response, ErrorRequestResult.TBinary> =
+    let asResult (r: Result) : FSharp.Core.Result<Response, ErrorRequestResult.BinaryErrorRequestResult> =
         match r with
         | Success s -> Ok s
         | NotFound e | AttachmentNameMissing e | DocumentIdMissing e | Unauthorized e

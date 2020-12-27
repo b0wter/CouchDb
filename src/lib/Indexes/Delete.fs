@@ -21,17 +21,17 @@ module Delete =
     
     type Result
         = Deleted of Response
-        | MissingDbName of RequestResult.TString
-        | MissingDesignDocName of RequestResult.TString
-        | InvalidDesignDocName of RequestResult.TString
-        | MissingIndexName of RequestResult.TString
-        | NotFound of RequestResult.TString
-        | BadRequest of RequestResult.TString
-        | Unauthorized of RequestResult.TString
-        | InternalServerError of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | MissingDbName of RequestResult.StringRequestResult
+        | MissingDesignDocName of RequestResult.StringRequestResult
+        | InvalidDesignDocName of RequestResult.StringRequestResult
+        | MissingIndexName of RequestResult.StringRequestResult
+        | NotFound of RequestResult.StringRequestResult
+        | BadRequest of RequestResult.StringRequestResult
+        | Unauthorized of RequestResult.StringRequestResult
+        | InternalServerError of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
-    let query (props: DbProperties.T) (dbName: string) (designDocumentName: string) (indexName: string) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (dbName: string) (designDocumentName: string) (indexName: string) : Async<Result> =
         async {
             if String.isNullOrWhiteSpace dbName then 
                 return MissingDbName <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.")

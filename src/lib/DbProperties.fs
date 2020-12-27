@@ -8,8 +8,8 @@ module DbProperties =
         | Http
 
     /// Contains all information necessary to connect to a CouchDb instance.
-    type T = {
-        Credentials: Credentials.T
+    type DbProperties = {
+        Credentials: Credentials.Credentials
         Host: string
         Port: int
         ConnectionType: ConnectionType
@@ -17,7 +17,7 @@ module DbProperties =
 
     /// Contains all possible states of a `DbProperties.T` instance.
     type DbPropertiesCreateResult
-        = Valid of T
+        = Valid of DbProperties
         | HostIsEmpty
         | PortIsInvalid
 
@@ -35,6 +35,6 @@ module DbProperties =
             } |> Valid
 
     /// Uses the `connectionType`, `host` and `port` fields to create base url for a CouchDb server.
-    let baseEndpoint (t: T) =
+    let baseEndpoint (t: DbProperties) =
         let protocol = match t.ConnectionType with | Http -> "http" | Https -> "https"
         sprintf "%s://%s:%i/" protocol t.Host t.Port

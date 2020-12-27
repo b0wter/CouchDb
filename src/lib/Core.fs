@@ -28,7 +28,7 @@ module Core =
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendTextRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TString> =
+    let sendTextRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.StringRequestResult> =
         async {
             try 
                 let! response = request
@@ -49,7 +49,7 @@ module Core =
     /// <summary>
     /// Sends a pre-made request and performs basic error handling.
     /// </summary>
-    let sendBinaryRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.TBinary> =
+    let sendBinaryRequest (request: Async<HttpResponseMessage>) : Async<RequestResult.BinaryRequestResult> =
         async {
             try 
                 let! response = request
@@ -79,7 +79,7 @@ module Core =
     /// Takes a string and deserialises its content.
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
-    let deserializeJsonWith<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserializationError.T> =
+    let deserializeJsonWith<'TResult> (customConverters: Newtonsoft.Json.JsonConverter list) (content: string) : Result<'TResult, JsonDeserializationError.JsonDeserializationError> =
         try
             let result = Ok <| match customConverters with
                                | [] ->
@@ -95,7 +95,7 @@ module Core =
     /// Takes a SuccessRequestResult and deserialises its content.
     /// Returns an error result in case the deserialisation fails.
     /// </summary>
-    let deserializeJson<'TResult> (content: string) : Result<'TResult, JsonDeserializationError.T> =
+    let deserializeJson<'TResult> (content: string) : Result<'TResult, JsonDeserializationError.JsonDeserializationError> =
         deserializeJsonWith<'TResult> [] content
 
     /// <summary>
@@ -120,7 +120,7 @@ module Core =
         |> Json.postProcessing
 
     /// Creates a POST request with a form encoded payload. Allows the usage of additional `JsonConverter`s.
-    let createCustomFormPost (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
+    let createCustomFormPost (p: DbProperties.DbProperties) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
         let data = formData |> Map.toSeq |> Seq.map (fun (key, value) -> Collections.Generic.KeyValuePair<string, string>(key, value |> string))
         let queryParameters = queryParameters |> formatQueryParameters 
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
@@ -129,11 +129,11 @@ module Core =
         DefaultClient.SendAsync(request) |> Async.AwaitTask
 
     /// Creates a POST request with a form encoded payload.
-    let createFormPost (p: DbProperties.T) (path: HttpPath) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
+    let createFormPost (p: DbProperties.DbProperties) (path: HttpPath) (formData: Map<string, obj>) (queryParameters: QueryParameters) =
         createCustomFormPost p path [] formData queryParameters
 
     /// Creates a POST request containing a json serialized payload. Allows to define additional `JsonConverter`.
-    let createCustomJsonPost (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) (queryParameters: QueryParameters) =
+    let createCustomJsonPost (p: DbProperties.DbProperties) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters 
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let serialized = serializeAsJson customConverters content
@@ -144,13 +144,13 @@ module Core =
     /// <summary>
     /// Creates a POST request containing a json serialized payload.
     /// </summary>
-    let createJsonPost (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
+    let createJsonPost (p: DbProperties.DbProperties) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
         createCustomJsonPost p path [] content queryParameters
         
     /// <summary>
     /// Creates a POST request containing a binary payload.
     /// </summary>
-    let createBinaryPut (p: DbProperties.T) (path: HttpPath) (content: byte array) (queryParameters: QueryParameters) =
+    let createBinaryPut (p: DbProperties.DbProperties) (path: HttpPath) (content: byte array) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters 
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let request = new HttpRequestMessage(HttpMethod.Put, url)
@@ -160,7 +160,7 @@ module Core =
     /// <summary>
     /// Creates a COPY request without a body (this is a custom HTTP method defined by CouchDb).
     /// </summary>
-    let createCopy (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) (headers: (string * string) list) =
+    let createCopy (p: DbProperties.DbProperties) (path: HttpPath) (queryParameters: QueryParameters) (headers: (string * string) list) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = (combineUrls (p |> DbProperties.baseEndpoint) path) + queryParameters
         let method = HttpMethod("COPY")
@@ -169,14 +169,14 @@ module Core =
         DefaultClient.SendAsync(request) |> Async.AwaitTask
 
     /// Creates a PUT request without a body.
-    let createPut (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
+    let createPut (p: DbProperties.DbProperties) (path: HttpPath) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = (combineUrls (p |> DbProperties.baseEndpoint) path) + queryParameters
         let request = new HttpRequestMessage(HttpMethod.Put, url)
         DefaultClient.SendAsync(request) |> Async.AwaitTask
 
     /// Creates a PUT request with a json payload.
-    let createCustomJsonPut (p: DbProperties.T) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) (queryParameters: QueryParameters) =
+    let createCustomJsonPut (p: DbProperties.DbProperties) (path: HttpPath) (customConverters: Newtonsoft.Json.JsonConverter list) (content: 'a) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let json = serializeAsJson customConverters content
@@ -186,18 +186,18 @@ module Core =
         // Binary body?
 
     /// Creates a simple PUT request without a body.
-    let createJsonPut (p: DbProperties.T) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
+    let createJsonPut (p: DbProperties.DbProperties) (path: HttpPath) (content: obj) (queryParameters: QueryParameters) =
         createCustomJsonPut p path [] content queryParameters
 
     /// Creates a simple GET request.
-    let createGet (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
+    let createGet (p: DbProperties.DbProperties) (path: HttpPath) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let request = new HttpRequestMessage(HttpMethod.Get, url)
         DefaultClient.SendAsync(request) |> Async.AwaitTask
 
     /// Creates a simple HEAD request.
-    let createHead (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
+    let createHead (p: DbProperties.DbProperties) (path: HttpPath) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let request = new HttpRequestMessage(HttpMethod.Head, url)
@@ -206,7 +206,7 @@ module Core =
     /// <summary>
     /// Creates a simple DELETE request.
     /// </summary>
-    let createDelete (p: DbProperties.T) (path: HttpPath) (queryParameters: QueryParameters) =
+    let createDelete (p: DbProperties.DbProperties) (path: HttpPath) (queryParameters: QueryParameters) =
         let queryParameters = queryParameters |> formatQueryParameters
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let request = new HttpRequestMessage(HttpMethod.Delete, url)

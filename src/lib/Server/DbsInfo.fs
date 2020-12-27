@@ -70,18 +70,18 @@ module DbsInfo =
         /// <summary>
         /// Returned if the keys-field is missing or the number of requested keys exceeded the server's maximum allowed number of keys.
         /// </summary>
-        | KeyError of RequestResult.TString
+        | KeyError of RequestResult.StringRequestResult
         /// Returned if the local deserialization of the response failed.
-        | JsonDeserialisationError of RequestResult.TString
+        | JsonDeserialisationError of RequestResult.StringRequestResult
         /// <summary>
         /// Generic error case. Refer to the status code and reason for more details.
         /// </summary>
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
 
     /// <summary>
     /// Returns detailed information for all databases (`names` parameter).
     /// </summary>
-    let query (props: DbProperties.T) (names: string list) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (names: string list) : Async<Result> =
         async {
             if names.IsEmpty then
                 return KeyError <| RequestResult.createText (None, "You have not supplied database names. No query was sent to the server.")

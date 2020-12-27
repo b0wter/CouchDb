@@ -72,20 +72,20 @@ module Create =
     type Result
         = Success of Response
         /// Invalid request
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Admin permission required
-        | NotAuthorized of RequestResult.TString
+        | NotAuthorized of RequestResult.StringRequestResult
         /// Execution error
-        | InternalServerError of RequestResult.TString
+        | InternalServerError of RequestResult.StringRequestResult
         /// The given database does not exist.
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// A client side error occured while trying to deserialize an incoming response.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// You tried to make a query without a database name or with an empty database name.
         /// This error occurs locally. No requests have been sent to the server.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Catch-all for unhandled error cases.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
 
     /// Create a new index on a database.
     /// Mango is a declarative JSON querying language for CouchDB databases. 
@@ -93,7 +93,7 @@ module Create =
     /// Mango indexes, with index type json, are built using MapReduce Views.
     /// 
     /// **IMPORTANT**: only `json` type indices are supported.
-    let query (props: DbProperties.T) (name: string) (queryParameters: QueryParameters) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (name: string) (queryParameters: QueryParameters) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let url = sprintf "%s/_index" name

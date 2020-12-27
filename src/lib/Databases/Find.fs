@@ -47,22 +47,22 @@ module Find =
         /// Request completed successfully
         = Success of Response<'a>
         /// Invalid request
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Read permission required
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Query execution error
-        | QueryExecutionError of RequestResult.TString
+        | QueryExecutionError of RequestResult.StringRequestResult
         /// The database with the given name could not be found.
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// If the local deserialization of the servers response failed.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// If the response from the server could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
 
 
     /// Turns a `RequestResult.TString` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
-    let private mapError (r: RequestResult.TString) =
+    let private mapError (r: RequestResult.StringRequestResult) =
         match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r
@@ -85,7 +85,7 @@ module Find =
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
     /// The `JOject` has a single property named `docs` that contains a list of `JObjects`.
-    let private jObjectsQuery (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+    let private jObjectsQuery (printSerializedOperators: bool) (props: DbProperties.DbProperties) (dbName: string) (expression: Mango.Expression) =
         async {
             let request = createCustomJsonPost props (sprintf "%s/_find" dbName) [ (MangoConverters.OperatorJsonConverter(printSerializedOperators)) :> JsonConverter ] expression []
             let! result = sendTextRequest request
@@ -108,7 +108,7 @@ module Find =
 
 
     /// Is build on top of `jObjectsQuery` and uses `Json.JObject.toObjects` to deserialize the `JObject list` into a list of actual objects.
-    let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) : Async<Result<'a>> =
+    let private queryWith<'a> (printSerializedOperators: bool) (props: DbProperties.DbProperties) (dbName: string) (expression: Mango.Expression) : Async<Result<'a>> =
         async {
             match! jObjectsQuery printSerializedOperators props dbName expression with
             | Ok (o, statusCode, headers) -> 
@@ -123,18 +123,18 @@ module Find =
 
 
     /// Works like query but prints the serialized Find-Operators to stdout.
-    let queryWithOutput<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+    let queryWithOutput<'a> (props: DbProperties.DbProperties) (dbName: string) (expression: Mango.Expression) =
         queryWith<'a> true props dbName expression
 
 
     /// Queries the database using a custom-built mango expression. 
     /// If you want to print the serialized operator use `queryWithOutput` instead.
-    let query<'a> (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) =
+    let query<'a> (props: DbProperties.DbProperties) (dbName: string) (expression: Mango.Expression) =
         queryWith<'a> false props dbName expression
 
 
     /// Is build on top of `jObjectsQuery` and maps the result into a `Database.Find.Result<JObject>`.
-    let private queryJObjectsWith (printSerializedOperators: bool) (props: DbProperties.T) (dbName: string) (expression: Mango.Expression) : Async<Result<Linq.JObject>> =
+    let private queryJObjectsWith (printSerializedOperators: bool) (props: DbProperties.DbProperties) (dbName: string) (expression: Mango.Expression) : Async<Result<Linq.JObject>> =
         async {
             let! result = jObjectsQuery printSerializedOperators props dbName expression
             return match result with

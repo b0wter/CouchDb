@@ -9,7 +9,7 @@ module Copy =
 
     type Response = HttpVerbs.Copy.Response
 
-    let query<'a> (props: DbProperties.T) (dbName: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) =
+    let query<'a> (props: DbProperties.DbProperties) (dbName: string) (docId: string) (docRev: string option) (destinationId: string) (destinationRev: string option) =
         async {
             if System.String.IsNullOrWhiteSpace(dbName) then 
                 return Result.DbNameMissing <| RequestResult.createText (None, "The database name is empty. The query has not been sent to the server.")

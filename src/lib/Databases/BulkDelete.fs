@@ -14,21 +14,21 @@ module BulkDelete =
         /// BulkAdd and BulkUpdate.
         = Created of BulkAdd.Response
         /// The request provided invalid JSON data (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Occurs when at least one document was rejected by a validation function (417)
-        | ExpectationFailed of RequestResult.TString
+        | ExpectationFailed of RequestResult.StringRequestResult
         /// Occurs when the local deserialization of a response failed.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// Occurs of the database name is null or empty. No request has been sent to the server.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Occurs if response could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         /// Returned if at least one of the documents failed the `idSetCheck`.
-        | IdCheckFailed of RequestResult.TString
+        | IdCheckFailed of RequestResult.StringRequestResult
         /// Returned if at least one of the documents failed the `revSetCheck`.
-        | RevCheckFailed of RequestResult.TString
+        | RevCheckFailed of RequestResult.StringRequestResult
         /// Requested database does not exist
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
     
     type DeleteUpdate<'a, 'b>(id: 'a, rev: 'b) = 
         [<JsonProperty("_id")>]
@@ -40,7 +40,7 @@ module BulkDelete =
         
     /// This query wraps `BulkAdd.query` but requires that each doc passes the given idSetCheck and revSetCheck.
     /// This makes sure that the documents are updates not insertions.
-    let query (props: DbProperties.T) (dbName: string) (isIdValid: 'a -> bool) (isRevValid: 'b -> bool) (idsAndRevs: ('a * 'b) list) =
+    let query (props: DbProperties.DbProperties) (dbName: string) (isIdValid: 'a -> bool) (isRevValid: 'b -> bool) (idsAndRevs: ('a * 'b) list) =
         async {
             let ids = idsAndRevs |> List.map fst
             let revs = idsAndRevs |> List.map snd

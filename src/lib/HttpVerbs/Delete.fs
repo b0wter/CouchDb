@@ -19,29 +19,29 @@ module Delete =
         /// Request was accepted, but changes are not yet stored on disk (202)
         | Accepted of Response 
         /// Json deserialization failed
-        | JsonDeserialisationError of RequestResult.TString
+        | JsonDeserialisationError of RequestResult.StringRequestResult
         /// Document id is empty
-        | DocumentIdEmpty of RequestResult.TString
+        | DocumentIdEmpty of RequestResult.StringRequestResult
         /// Document rev is empty
-        | DocumentRevEmpty of RequestResult.TString
+        | DocumentRevEmpty of RequestResult.StringRequestResult
         /// The database name is empty.
-        | DbNameMissing of RequestResult.TString // <- this result is not returned from this module since `query` gets urls instead of db names
+        | DbNameMissing of RequestResult.StringRequestResult // <- this result is not returned from this module since `query` gets urls instead of db names
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.TString 
+        | BadRequest of RequestResult.StringRequestResult 
         /// Write privileges required (401)
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Specified database or document ID doesn’t exists (404)
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// Specified revision is not the latest for target document (409)
-        | Conflict of RequestResult.TString
+        | Conflict of RequestResult.StringRequestResult
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
     
     /// Marks the specified document as deleted by adding a field _deleted with the value true.
     /// Documents with this field will not be returned within requests anymore, but stay in the database.
     /// You must supply the current (latest) revision, either by using the rev parameter or by using
     /// the If-Match header to specify the revision.
-    let query<'a> (props: DbProperties.T) (url: string) (docId: string) (docRev: string) : Async<Result> =
+    let query<'a> (props: DbProperties.DbProperties) (url: string) (docId: string) (docRev: string) : Async<Result> =
         async {
             if docId |> String.isNullOrWhiteSpace then
                 return DocumentIdEmpty <| RequestResult.createText(None, "You need to supply a non-empty document id. The query has not been sent to the server.")

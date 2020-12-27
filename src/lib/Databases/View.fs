@@ -47,15 +47,15 @@ module View =
     type Result<'key, 'value>
         = Success of Response<'key, 'value>
         /// Invalid request
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Read permission required
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// The database with the given name could not be found.
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// If the local deserialization of the servers response failed.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// If the response from the server could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
 
     /// Additional settings for a single view query.
     type SingleQueryParameters = {
@@ -130,7 +130,7 @@ module View =
 
     /// Turns a `RequestResult.TString` into an actual `Result<'a>`.
     /// It will never return `Success` because that takes a `Response<'a>` as parameter.
-    let private mapError (r: RequestResult.TString) =
+    let private mapError (r: RequestResult.StringRequestResult) =
         match r.StatusCode with
         | Some 400 -> BadRequest r
         | Some 401 -> Unauthorized r
@@ -150,7 +150,7 @@ module View =
     /// The documents are not deserialized to objects but kept in a JObject list.
     /// This allows the user to perform dynamic operations.
     /// The `JOject` has a single property named `docs` that contains a list of `JObjects`.
-    let private jObjectsQuery<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.TString>> =
+    let private jObjectsQuery<'key> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Core.Result<Response<'key, JObject> * RequestResult.StatusCode * RequestResult.Headers, RequestResult.StringRequestResult>> =
         async {
             let isSingleQuery = match queryParameters with | Single _ -> true | Multi _ -> false
             let url = if isSingleQuery then
@@ -194,7 +194,7 @@ module View =
 
     /// Queries the given view of the design document and converts the emitted keys to `'key` and the values of the rows to `'value`.
     /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
-    let queryWith<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, 'value>> =
+    let queryWith<'key, 'value> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, 'value>> =
         async {
             match! jObjectsQuery props dbName designDoc view queryParameters with
             | Ok (o, statusCode, headers) -> 
@@ -216,12 +216,12 @@ module View =
 
     /// Queries the given view of the design document and converts the emitted keys to `'key` and the values of the rows to `'value`.
     /// Does not allow the definition of query parameters. Use `queryWith` instead.
-    let query<'key, 'value> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) =
+    let query<'key, 'value> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) =
         queryWith<'key, 'value> props dbName designDoc view (Single EmptyQueryParameters)
         
     /// Queries the given view of the design document and converts only the emitted keys to `'key`. The values are returned as `JObject`s.
     /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
-    let queryJObjectsWith<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
+    let queryJObjectsWith<'key> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, JObject>> =
         async {
             let! result = jObjectsQuery<'key> props dbName designDoc view queryParameters
             return match result with
@@ -231,7 +231,7 @@ module View =
 
     /// Queries the given view of the design document and converts only the emitted keys to `'key`. The values are returned as `JObject`s.
     /// Does not allow the definition of query parameters. Use `queryWith` instead.
-    let queryJObjects<'key> (props: DbProperties.T) (dbName: string) (designDoc: string) (view: string) : Async<Result<'key, JObject>> =
+    let queryJObjects<'key> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) : Async<Result<'key, JObject>> =
         queryJObjectsWith<'key> props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
 
     /// Runs `queryObjects` followed by `asResult`.

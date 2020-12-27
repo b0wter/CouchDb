@@ -133,7 +133,7 @@ There is a submodule for the _database_, _server_ and _documents_ endpoints. Eac
 Connection Details
 ------------------
 Each query takes a `DbProperties.T` argument that contains the information necessary to connect to the server. Use `b0wter.CouchDb.Lib.DbProperties.create` to create an instance.
-Note that adding credentials does not automatically authenticate you. You will have to run a `b0wter.CouchDb.Lib.Core.authenticate` request to do so. Since all HTTP requests share the same cookie container you only need to authenticate once for all subsequent requests.
+Note that adding credentials does not automatically authenticate you. You will have to run a `b0wter.CouchDb.Lib.Server.Authenticate.query` request to do so. Since all HTTP requests share the same cookie container you only need to authenticate once for all subsequent requests.
 
 Query Examples
 --------------

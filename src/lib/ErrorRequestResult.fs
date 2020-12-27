@@ -9,7 +9,7 @@ module ErrorRequestResult =
     
     /// Wraps all http information of a failed CouchDb request. The case is no longer type-safe since
     /// it's stored as a string.
-    type TString = {
+    type StringErrorRequestResult = {
         StatusCode: RequestResult.StatusCode
         Content: string
         Headers: RequestResult.Headers
@@ -21,7 +21,7 @@ module ErrorRequestResult =
         { StatusCode = statusCode; Content = content; Headers = headers; Case = case }
     
     /// Creates an `ErrorRequestResult.TString` from a `RequestResult.TString` and a case name.
-    let fromRequestResult (r: RequestResult.TString, case) =
+    let fromRequestResult (r: RequestResult.StringRequestResult, case) =
         {
             StatusCode = r.StatusCode
             Content = r.Content
@@ -31,7 +31,7 @@ module ErrorRequestResult =
         
     /// Creates an `ErrorRequestResult.TString` from a `RequestResult.TString` and a case.
     /// Uses `getUnionCaseName` to retrieve the case name.
-    let fromRequestResultAndCase<'a>(r: RequestResult.TString, case: 'a) =
+    let fromRequestResultAndCase<'a>(r: RequestResult.StringRequestResult, case: 'a) =
         let caseName = case |> getUnionCaseName 
         fromRequestResult(r, caseName)
         
@@ -39,7 +39,7 @@ module ErrorRequestResult =
     let textAsString e =
         sprintf "[%s] %s" e.Case e.Content
         
-    type TBinary = {
+    type BinaryErrorRequestResult = {
         StatusCode: RequestResult.StatusCode
         Content: byte []
         Headers: RequestResult.Headers
@@ -49,7 +49,7 @@ module ErrorRequestResult =
     let createBinary (statusCode, content, headers, case) =
         { StatusCode = statusCode; Content = content; Headers = headers; Case = case }
     
-    let fromBinaryRequestResult (r: RequestResult.TBinary, case) =
+    let fromBinaryRequestResult (r: RequestResult.BinaryRequestResult, case) =
         {
             StatusCode = r.StatusCode
             Content = r.Content
@@ -57,7 +57,7 @@ module ErrorRequestResult =
             Case = case
         }
         
-    let fromBinaryRequestResultAndCase<'a> (r: RequestResult.TBinary, case: 'a) =
+    let fromBinaryRequestResultAndCase<'a> (r: RequestResult.BinaryRequestResult, case: 'a) =
         let caseName = case |> getUnionCaseName
         fromBinaryRequestResult(r, caseName)
         

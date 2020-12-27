@@ -19,25 +19,25 @@ module PutBinary =
         /// Document data accepted, but not yet stored on disk (202)
         | Accepted of Response
         /// Invalid request body or parameters (400)
-        | BadRequest of RequestResult.TString
+        | BadRequest of RequestResult.StringRequestResult
         /// Write privileges required (401)
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// Specified database, document or attachment was not found (404)
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// Document’s revision wasn’t specified or it’s not the latest
-        | Conflict of RequestResult.TString
+        | Conflict of RequestResult.StringRequestResult
         /// Is returned before querying the db if the database name is empty.
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// Local Json deserialization failed. A response from the server was received.
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// If the result could not be interpreted.
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         /// An empty document id was given.
-        | DocumentIdMissing of RequestResult.TString
+        | DocumentIdMissing of RequestResult.StringRequestResult
         /// An empty document rev was given.
-        | DocumentRevMissing of RequestResult.TString
+        | DocumentRevMissing of RequestResult.StringRequestResult
         /// An empty attachment name was given.
-        | AttachmentNameMissing of RequestResult.TString
+        | AttachmentNameMissing of RequestResult.StringRequestResult
 
     /// Adds a binary attachment to an existing document.
     let query<'a> dbProps dbName docId docRev attachmentName attachment =

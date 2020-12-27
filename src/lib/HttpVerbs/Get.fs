@@ -72,28 +72,28 @@ module Get =
         /// <summary>
         /// Read privilege required
         /// </summary>
-        | Unauthorized of RequestResult.TString
+        | Unauthorized of RequestResult.StringRequestResult
         /// <summary>
         /// Document not found>
         /// </summary>
-        | NotFound of RequestResult.TString
+        | NotFound of RequestResult.StringRequestResult
         /// <summary>
         /// Is returned before querying the db if the database name is empty.
         /// </summary>
-        | DbNameMissing of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
         /// <summary>
         /// Is returned before querying the db if the id is null.
         /// </summary>
-        | DocumentIdMissing of RequestResult.TString
+        | DocumentIdMissing of RequestResult.StringRequestResult
         /// <summary>
         /// Is returned if the query was successful but the local deserialization failed.
         /// </summary>
-        | JsonDeserializationError of RequestResult.TString
+        | JsonDeserializationError of RequestResult.StringRequestResult
         /// <summary>
         /// Is returned if the response could not be interpreted as a case specified by the documentation
         /// or a network level error ocurred.
         /// </summary>
-        | Unknown of RequestResult.TString
+        | Unknown of RequestResult.StringRequestResult
         
     /// <summary>
     /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
@@ -105,7 +105,7 @@ module Get =
     ///
     /// The given `id` will be converted to a string using the ToString() method.
     /// </summary>
-    let query<'a> (props: DbProperties.T) (url: string) (id: string) (queryParameters: BaseQueryParameter list) (customConverters: Newtonsoft.Json.JsonConverter list) : Async<Result<'a>> =
+    let query<'a> (props: DbProperties.DbProperties) (url: string) (id: string) (queryParameters: BaseQueryParameter list) (customConverters: Newtonsoft.Json.JsonConverter list) : Async<Result<'a>> =
         async {
             if id |> String.isNullOrWhiteSpace then
                 return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")

@@ -25,10 +25,10 @@ module Create =
     type Result
         = Created of Response
         | Accepted of Response
-        | InvalidDbName of RequestResult.TString
-        | Unauthorized of RequestResult.TString
-        | AlreadyExists of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | InvalidDbName of RequestResult.StringRequestResult
+        | Unauthorized of RequestResult.StringRequestResult
+        | AlreadyExists of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
     let TrueCreateResult = { Ok = true}
     let FalseCreateResult = { Ok = false}
@@ -38,7 +38,7 @@ module Create =
     /// a-z, 0-9, _, $, (, ), +, -, /
     /// The name *must* begin with a lower-case letter.
     /// </summary>
-    let query (props: DbProperties.T) (name: string) (parameters: QueryParameters) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (name: string) (parameters: QueryParameters) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then return InvalidDbName <| RequestResult.createText (None, "You need to set a database name.") else
             let request = createPut props name parameters

@@ -13,10 +13,10 @@ module Exists =
     type Result
         = Exists
         | DoesNotExist
-        | DbNameMissing of RequestResult.TString
-        | Unknown of RequestResult.TString
+        | DbNameMissing of RequestResult.StringRequestResult
+        | Unknown of RequestResult.StringRequestResult
 
-    let query (props: DbProperties.T) (name: string) : Async<Result> =
+    let query (props: DbProperties.DbProperties) (name: string) : Async<Result> =
         async {
             if System.String.IsNullOrWhiteSpace(name) then return DbNameMissing <| RequestResult.createText(None, "No query was sent to the server. You supplied an empty db name.") else
             let request = createHead props name []
