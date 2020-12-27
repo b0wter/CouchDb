@@ -1,7 +1,7 @@
 #
 # Since this is a library th
 #
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim
 WORKDIR /app
 
 COPY ./*.sln ./
