@@ -19,7 +19,7 @@ module Get =
             async {
                 let! doc = this.GetSingleDocument<Default.T> ()
                 
-                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "foo" defaultAttachment with
+                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev "foo" defaultAttachment with
                 | Ok attachment ->
                     let! result = Attachments.GetBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id "foo"
                     match result with

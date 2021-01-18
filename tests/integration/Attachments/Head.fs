@@ -42,7 +42,7 @@ module Head =
         member this.``Retrieving a newly-added document returns `` () =
             async {
                 let! doc = this.GetSingleDocument<Default.T> ()
-                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "foo" defaultAttachment with
+                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev "foo" defaultAttachment with
                 | Ok attachment ->
                     let! result = Attachments.Head.query Initialization.defaultDbProperties this.DbName doc._id "foo" (Some attachment.Rev)
                     result |> should be (ofCase <@ HttpVerbs.Head.DocumentExists @>)

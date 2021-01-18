@@ -23,7 +23,7 @@ module Delete =
         member this.``Deleting an existing attachment returns Ok result`` () =
             async {
                 let! doc = this.GetSingleDocument<Default.T> ()
-                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "foo" defaultAttachment with
+                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev "foo" defaultAttachment with
                 | Ok attachment ->
                     let! result = Attachments.Delete.query Initialization.defaultDbProperties this.DbName attachment.Id attachment.Rev "foo"
                     result |> should be (ofCase <@ Attachments.Delete.Result.Ok @>)
@@ -79,7 +79,7 @@ module Delete =
         member this.``Deleting an attachment with an old rev returns Conflict result`` () =
             async {
                 let! doc = this.GetSingleDocument<Default.T> ()
-                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "foo" defaultAttachment with
+                match! Attachments.PutBinary.queryAsResult Initialization.defaultDbProperties this.DbName doc._id doc._rev "foo" defaultAttachment with
                 | Ok _ ->
                     let! result = Attachments.Delete.query Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "foo"
                     result |> should be (ofCase <@ Attachments.Delete.Result.Conflict @>)
