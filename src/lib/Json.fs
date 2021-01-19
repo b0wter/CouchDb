@@ -5,20 +5,20 @@ module Json =
     open Newtonsoft.Json
     
     /// List of default converters.
-    let defaultConverters = [ FifteenBelow.Json.OptionConverter () :> Newtonsoft.Json.JsonConverter ]
+    let defaultConverters = [ FifteenBelow.Json.OptionConverter () :> JsonConverter ]
 
     /// Takes a list of converters and turns them into an `IList<JsonConverter>`.
     let private converterListToIList (converters: JsonConverter list) =
-        System.Collections.Generic.List<Newtonsoft.Json.JsonConverter> (converters |> Seq.ofList)
+        System.Collections.Generic.List<JsonConverter> (converters |> Seq.ofList)
 
     /// Default `IList` of json converters.
     let converters = defaultConverters |> converterListToIList
 
     /// Creates a new instance of the default settings.
-    let settings () = Newtonsoft.Json.JsonSerializerSettings(ContractResolver = CamelCasePropertyNamesContractResolver(),
+    let settings () = JsonSerializerSettings(ContractResolver = CamelCasePropertyNamesContractResolver(),
                                                               Converters = converters,
-                                                              Formatting = Newtonsoft.Json.Formatting.Indented,
-                                                              NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)
+                                                              Formatting = Formatting.Indented,
+                                                              NullValueHandling = NullValueHandling.Ignore)
     
     /// This function is run after an object has been serialized. You can use it to tweak the output.
     let mutable postProcessing = fun (serialized: string) -> serialized
@@ -28,7 +28,7 @@ module Json =
         // TODO: make this nice ^^
         let converters = (customs @ defaultConverters) |> converterListToIList
         let settings = settings ()
-        let s = Newtonsoft.Json.JsonSerializerSettings()
+        let s = JsonSerializerSettings()
         do s.Context <- settings.Context
         do s.Culture <- settings.Culture
         do s.ContractResolver <- settings.ContractResolver
@@ -64,9 +64,9 @@ module Json =
 
         let asJObject s : Result<JObject, string> =
             try
-                Ok (Newtonsoft.Json.Linq.JObject.Parse(s))
+                Ok (JObject.Parse(s))
             with
-                | :? Newtonsoft.Json.JsonException as ex -> Error ex.Message
+                | :? JsonException as ex -> Error ex.Message
 
         let getJArray (p: JProperty) =
             match p.Value.Type with
@@ -78,14 +78,14 @@ module Json =
             else Error "JObject does not contain given key."
 
         let toObject<'a> (doc: JObject) =
-            let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
+            let serializer = JsonSerializer.Create(settings())
             try
                 Ok <| doc.ToObject<'a>(serializer)
             with
             | ex -> Error ex.Message
 
         let toObjects<'a> (docs: JObject list) =
-            let serializer = Newtonsoft.Json.JsonSerializer.Create(settings())
+            let serializer = JsonSerializer.Create(settings())
             try
                 Ok (docs |> List.map (fun doc -> 
                     doc.ToObject<'a>(serializer)))

@@ -9,7 +9,7 @@ module Get =
 
     type Response<'a> = HttpVerbs.Get.Response<'a>
 
-    let private designDocumentConverters = [ DesignDocuments.Converter.DesignDocumentConverter() :> Newtonsoft.Json.JsonConverter ]
+    let private designDocumentConverters = [ Converter.DesignDocumentConverter() :> Newtonsoft.Json.JsonConverter ]
 
     let query dbProps dbName id queryParameters =
         async {

@@ -138,7 +138,7 @@ module Core =
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let serialized = serializeAsJson customConverters content
         let request = new HttpRequestMessage(HttpMethod.Post, url)
-        do request.Content <- new StringContent(serialized, Text.Encoding.UTF8, "application/json")
+        do request.Content <- new StringContent(serialized, Encoding.UTF8, "application/json")
         DefaultClient.SendAsync(request) |> Async.AwaitTask
 
     /// <summary>
@@ -181,7 +181,7 @@ module Core =
         let url = combineUrls (p |> DbProperties.baseEndpoint) path + queryParameters
         let json = serializeAsJson customConverters content
         let request = new HttpRequestMessage(HttpMethod.Put, url)
-        do request.Content <- new StringContent(json, Text.Encoding.UTF8, "application/json")
+        do request.Content <- new StringContent(json, Encoding.UTF8, "application/json")
         DefaultClient.SendAsync(request) |> Async.AwaitTask
         // Binary body?
 

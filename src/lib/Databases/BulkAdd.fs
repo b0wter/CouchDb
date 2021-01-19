@@ -55,7 +55,7 @@ module BulkAdd =
     }
     
     type InsertResultConverter() =
-        inherit Newtonsoft.Json.JsonConverter()
+        inherit JsonConverter()
         override this.CanWrite = false
         
         override this.CanConvert(t) =
@@ -68,7 +68,7 @@ module BulkAdd =
             if ``type`` <> typeof<InsertResult> then
                 failwith <| sprintf "The converter has been given a non-matching type. Expected `InsertResult` got `%s`" ``type``.FullName
             else
-                if reader.TokenType = Newtonsoft.Json.JsonToken.Null then
+                if reader.TokenType = JsonToken.Null then
                     failwith "The given token is null!"
                 else
                     let jobject = Newtonsoft.Json.Linq.JObject.Load(reader)
