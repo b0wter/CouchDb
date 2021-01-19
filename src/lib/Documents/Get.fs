@@ -51,7 +51,7 @@ module Get =
     /// <summary>
     /// Runs `query` followed by `asResult`.
     /// </summary>
-    let queryAsResult dbProps dbName id queryParameters = query dbProps dbName id queryParameters |> Async.map HttpVerbs.Get.asResult
+    let queryAsResult<'a> dbProps dbName id queryParameters = query<'a> dbProps dbName id queryParameters |> Async.map HttpVerbs.Get.asResult
     
     /// <summary>
     /// Runs `queryJObject` followed by `asResult`.
