@@ -112,7 +112,7 @@ module Find =
         async {
             match! jObjectsQuery printSerializedOperators props dbName expression with
             | Ok (o, statusCode, headers) -> 
-                match o.Docs |> Json.JObject.toObjects<'a> with
+                match o.Docs |> (Json.JObject.toObjects<'a> []) with
                 | Ok docs -> 
                     return Success ({ Response.Docs = docs; Response.Bookmarks = o.Bookmarks; Response.ExecutionStats = o.ExecutionStats; Response.Warning = o.Warning })
                 | Error e -> 

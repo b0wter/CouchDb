@@ -5,8 +5,11 @@ namespace b0wter.CouchDb.Lib.HttpVerbs
 //
 
 open Newtonsoft.Json
+open Newtonsoft.Json.Linq
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
+open b0wter.CouchDb.Lib.Json
+open b0wter.CouchDb.Lib.Json
 open b0wter.CouchDb.Lib.QueryParameters
 open b0wter.FSharp
 
@@ -96,14 +99,8 @@ module Get =
         | Unknown of RequestResult.StringRequestResult
         
     /// <summary>
-    /// Returns the HTTP Headers containing a minimal amount of information about the specified document.
-    /// The method supports the same query arguments as the GET /{db}/{docid} method, but only the header
-    /// information (including document size, and the revision as an ETag), is returned.
-    ///
-    /// The ETag header shows the current revision for the requested document, and the Content-Length specifies
-    /// the length of the data, if the document were requested in full.
-    ///
-    /// The given `id` will be converted to a string using the ToString() method.
+    /// Returns document by the specified `id` from the specified db.
+    /// Unless you request a specific revision, the latest revision of the document will always be returned.
     /// </summary>
     let query<'a> (props: DbProperties.DbProperties) (url: string) (id: string) (queryParameters: BaseQueryParameter list) (customConverters: JsonConverter list) : Async<Result<'a>> =
         async {
@@ -119,6 +116,27 @@ module Get =
                          match (document, meta) with
                          | (Ok d, Ok m) -> DocumentExists { Meta = m; Content = d }
                          | (Error e, _) -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
+                         | (_, Error e) -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
+                       | Some 401 -> Unauthorized result
+                       | Some 404 -> NotFound result
+                       | _        -> Unknown result
+        }
+        
+    
+    let queryJObject (props: DbProperties.DbProperties) (url: string) (id: string) (queryParameters: BaseQueryParameter list) : Async<Result<JObject>> =
+        async {
+            if id |> String.isNullOrWhiteSpace then
+                return DocumentIdMissing <| RequestResult.createText (None, "The document id is empty. The query has not been sent to the server.")
+            else
+                let request = createGet props url queryParameters
+                let! result = sendTextRequest request
+                return match result.StatusCode with
+                       | Some 200 | Some 304 ->
+                         let jObject = result.Content |> Json.JObject.asJObject
+                         let meta = result.Content |> deserializeJson<MetaFields>
+                         match (jObject, meta) with
+                         | (Ok d, Ok m) -> DocumentExists { Meta = m; Content = d }
+                         | (Error e, _) -> JsonDeserializationError <| RequestResult.createTextWithHeaders (result.StatusCode, e, result.Headers)
                          | (_, Error e) -> JsonDeserializationError <| RequestResult.createForJson(e, result.StatusCode, result.Headers)
                        | Some 401 -> Unauthorized result
                        | Some 404 -> NotFound result

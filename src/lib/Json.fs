@@ -77,15 +77,17 @@ module Json =
             if j.ContainsKey propertyName then Ok (j.Property propertyName)
             else Error "JObject does not contain given key."
 
-        let toObject<'a> (doc: JObject) =
-            let serializer = JsonSerializer.Create(settings())
+        let toObject<'a> (customConverters: JsonConverter list) (doc: JObject) =
+            let settings = settingsWithCustomConverter customConverters
+            let serializer = JsonSerializer.Create(settings)
             try
                 Ok <| doc.ToObject<'a>(serializer)
             with
             | ex -> Error ex.Message
 
-        let toObjects<'a> (docs: JObject list) =
-            let serializer = JsonSerializer.Create(settings())
+        let toObjects<'a> (customConverters: JsonConverter list) (docs: JObject list) =
+            let settings = settingsWithCustomConverter customConverters
+            let serializer = JsonSerializer.Create(settings)
             try
                 Ok (docs |> List.map (fun doc -> 
                     doc.ToObject<'a>(serializer)))

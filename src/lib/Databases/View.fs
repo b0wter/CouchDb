@@ -187,7 +187,7 @@ module View =
             | [] -> 
                 let r = Ok { SingleResponse.Offset = response.Offset; SingleResponse.TotalRows = response.TotalRows; SingleResponse.Rows = (acc |> List.rev) }
                 r
-            | head :: tail -> match head.Value |> Json.JObject.toObject<'value> with
+            | head :: tail -> match head.Value |> Json.JObject.toObject<'value> [] with
                               | Ok converted -> step ({ Id = head.Id; Key = head.Key; Value = converted } :: acc) tail
                               | Error e -> Core.Result<SingleResponse<'key, 'value>, string>.Error e
         step [] response.Rows
