@@ -78,7 +78,7 @@ module Json =
             else Error "JObject does not contain given key."
 
         let toObject<'a> (customConverters: JsonConverter list) (doc: JObject) =
-            let settings = settingsWithCustomConverter customConverters
+            let settings = if customConverters.IsEmpty then settingsWithCustomConverter customConverters else settings ()
             let serializer = JsonSerializer.Create(settings)
             try
                 Ok <| doc.ToObject<'a>(serializer)
@@ -86,7 +86,7 @@ module Json =
             | ex -> Error ex.Message
 
         let toObjects<'a> (customConverters: JsonConverter list) (docs: JObject list) =
-            let settings = settingsWithCustomConverter customConverters
+            let settings = if customConverters.IsEmpty then settingsWithCustomConverter customConverters else settings ()
             let serializer = JsonSerializer.Create(settings)
             try
                 Ok (docs |> List.map (fun doc -> 
