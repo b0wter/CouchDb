@@ -17,10 +17,10 @@ module View =
     let id3 = "94429f08-0b16-4076-be3e-bc47d4deea21"
     let id4 = "9f5f60ca-1225-4a02-9273-ff0984f2a2f2"
 
-    let model1 = DocumentTestModels.Default.create (id1, 1, "one",   "eno",   2.5,  System.DateTime(1980, 1, 1, 12, 0, 0))
-    let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
-    let model3 = DocumentTestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
-    let model4 = DocumentTestModels.Default.create (id4, 3, "four", "rouf", 6.28, System.DateTime(2000, 10, 10, 20, 0, 0))
+    let model1 = DocumentTestModels.Default.create (id1, 1, "one",   "eno",   2.5,  DateTime(1980, 1, 1, 12, 0, 0))
+    let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  DateTime(1990, 10, 10, 20, 0, 0))
+    let model3 = DocumentTestModels.Default.create (id3, 3, "three", "eerht", 3.14, DateTime(2000, 10, 10, 20, 0, 0))
+    let model4 = DocumentTestModels.Default.create (id4, 3, "four", "rouf", 6.28, DateTime(2000, 10, 10, 20, 0, 0))
 
     let designDocId = "b1fbe634-a0b6-40c2-b898-c5c5e4e54f01"
     let view1Name = "all"

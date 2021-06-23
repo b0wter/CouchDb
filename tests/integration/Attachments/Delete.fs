@@ -51,7 +51,7 @@ module Delete =
         [<Fact>]
         member this.``Deleting an attachment with an empty database name returns DbNameMissing result`` () =
             async {
-                let! result = Attachments.Delete.query Initialization.defaultDbProperties System.String.Empty "some id" "some rev" "some attachment name"
+                let! result = Attachments.Delete.query Initialization.defaultDbProperties String.Empty "some id" "some rev" "some attachment name"
                 result |> should be (ofCase<@ Attachments.Delete.Result.DbNameMissing @>)
             }
             

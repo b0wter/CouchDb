@@ -19,24 +19,24 @@ module Find =
     let model2 = DocumentTestModels.Default.create (id2, 2, "one",   "owt",   2.5,  System.DateTime(1990, 10, 10, 20, 0, 0))
     let model3 = DocumentTestModels.Default.create (id3, 3, "three", "eerht", 3.14, System.DateTime(2000, 10, 10, 20, 0, 0))
     
-    let sub1_1 = DocumentTestModels.HierarchicalArray.createSubField (101, "substring", -3.14)
-    let sub1_2 = DocumentTestModels.HierarchicalArray.createSubField (102, "substring", -6.28)
-    let sub2_1 = DocumentTestModels.HierarchicalArray.createSubField (201, "substring", -9.42)
-    let sub2_2 = DocumentTestModels.HierarchicalArray.createSubField (202, "substring", -9.42)
-    let sub3_1 = DocumentTestModels.HierarchicalArray.createSubField (301, "substring", -9.42)
-    let sub3_2 = DocumentTestModels.HierarchicalArray.createSubField (302, "substring", -12.56)
+    let sub1_1 = HierarchicalArray.createSubField (101, "substring", -3.14)
+    let sub1_2 = HierarchicalArray.createSubField (102, "substring", -6.28)
+    let sub2_1 = HierarchicalArray.createSubField (201, "substring", -9.42)
+    let sub2_2 = HierarchicalArray.createSubField (202, "substring", -9.42)
+    let sub3_1 = HierarchicalArray.createSubField (301, "substring", -9.42)
+    let sub3_2 = HierarchicalArray.createSubField (302, "substring", -12.56)
     
-    let hAModel1 = DocumentTestModels.HierarchicalArray.create(id1, 42, "one",   11.1, [ sub1_1; sub1_2 ])
-    let hAModel2 = DocumentTestModels.HierarchicalArray.create(id2, 42, "two",   22.2, [ sub2_1; sub2_2 ])
-    let hAModel3 = DocumentTestModels.HierarchicalArray.create(id3, 42, "three", 33.3, [ sub3_1; sub3_2 ])
+    let hAModel1 = HierarchicalArray.create(id1, 42, "one",   11.1, [ sub1_1; sub1_2 ])
+    let hAModel2 = HierarchicalArray.create(id2, 42, "two",   22.2, [ sub2_1; sub2_2 ])
+    let hAModel3 = HierarchicalArray.create(id3, 42, "three", 33.3, [ sub3_1; sub3_2 ])
     
-    let hModel1 = DocumentTestModels.Hierarchical.create (id1, 42, "one",   11.1, "sub-one", -21, -11.1)
-    let hModel2 = DocumentTestModels.Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
-    let hModel3 = DocumentTestModels.Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
+    let hModel1 = Hierarchical.create (id1, 42, "one",   11.1, "sub-one", -21, -11.1)
+    let hModel2 = Hierarchical.create (id2, 42, "one",   22.2, "sub-two", -42, -22.2)
+    let hModel3 = Hierarchical.create (id3, 42, "three", 33.3, "sub-two", -42, -33.3)
     
-    let hSModel1 = DocumentTestModels.HierarchicalSimpel.create (id1, 42, "one", 11.1, [1;2;3;4])
-    let hSModel2 = DocumentTestModels.HierarchicalSimpel.create (id2, 43, "one", 22.2, [1;2;7;9])
-    let hSModel3 = DocumentTestModels.HierarchicalSimpel.create (id3, 44, "one", 33.3, [1;5;6;9])
+    let hSModel1 = HierarchicalSimpel.create (id1, 42, "one", 11.1, [1;2;3;4])
+    let hSModel2 = HierarchicalSimpel.create (id2, 43, "one", 22.2, [1;2;7;9])
+    let hSModel3 = HierarchicalSimpel.create (id3, 44, "one", 33.3, [1;5;6;9])
     
     type GenericTests() =
         inherit Utilities.PrefilledSingleDatabaseTests("database-find-tests", [ model1; model2; model3 ])
@@ -142,8 +142,8 @@ module Find =
                 let elementSelector = condition "subFloat" (Equal <| Float -9.42)
                 let selector = combination <| ElementMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<DocumentTestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalArray.T>.Success @>)
+                let! result = Databases.Find.query<HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<HierarchicalArray.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
@@ -151,8 +151,8 @@ module Find =
                     let s2 = s.Docs |> List.find (fun x -> x._id = id2)
                     let s3 = s.Docs |> List.find (fun x -> x._id = id3)
                     
-                    do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
-                    do (s3 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel3)
+                    do (s2 |> HierarchicalArray.compareWithoutRev hAModel2)
+                    do (s3 |> HierarchicalArray.compareWithoutRev hAModel3)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
@@ -165,8 +165,8 @@ module Find =
                 let elementSelector = condition "" (Equal <| Integer 9)
                 let selector = combination <| ElementMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<DocumentTestModels.HierarchicalSimpel.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalSimpel.T>.Success @>)
+                let! result = Databases.Find.query<HierarchicalSimpel.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<HierarchicalSimpel.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
@@ -174,8 +174,8 @@ module Find =
                     let s2 = s.Docs |> List.find (fun x -> x._id = id2)
                     let s3 = s.Docs |> List.find (fun x -> x._id = id3)
                     
-                    do (s2 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel2)
-                    do (s3 |> DocumentTestModels.HierarchicalSimpel.compareWithoutRev hSModel3)
+                    do (s2 |> HierarchicalSimpel.compareWithoutRev hSModel2)
+                    do (s3 |> HierarchicalSimpel.compareWithoutRev hSModel3)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
@@ -188,15 +188,15 @@ module Find =
                 let elementSelector = condition "subFloat" (Equal <| Float -9.42)
                 let selector = combination <| AllMatch (elementSelector, "mySubs")
                 let expression = createExpression selector
-                let! result = Databases.Find.query<DocumentTestModels.HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
-                do result |> should be (ofCase <@ Databases.Find.Result<DocumentTestModels.HierarchicalArray.T>.Success @>)
+                let! result = Databases.Find.query<HierarchicalArray.T> Initialization.defaultDbProperties this.DbName expression
+                do result |> should be (ofCase <@ Databases.Find.Result<HierarchicalArray.T>.Success @>)
                 
                 match result with
                 | Databases.Find.Result.Success s ->
                     do s.Docs |> should haveLength 1
                     let s2 = s.Docs |> List.find (fun x -> x._id = id2)
                     
-                    do (s2 |> DocumentTestModels.HierarchicalArray.compareWithoutRev hAModel2)
+                    do (s2 |> HierarchicalArray.compareWithoutRev hAModel2)
                 | _ -> failwith "This non-matching union case should have been caught earlier! Please fix the test!"
             }
             
