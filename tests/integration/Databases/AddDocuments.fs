@@ -34,7 +34,11 @@ module AddDocument =
             }
             
         [<Fact>]
-        member this.``Adding a document using an invalid database name returns InvalidDbName`` () =
+        member this.``Adding a document using an invalid database name returns NotFound`` () =
+            // As of 12.07.2021 the documentation states that providing an invalid db name should return
+            // '400 Bad Request - invalid database name'
+            // but that is not the implemented (or desired) behaviour:
+            // https://github.com/apache/couchdb/issues/2246
             async {
                 let! result = Databases.AddDocument.query Initialization.defaultDbProperties "00-this-[is]-{an}-inv@lid-name" DocumentTestModels.Default.defaultInstance
                 result |> should be (ofCase <@ Databases.AddDocument.Result.DbDoesNotExist @>)
