@@ -1,8 +1,8 @@
 namespace b0wter.CouchDb.Lib
 
-module Exception =
-    open b0wter.FSharp
+open Utilities
 
+module Exception =
     /// Creates a string of the format:
     /// [$ExceptionType] $ExceptionMessage
     let formatForLog (ex: System.Exception) =

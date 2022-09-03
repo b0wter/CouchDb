@@ -1,7 +1,6 @@
 namespace b0wter.CouchDb.Lib.DesignDocuments
 
 module DesignDocument =
-    open System
     open Newtonsoft.Json
     open Newtonsoft.Json.Linq
 

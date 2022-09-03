@@ -1,9 +1,8 @@
 namespace b0wter.CouchDb.Lib.Databases
 open b0wter.CouchDb.Lib
+open Utilities
 
 module BulkUpdate =
-    
-    open b0wter.FSharp
     
     type Result
         /// Document(s) have been created or updated (201)

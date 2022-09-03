@@ -2,7 +2,6 @@ namespace b0wter.CouchDb.Lib
 
 module RequestResult =
     
-    open Utilities
     open System
     
     type Headers = Map<string, string>

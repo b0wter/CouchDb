@@ -6,9 +6,9 @@ namespace b0wter.CouchDb.Lib.Databases
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
-open b0wter.FSharp
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
+open Utilities
 
 module View =
 

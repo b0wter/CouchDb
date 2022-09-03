@@ -6,7 +6,7 @@ namespace b0wter.CouchDb.Lib.Server
 
 open b0wter.CouchDb.Lib.Core
 open b0wter.CouchDb.Lib
-open b0wter.FSharp
+open Utilities
 
 module AllDbs =
     type Response = string list

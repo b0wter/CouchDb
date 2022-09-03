@@ -6,10 +6,9 @@ namespace b0wter.CouchDb.Lib.Indexes
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
-open b0wter.FSharp
 open Newtonsoft.Json.Linq
 open Newtonsoft.Json
-open System.Collections.Generic
+open Utilities
 
 module Get =
 

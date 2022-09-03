@@ -8,10 +8,8 @@ open Newtonsoft.Json
 open Newtonsoft.Json.Linq
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
-open b0wter.CouchDb.Lib.Json
-open b0wter.CouchDb.Lib.Json
 open b0wter.CouchDb.Lib.QueryParameters
-open b0wter.FSharp
+open Utilities
 
 module Get =
     

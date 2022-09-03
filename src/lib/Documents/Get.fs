@@ -5,7 +5,7 @@ module Get =
 
     open Newtonsoft.Json.Linq
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
+    open Utilities
 
     type Result<'a> = HttpVerbs.Get.Result<'a>
 

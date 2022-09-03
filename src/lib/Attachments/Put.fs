@@ -3,9 +3,9 @@ namespace b0wter.CouchDb.Lib.Attachments
 module PutBinary =
 
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
     open b0wter.CouchDb.Lib.Core
     open b0wter.CouchDb.Lib.QueryParameters
+    open Utilities
 
     type Response = {
         Id: string

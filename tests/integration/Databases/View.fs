@@ -8,7 +8,6 @@ module View =
     open Xunit
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
-    open b0wter.CouchDb.Lib.Mango
     open b0wter.FSharp.Collections
     open FsUnit.CustomMatchers
 

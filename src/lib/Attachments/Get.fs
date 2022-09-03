@@ -2,7 +2,7 @@ namespace b0wter.CouchDb.Lib.Attachments
 
 module GetText =
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
+    open Utilities
 
     type Result<'a> = HttpVerbs.Get.Result<'a>
 
@@ -30,7 +30,6 @@ module GetText =
     
 module GetBinary =
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
     
     type Response = byte []
     
@@ -44,8 +43,8 @@ module GetBinary =
     
     let queryWith dbProps dbName docId attachmentName queryParameters =
         async {
-            if docId |> String.isNullOrWhiteSpace then return DocumentIdMissing (RequestResult.createBinary (None, [||]))
-            else if attachmentName |> String.isNullOrWhiteSpace then return AttachmentNameMissing (RequestResult.createBinary (None, [||]))
+            if docId |> Utilities.String.isNullOrWhiteSpace then return DocumentIdMissing (RequestResult.createBinary (None, [||]))
+            else if attachmentName |> Utilities.String.isNullOrWhiteSpace then return AttachmentNameMissing (RequestResult.createBinary (None, [||]))
             else
                 let url = (sprintf "%s/%s/%s" dbName (docId |> string)) attachmentName
                 let request = Core.createGet dbProps url queryParameters
@@ -70,6 +69,6 @@ module GetBinary =
         | Unknown e -> Error <| ErrorRequestResult.fromBinaryRequestResultAndCase(e, r)
         
     let queryWithAsResult dbProps dbName docId attachmentName queryParameters =
-        queryWith dbProps dbName docId attachmentName queryParameters |> Async.map asResult
+        queryWith dbProps dbName docId attachmentName queryParameters |> Utilities.Async.map asResult
     
-    let queryAsResult dbProps dbName docId attachmentName = query dbProps dbName docId attachmentName |> Async.map asResult
+    let queryAsResult dbProps dbName docId attachmentName = query dbProps dbName docId attachmentName |> Utilities.Async.map asResult

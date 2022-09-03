@@ -6,9 +6,8 @@ namespace b0wter.CouchDb.Lib.Databases
 
 open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
-open b0wter.FSharp
 open QueryParameters
-open b0wter.CouchDb.Lib
+open Utilities
 
 module Create =
     

@@ -3,7 +3,7 @@ namespace b0wter.CouchDb.Lib.Documents
 module Delete =
 
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
+    open Utilities
 
     type Result = HttpVerbs.Delete.Result
 

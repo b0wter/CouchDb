@@ -1,11 +1,10 @@
 namespace b0wter.CouchDb.Lib.Databases
 open Newtonsoft.Json
 open b0wter.CouchDb.Lib
-open b0wter.CouchDb.Lib.Json
+open Utilities
 
 module BulkAdd =
     
-    open b0wter.FSharp
     open b0wter.CouchDb.Lib.Core
     
     type Success = {

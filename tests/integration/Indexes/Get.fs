@@ -7,7 +7,6 @@ module GetIndices =
     open b0wter.CouchDb.Lib
     open b0wter.CouchDb.Tests.Integration
     open FsUnit.CustomMatchers
-    open Newtonsoft.Json.Linq
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("db-tests")

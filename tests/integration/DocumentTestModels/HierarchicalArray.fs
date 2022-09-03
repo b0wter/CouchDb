@@ -2,7 +2,6 @@ namespace b0wter.CouchDb.Tests.Integration.DocumentTestModels
 
 module HierarchicalArray =
     open FsUnit.Xunit
-    open System
     
     type SubField = {
         subInt: int

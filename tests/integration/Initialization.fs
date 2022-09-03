@@ -1,9 +1,7 @@
 namespace b0wter.CouchDb.Tests.Integration
 
-open System.Collections.Generic
 open b0wter.CouchDb.Lib
 open b0wter.FSharp
-open b0wter.FSharp.Operators
 open Microsoft.Extensions.Configuration
 
 module Initialization =

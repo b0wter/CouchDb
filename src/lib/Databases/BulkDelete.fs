@@ -3,8 +3,8 @@ namespace b0wter.CouchDb.Lib.Databases
 module BulkDelete =
     
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
     open Newtonsoft.Json
+    open Utilities
     
     type Result
         /// Document(s) have been created or updated (201). *Beware*, CouchDb returns created

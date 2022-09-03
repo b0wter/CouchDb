@@ -3,7 +3,7 @@ namespace b0wter.CouchDb.Lib.Documents
 module Copy =
 
     open b0wter.CouchDb.Lib
-    open b0wter.FSharp
+    open Utilities
 
     type Result = HttpVerbs.Copy.Result
 

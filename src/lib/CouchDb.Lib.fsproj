@@ -8,8 +8,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Exception.fs" />
     <Compile Include="Utilities.fs" />
+    <Compile Include="Exception.fs" />
     <Compile Include="Json.fs" />
     <Compile Include="Credentials.fs" />
     <Compile Include="DbProperties.fs" />
@@ -78,6 +78,5 @@
     <PackageReference Update="FSharp.Core" Version="4.7.0" />
     <PackageReference Include="FifteenBelow.Json.Core" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="*" />
-    <PackageReference Include="b0wter.FSharp" Version="4.10.0" />
   </ItemGroup>
 </Project>
