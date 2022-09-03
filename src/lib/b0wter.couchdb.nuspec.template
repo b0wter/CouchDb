@@ -28,7 +28,6 @@
     </metadata>
     <files>
         <file src="CouchDb.Lib.fsproj" target="src"/>
-        <file src="*.fs" target="src"/>
         <file src="**/*.fs" target="src"/>
         <file src="bin/Release/netstandard2.0/b0wter.CouchDb.dll" target="lib/netstandard2.0"/>
         <file src="bin/Release/netstandard2.0/b0wter.CouchDb.xml" target="lib/netstandard2.0"/>
