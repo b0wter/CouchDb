@@ -38,7 +38,7 @@ module Delete =
                 // https://github.com/apache/couchdb/issues/2146
                 let! doc = this.GetSingleDocument<Default.T> ()
                 let! result = Attachments.Delete.query Initialization.defaultDbProperties this.DbName doc._id doc._rev.Value "non-existing attachment"
-                result |> should be (ofCase<@ Attachments.Delete.Result.Ok @>)
+                result |> should be (ofCase<@ Attachments.Delete.Result.NotFound @>)
             }
             
         [<Fact>]

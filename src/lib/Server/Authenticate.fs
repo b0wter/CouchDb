@@ -15,10 +15,9 @@ module Authenticate =
     }
     
     type Response = {
-        CouchDb: string
-        Uuid: string
-        Version: string
-        Vendor: Vendor    
+        Ok: bool
+        Name: string
+        Roles: string list
     }
     
     type Result
