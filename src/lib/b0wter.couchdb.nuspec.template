@@ -12,19 +12,14 @@
         <description>Easy to use library to talk to CouchDb from F#.</description>
         <tags>database couchdb fsharp</tags>
         <dependencies>
-		<group targetFramework=".NETStandard2.0" />
-        </dependencies>
-        <dependencies>
-		<dependency id="FifteenBelow.Json.Core" version="1.0.0" />
-		<dependency id="b0wter.FSharp" version="4.7.0" />
-		<dependency id="Newtonsoft.Json" version="12.0.2" />
+			<group targetFramework="netstandard2.0">
+				<dependency id="FifteenBelow.Json.Core" version="1.0.0" />
+				<dependency id="Newtonsoft.Json" version="12.0.2" />
+			</group>
         </dependencies>
         <contentFiles>
             <files include="bin/Release/netstandard2.0/b0wter.CouchDb.xml" buildAction="content" flatten="true" copyToOutput="true"/>
         </contentFiles>
-        <dependencies>
-            <group targetFramework=".netstandard2.0" />
-        </dependencies>
     </metadata>
     <files>
         <file src="CouchDb.Lib.fsproj" target="src"/>
