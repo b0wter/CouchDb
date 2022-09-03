@@ -18,6 +18,6 @@ module Put =
                 return! HttpVerbs.Put.query<'a> dbProps url [] docId docRev document
         }
 
-    let queryAsResult dbProps dbName docId docRev document = query dbProps dbName docId docRev document |> Async.map HttpVerbs.Put.asResult
+    let queryAsResult<'a> dbProps dbName docId docRev document = query<'a> dbProps dbName docId docRev document |> Async.map HttpVerbs.Put.asResult
 
     let asResult = HttpVerbs.Put.asResult
