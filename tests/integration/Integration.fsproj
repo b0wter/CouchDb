@@ -86,7 +86,7 @@
     <Compile Include="Attachments/Delete.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Partitions\Get.fs" />
+    <Compile Include="Partitions\Infos.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

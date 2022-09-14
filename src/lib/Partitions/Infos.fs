@@ -9,7 +9,7 @@ open b0wter.CouchDb.Lib.Core
 open Newtonsoft.Json
 open Utilities
 
-module Get =
+module Infos =
     
     type Response = {
         [<JsonProperty("db_name")>]

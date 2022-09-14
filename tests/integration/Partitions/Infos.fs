@@ -1,6 +1,6 @@
 namespace b0wter.CouchDb.Tests.Integration.Partitions
 
-module Get =
+module Infos =
     
     open FsUnit.Xunit
     open Xunit
@@ -23,12 +23,12 @@ module Get =
         [<Fact>]
         member this.``Querying an existing partitioned database for partition details returns Success-result`` () =
             async {
-                let! result = Partitions.Get.query Initialization.defaultDbProperties this.DbName "foo"
+                let! result = Partitions.Infos.query Initialization.defaultDbProperties this.DbName "foo"
                 
-                result |> should be (ofCase <@ Partitions.Get.Result.Success @>)
+                result |> should be (ofCase <@ Partitions.Infos.Result.Success @>)
                 
                 match result with
-                | Partitions.Get.Result.Success response ->
+                | Partitions.Infos.Result.Success response ->
                     response.Partition |> should equal "foo"
                     response.DbName |> should equal this.DbName
                     response.DocumentCount |> should equal 3
