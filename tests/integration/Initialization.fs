@@ -66,11 +66,11 @@ module Initialization =
     /// <summary>
     /// Creates a database using the default db properties.
     /// </summary>
-    let createDatabases (names: string list) : Async<Result<bool, string>> =
+    let createDatabases (isPartitioned: bool) (names: string list) : Async<Result<bool, string>> =
         async {
             let queries = names |> List.map (fun name ->
                 async {
-                    match! Databases.Create.query defaultDbProperties name [] with
+                    match! Databases.Create.query defaultDbProperties name [ Databases.Create.QueryParameters.Partitioned isPartitioned ] with
                     | Databases.Create.Result.Unauthorized x ->  return Error (sprintf "[%s] %s: %s" name "unauthorized" x.Content)
                     | Databases.Create.Result.AlreadyExists x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.Content)
                     | Databases.Create.Result.InvalidDbName x -> return Error (sprintf "[%s] %s: %s" name "unknown" x.Content)

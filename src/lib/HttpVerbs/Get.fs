@@ -61,11 +61,11 @@ module Get =
         Content: 'a
     }
     
-    type Result<'a>
+    type Result<'a> =
         /// <summary>
         /// Document exists
         /// </summary>
-        = DocumentExists of Response<'a>
+        | DocumentExists of Response<'a>
         /// <summary>
         /// Document wasn’t modified since specified revision
         /// </summary>

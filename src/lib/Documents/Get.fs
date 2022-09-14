@@ -1,6 +1,5 @@
 namespace b0wter.CouchDb.Lib.Documents
 
-
 module Get =
 
     open Newtonsoft.Json.Linq

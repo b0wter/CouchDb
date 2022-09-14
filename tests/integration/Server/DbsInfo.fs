@@ -30,7 +30,7 @@ module DbsInfo =
                         info.DiskFormatVersion |> should be (greaterThan 0)
                     | None -> failwith <| sprintf "The response does not contain a proper Info instance for database: '%s'." response.Key
                     
-                do match Initialization.createDatabases [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously with Ok _ -> () | Error e -> failwith e
+                do match Initialization.createDatabases false [ "test-db-1"; "test-db-2" ] |> Async.RunSynchronously with Ok _ -> () | Error e -> failwith e
                     
                 let! result = Server.DbsInfo.query Initialization.defaultDbProperties [ "test-db-1"; "test-db-2" ]
                 match result with

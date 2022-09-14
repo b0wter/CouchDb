@@ -18,11 +18,11 @@ module Head =
         ETag: string
     }
     
-    type Result
+    type Result =
         /// <summary>
         /// Document exists
         /// </summary>
-        = DocumentExists of Response
+        | DocumentExists of Response
         /// <summary>
         /// Document wasn’t modified since specified revision
         /// </summary>

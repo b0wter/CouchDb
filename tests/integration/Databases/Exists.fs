@@ -15,7 +15,7 @@ module Exists =
         member this.``Querying for an existing database returns Exists-result`` () =
             async {
                let dbNames = [ "exists-test-db-1"; "exists-test-db-2" ]
-               match! Initialization.createDatabases dbNames with
+               match! Initialization.createDatabases false dbNames with
                | Ok _ ->
                    let! result = Databases.Exists.query Initialization.defaultDbProperties dbNames.Head
                    result |> should be (ofCase<@ Databases.Exists.Result.Exists @>)

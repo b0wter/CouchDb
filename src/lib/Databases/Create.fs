@@ -16,6 +16,8 @@ module Create =
         let ShardRangePartition q = IntQueryParameter("q", q)
         /// `n`: Replicas. The number of copies of the database in the cluster. The default is 3, unless overridden in the cluster config .
         let Replicas r = IntQueryParameter("r", r)
+        /// `partitioned`: Whether to create a partitioned database. Default is false.
+        let Partitioned p = BoolQueryParameter("partitioned", p)
     
     type Response = {
         Ok: bool

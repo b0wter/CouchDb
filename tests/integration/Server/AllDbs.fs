@@ -15,7 +15,7 @@ module AllDbs =
         member this.``Querying all databases on a prefilled database returns all databases`` () =
             async {
                 let dbNames = [ "test-db-1"; "test-db-2"; "test-db-3" ]
-                match! Initialization.createDatabases dbNames with
+                match! Initialization.createDatabases false dbNames with
                 | Ok _ ->
                     let! result = Server.AllDbs.query Initialization.defaultDbProperties
                     match result with

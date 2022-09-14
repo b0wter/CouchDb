@@ -36,10 +36,10 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type EmptyMultiDatabaseTests(dbNames: string list) =
+    type EmptyMultiDatabaseTests(dbNames: string list, shouldPartition: bool) =
         inherit DatabaseTests ()
         do if dbNames |> List.exists (System.String.IsNullOrWhiteSpace) then failwith "dbNames must not be empty!" else
-           do Initialization.createDatabases dbNames
+           do Initialization.createDatabases shouldPartition dbNames
               |> Async.RunSynchronously
               |> (fun x -> match x with
                            | Ok _ -> ()
@@ -51,7 +51,7 @@ module Utilities =
         /// <summary>
         /// Instatiate without creating databases.
         /// </summary>
-        new() = EmptyMultiDatabaseTests([])
+        new() = EmptyMultiDatabaseTests([], false)
         
         (*
         /// <summary>
@@ -75,10 +75,10 @@ module Utilities =
     /// may require the same databases.
     /// </remarks>
     [<AbstractClass>]
-    type EmptySingleDatabaseTests(dbName: string) =
+    type EmptySingleDatabaseTests(dbName: string, shouldPartition: bool) =
         inherit DatabaseTests ()
         do if System.String.IsNullOrWhiteSpace(dbName) then failwith "If you supply a dbName it must not be empty." else
-           do Initialization.createDatabases [ dbName ]
+           do Initialization.createDatabases shouldPartition [ dbName ]
               |> Async.RunSynchronously
               |> (fun x -> match x with
                            | Ok _ -> ()
@@ -91,6 +91,11 @@ module Utilities =
         /// Instatiate without creating databases.
         /// </summary>
         new() = EmptySingleDatabaseTests()
+        
+        /// <summary>
+        /// Instatiate with creating a non-partitioned databases.
+        /// </summary>
+        new(dbName) = EmptySingleDatabaseTests(dbName, false)
         
         /// Will run a create query for the supplied database name and `toRun` afterwards.
         (*
@@ -105,8 +110,8 @@ module Utilities =
     /// Removes all databases and creates the a database names 'dbName' and
     /// inserts all given 'documents'.
     [<AbstractClass>]
-    type PrefilledSingleDatabaseTests(dbName: string, documents: obj list) =
-        inherit EmptySingleDatabaseTests (dbName)
+    type PrefilledSingleDatabaseTests(dbName: string, documents: obj list, shouldPartition: bool) =
+        inherit EmptySingleDatabaseTests (dbName, shouldPartition)
         let addDocument obj = Databases.AddDocument.query Initialization.defaultDbProperties dbName obj
                               |> Async.RunSynchronously
         let result = documents |> List.map addDocument
@@ -139,4 +144,4 @@ module Utilities =
                                  else if r.Docs.Length > 1 then failwith "Tried to retrieve the single document from the database but it has more than one document."
                                  else failwith "Getting the single document failed for unknown reasons."
                          )
-            
+        new(dbName, documents) = PrefilledSingleDatabaseTests(dbName, documents, false)

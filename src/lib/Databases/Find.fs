@@ -43,9 +43,9 @@ module Find =
         Bookmarks: string option
     }
 
-    type Result<'a>
+    type Result<'a> =
         /// Request completed successfully
-        = Success of Response<'a>
+        | Success of Response<'a>
         /// Invalid request
         | BadRequest of RequestResult.StringRequestResult
         /// Read permission required

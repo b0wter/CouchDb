@@ -10,7 +10,6 @@ module Infos =
     
     type Tests() =
         inherit Utilities.EmptySingleDatabaseTests("db-tests")
-        
 
         [<Fact>]
         member this.``Retrieving database info for an existing database returns infos`` () =
