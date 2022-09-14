@@ -14,7 +14,7 @@ module QueryParameters =
         
     type BoolQueryParameter(key, value: bool) =
         inherit TypedQueryParameter<bool>(key, value)
-        override this.AsString = (this.Value |> string)
+        override this.AsString = (this.Value |> string).ToLower()
         
     type TrueQueryParameter(key) =
         inherit BoolQueryParameter(key, true)
@@ -28,7 +28,7 @@ module QueryParameters =
         
     type StringListQueryParameter(key, value: string list) =
         inherit TypedQueryParameter<string list>(key, value)
-        override this.AsString = (System.String.Join(",", this.Value))
+        override this.AsString = System.String.Join(",", this.Value)
         
     type IntQueryParameter(key, value: int) =
         inherit TypedQueryParameter<int>(key, value)
