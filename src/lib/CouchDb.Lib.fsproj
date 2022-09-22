@@ -74,6 +74,7 @@
     <Compile Include="Attachments/Put.fs" />
     <Compile Include="Attachments/Delete.fs" />
     <Compile Include="Partitions\Infos.fs" />
+    <Compile Include="Partitions\AllDocs.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />

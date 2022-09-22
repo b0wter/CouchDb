@@ -8,7 +8,6 @@ open b0wter.CouchDb.Lib
 open b0wter.CouchDb.Lib.Core
 open Newtonsoft.Json
 open Newtonsoft.Json.Linq
-open Utilities
 
 module View =
 
@@ -196,7 +195,7 @@ module View =
     /// Allows the definition of query parameters. These will be sent in the POST body (not as query parameters in a GET request).
     let queryWith<'key, 'value> (props: DbProperties.DbProperties) (dbName: string) (designDoc: string) (view: string) (queryParameters: QueryParameters) : Async<Result<'key, 'value>> =
         async {
-            match! jObjectsQuery props dbName designDoc view queryParameters with
+            match! jObjectsQuery<'key> props dbName designDoc view queryParameters with
             | Ok (o, statusCode, headers) -> 
                 match o with
                 | Response.Single s -> 
@@ -235,18 +234,18 @@ module View =
         queryJObjectsWith<'key> props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
 
     /// Runs `queryObjects` followed by `asResult`.
-    let queryJObjectsWithAsResult props dbName designDoc view queryParameters =
-        queryJObjectsWith props dbName designDoc view queryParameters |> Async.map asResult
+    let queryJObjectsWithAsResult<'key> props dbName designDoc view queryParameters =
+        queryJObjectsWith<'key> props dbName designDoc view queryParameters |> Utilities.Async.map asResult
 
     /// Runs `queryObjectsWith` followed by `asResult`.
-    let queryJObjectsAsResult props dbName designDoc view =
-        queryJObjectsWithAsResult props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
+    let queryJObjectsAsResult<'key> props dbName designDoc view =
+        queryJObjectsWithAsResult<'key> props dbName designDoc view (QueryParameters.Single EmptyQueryParameters)
         
     /// Runs `queryWith` followed by `asResult`.
-    let queryWithAsResult<'key, 'value> props dbName designDoc view queryParameters = queryWith<'key, 'value> props dbName designDoc view queryParameters |> Async.map asResult
+    let queryWithAsResult<'key, 'value> props dbName designDoc view queryParameters = queryWith<'key, 'value> props dbName designDoc view queryParameters |> Utilities.Async.map asResult
 
     /// Runs `query` followed by `asResult`.
-    let queryAsResult<'key, 'value> props dbName designDoc view = query<'key, 'value> props dbName designDoc view |> Async.map asResult
+    let queryAsResult<'key, 'value> props dbName designDoc view = query<'key, 'value> props dbName designDoc view |> Utilities.Async.map asResult
 
     /// Returns all rows of a response in a single list.
     /// If the response is a `Response.Multi` then the items of all lists will be collected.
