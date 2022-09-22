@@ -234,7 +234,7 @@ type MyRecord = {
 ```
 In case you miss these attributes CouchDb will assign these values on its own. But since their names are unknown to the deserializer these values will never be used. Thus, updating a document will result in the creation of a new document!
 
-Why use this approach? I could define interfaces are make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
+Why use this approach? I could define interfaces or make the requirement that all objects need to be inherited from an abstract base class but I want to keep things as simple as possible.
 
 Hint: In most cases it's pretty handy to add a "constant property" to all records that specifies the type. This helps you to restrict queries to certain types of entities. Since records are compiled to classes the following adds a readonly property to `MyRecord` that does not need to be specified when creating a new instance:
 ```
