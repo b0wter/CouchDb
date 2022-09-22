@@ -7,11 +7,13 @@
         <owners>b0wter (b0wter@gmx.de)</owners>
         <projectUrl>https://github.com/b0wter/CouchDb</projectUrl>
 		<readme>README.md</readme>
+		<title>F# CouchDb Client</title>
         <license type="expression">GPL-3.0-only</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <releaseNotes>%RELEASE_NOTES%</releaseNotes>
         <description>Easy to use library to talk to CouchDb from F#.</description>
         <tags>database couchdb fsharp</tags>
+		<repository type="git" url="https://github.com/b0wter/CouchDb.git" branch="master" commit="%COMMIT%" />
         <dependencies>
 			<group targetFramework="netstandard2.0">
 				<dependency id="FifteenBelow.Json.Core" version="1.0.0" />

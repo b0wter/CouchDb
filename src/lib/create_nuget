@@ -6,9 +6,11 @@ set -e
 GIT_TAG=$(git describe --tags --abbrev=0)
 GIT_TAG=$(echo "${GIT_TAG//v}")
 GIT_MESSAGE=$(git for-each-ref --format="%(subject) %(body)" refs/tags | tail -n 1)
+GIT_COMMIT=$(git rev-parse HEAD)
 echo "Latest tag: $GIT_TAG; Latest commit: $GIT_MESSAGE"
 echo "Creating temporary nuspec file from template."
 sed "s|%VERSION%|$GIT_TAG|g" b0wter.couchdb.nuspec.template > b0wter.couchdb.nuspec
+sed -i "s|%COMMIT%|$GIT_COMMIT|g" b0wter.couchdb.nuspec
 sed -i 's|%RELEASE_NOTES%|'"$GIT_MESSAGE"'|g' b0wter.couchdb.nuspec
 
 echo "Packing release."
