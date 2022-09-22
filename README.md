@@ -107,8 +107,18 @@ Design Documents endpoint
 | /db/_design/design-doc/_update/update-name        |      |     | ❌   |     |        |      |
 | /db/_design/design-doc/_update/update-name/doc-id |      |     |      | ❌  |        |      |
 
-
 The `show`, `list` and `rewrite` functions for design documents will not be implemented since the feature will be removed with CouchDb 4.0.
+
+Partition endpoint
+------------------
+| Endpoint                                                    | HEAD | GET | POST | PUT | DELETE | COPY |
+|-------------------------------------------------------------|------|-----|------|-----|--------|------|
+| /db/_partition/partition                                    |      | ✔️   |      |     |        |      |
+| /db/_partition/partition/_all_docs                          |      | ✔️   |      |     |        |      |
+| /db/_partition/partition/_design/design-doc/_view/view-name |      | ❌  |      |     |        |      |
+| /db/_partition/partition_id/_find                           |      |     | ❌   |     |        |      |
+| /db/_partition/partition_id/_explain                        |      |     | ❌   |     |        |      |
+
 
 How-to
 ======
