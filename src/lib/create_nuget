@@ -14,4 +14,4 @@ sed -i "s|%COMMIT%|$GIT_COMMIT|g" b0wter.couchdb.nuspec
 sed -i 's|%RELEASE_NOTES%|'"$GIT_MESSAGE"'|g' b0wter.couchdb.nuspec
 
 echo "Packing release."
-dotnet pack -c "Release" --no-build
+dotnet pack -c "Release"
