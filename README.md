@@ -7,6 +7,8 @@ This project is currently in development. Please consult the tables below to see
 
 You can get the library from [nuget](https://www.nuget.org/packages/b0wter.CouchDb/).
 
+I am currently developing this library with CouchDb version 3.2.2 as its target.
+
 Contributing
 ------------
 Contributions (bug fixes, features, ...) are very welcome! Please submit a pull request. I will merge the PR if it satisfies the following requirements:
