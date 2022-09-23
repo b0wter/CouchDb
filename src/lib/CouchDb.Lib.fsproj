@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generic\Find.fs" />
+    <Compile Include="Generic\View.fs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Server/AllDbs.fs" />
@@ -79,6 +80,7 @@
     <Compile Include="Partitions\Infos.fs" />
     <Compile Include="Partitions\AllDocs.fs" />
     <Compile Include="Partitions\Find.fs" />
+    <Compile Include="Partitions\View.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.0" />

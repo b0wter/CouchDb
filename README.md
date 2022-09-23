@@ -115,7 +115,7 @@ Partition endpoint
 |-------------------------------------------------------------|------|-----|------|-----|--------|------|
 | /db/_partition/partition                                    |      | ✔️   |      |     |        |      |
 | /db/_partition/partition/_all_docs                          |      | ✔️   |      |     |        |      |
-| /db/_partition/partition/_design/design-doc/_view/view-name |      | ❌  |      |     |        |      |
+| /db/_partition/partition/_design/design-doc/_view/view-name |      | ✔️   |      |     |        |      |
 | /db/_partition/partition_id/_find                           |      |     | ✔️    |     |        |      |
 | /db/_partition/partition_id/_explain                        |      |     | ❌   |     |        |      |
 

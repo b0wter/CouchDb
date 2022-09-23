@@ -89,6 +89,7 @@
     <Compile Include="Partitions\Infos.fs" />
     <Compile Include="Partitions\AllDocs.fs" />
     <Compile Include="Partitions\Find.fs" />
+    <Compile Include="Partitions\View.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
